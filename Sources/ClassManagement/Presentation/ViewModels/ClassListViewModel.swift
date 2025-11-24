@@ -51,4 +51,52 @@ public final class ClassListViewModel: ObservableObject {
             }
         }
     }
+    
+    public var todayClasses: [Class] {
+        let today = Calendar.current.component(.weekday, from: Date())
+        let dayOfWeek = DayOfWeek.fromWeekday(today)
+        
+        return classes.filter { classItem in
+            classItem.schedule.contains { $0.dayOfWeek == dayOfWeek }
+        }
+    }
+    
+    public var upcomingClasses: [Class] {
+        todayClasses.sorted { class1, class2 in
+            guard let time1 = class1.nextClassTime,
+                  let time2 = class2.nextClassTime else {
+                return false
+            }
+            return time1 < time2
+        }
+    }
 }
+
+extension DayOfWeek {
+    static func fromWeekday(_ weekday: Int) -> DayOfWeek {
+        switch weekday {
+        case 1: return .sunday
+        case 2: return .monday
+        case 3: return .tuesday
+        case 4: return .wednesday
+        case 5: return .thursday
+        case 6: return .friday
+        case 7: return .saturday
+        default: return .monday
+        }
+    }
+}
+
+extension Class {
+    var nextClassTime: Date? {
+        let today = Calendar.current.component(.weekday, from: Date())
+        let dayOfWeek = DayOfWeek.fromWeekday(today)
+        
+        return schedule
+            .filter { $0.dayOfWeek == dayOfWeek }
+            .map { $0.startTime }
+            .sorted()
+            .first { $0 > Date() }
+    }
+}
+

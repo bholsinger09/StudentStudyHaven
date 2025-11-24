@@ -1,3 +1,10 @@
+//
+//  RootView.swift
+//  StudentStudyHaven
+//
+//  Created by Ben H on 11/24/25.
+//
+
 import SwiftUI
 import Core
 import Authentication
@@ -84,127 +91,6 @@ struct ClassesTab: View {
                 userId: appState.currentUser?.id ?? UUID()
             )
         }
-    }
-}
-
-/// Class list view
-struct ClassListView: View {
-    let userId: UUID
-    @EnvironmentObject var appState: AppState
-    @State private var classes: [Class] = []
-    @State private var isLoading = false
-    @State private var showingAddClass = false
-    
-    var body: some View {
-        Group {
-            if isLoading {
-                ProgressView()
-            } else if classes.isEmpty {
-                EmptyClassesView {
-                    showingAddClass = true
-                }
-            } else {
-                List {
-                    ForEach(classes) { classItem in
-                        NavigationLink(destination: ClassDetailView(classItem: classItem)) {
-                            ClassRow(classItem: classItem)
-                        }
-                    }
-                    .onDelete { indexSet in
-                        deleteClasses(at: indexSet)
-                    }
-                }
-            }
-        }
-        .navigationTitle("My Classes")
-        .toolbar {
-            ToolbarItem(placement: .primaryAction) {
-                Button(action: { showingAddClass = true }) {
-                    Image(systemName: "plus")
-                }
-            }
-        }
-        .sheet(isPresented: $showingAddClass) {
-            AddClassView(viewModel: ClassFormViewModel(
-                createClassUseCase: CreateClassUseCase(classRepository: appState.classRepository),
-                updateClassUseCase: UpdateClassUseCase(classRepository: appState.classRepository),
-                userId: userId
-            ))
-        }
-        .task {
-            await loadClasses()
-        }
-    }
-    
-    private func loadClasses() async {
-        isLoading = true
-        do {
-            let useCase = GetClassesUseCase(classRepository: appState.classRepository)
-            classes = try await useCase.execute(userId: userId)
-        } catch {
-            print("Error loading classes: \(error)")
-        }
-        isLoading = false
-    }
-    
-    private func deleteClasses(at offsets: IndexSet) {
-        Task {
-            let useCase = DeleteClassUseCase(classRepository: appState.classRepository)
-            for index in offsets {
-                do {
-                    try await useCase.execute(classId: classes[index].id)
-                    classes.remove(at: index)
-                } catch {
-                    print("Error deleting class: \(error)")
-                }
-            }
-        }
-    }
-}
-
-/// Empty state for classes
-struct EmptyClassesView: View {
-    let onAddClass: () -> Void
-    
-    var body: some View {
-        VStack(spacing: 20) {
-            Image(systemName: "book.closed.fill")
-                .font(.system(size: 60))
-                .foregroundColor(.blue)
-            
-            Text("No Classes Yet")
-                .font(.title2)
-                .fontWeight(.semibold)
-            
-            Text("Add your first class to get started")
-                .font(.subheadline)
-                .foregroundColor(.secondary)
-            
-            Button(action: onAddClass) {
-                Label("Add Class", systemImage: "plus")
-                    .font(.headline)
-                    .foregroundColor(.white)
-                    .padding()
-                    .background(Color.blue)
-                    .cornerRadius(12)
-            }
-        }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-    }
-}
-
-struct ClassRow: View {
-    let classItem: Class
-    
-    var body: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            Text(classItem.name)
-                .font(.headline)
-            Text(classItem.courseCode)
-                .font(.subheadline)
-                .foregroundColor(.secondary)
-        }
-        .padding(.vertical, 4)
     }
 }
 

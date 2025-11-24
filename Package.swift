@@ -10,6 +10,9 @@ let package = Package(
         .macOS(.v13)
     ],
     products: [
+        .executable(
+            name: "StudentStudyHaven",
+            targets: ["App"]),
         .library(
             name: "Core",
             targets: ["Core"]),
@@ -28,6 +31,12 @@ let package = Package(
     ],
     dependencies: [],
     targets: [
+        // MARK: - App Target
+        .executableTarget(
+            name: "App",
+            dependencies: ["Core", "Authentication", "ClassManagement", "Flashcards", "Notes"],
+            path: "Sources/App"),
+        
         // MARK: - Core Module
         .target(
             name: "Core",

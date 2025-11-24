@@ -28,21 +28,31 @@ public struct RegisterView: View {
                 VStack(spacing: 16) {
                     TextField("Full Name", text: $viewModel.name)
                         .textFieldStyle(.roundedBorder)
-                        .textContentType(.name)
                     
                     TextField("Email", text: $viewModel.email)
                         .textFieldStyle(.roundedBorder)
-                        .textContentType(.emailAddress)
-                        .autocapitalization(.none)
-                        .keyboardType(.emailAddress)
                     
                     SecureField("Password", text: $viewModel.password)
                         .textFieldStyle(.roundedBorder)
-                        .textContentType(.newPassword)
                     
                     SecureField("Confirm Password", text: $viewModel.confirmPassword)
                         .textFieldStyle(.roundedBorder)
-                        .textContentType(.newPassword)
+                    
+                    // College Selection Button
+                    Button(action: {
+                        // Show college selection
+                    }) {
+                        HStack {
+                            Text(viewModel.selectedCollegeId != nil ? "College Selected" : "Select College (Optional)")
+                            Spacer()
+                        Image(systemName: "chevron.right")
+                            .foregroundColor(.secondary)
+                    }
+                    .padding()
+                    .background(Color.gray.opacity(0.1))
+                    .cornerRadius(8)
+                }
+                .buttonStyle(.plain)
                     
                     if let errorMessage = viewModel.errorMessage {
                         Text(errorMessage)
@@ -79,7 +89,6 @@ public struct RegisterView: View {
             }
         }
         .navigationTitle("Register")
-        .navigationBarTitleDisplayMode(.inline)
         .onChange(of: viewModel.isRegistered) { isRegistered in
             if isRegistered {
                 dismiss()

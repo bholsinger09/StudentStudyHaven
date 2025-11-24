@@ -33,25 +33,25 @@ public struct Class: Identifiable, Codable, Equatable {
         self.createdAt = createdAt
         self.updatedAt = updatedAt
     }
-}
-
-/// Represents a time slot for a class
-public struct TimeSlot: Codable, Equatable, Identifiable {
-    public let id: UUID
-    public var dayOfWeek: DayOfWeek
-    public var startTime: Date
-    public var endTime: Date
     
-    public init(
-        id: UUID = UUID(),
-        dayOfWeek: DayOfWeek,
-        startTime: Date,
-        endTime: Date
-    ) {
-        self.id = id
-        self.dayOfWeek = dayOfWeek
-        self.startTime = startTime
-        self.endTime = endTime
+    /// Represents a time slot for a class
+    public struct TimeSlot: Codable, Equatable, Identifiable {
+        public let id: UUID
+        public var dayOfWeek: DayOfWeek
+        public var startTime: Date
+        public var endTime: Date
+        
+        public init(
+            id: UUID = UUID(),
+            dayOfWeek: DayOfWeek,
+            startTime: Date,
+            endTime: Date
+        ) {
+            self.id = id
+            self.dayOfWeek = dayOfWeek
+            self.startTime = startTime
+            self.endTime = endTime
+        }
     }
 }
 

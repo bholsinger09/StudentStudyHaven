@@ -29,9 +29,6 @@ public struct LoginView: View {
                 VStack(spacing: 16) {
                     TextField("Email", text: $viewModel.email)
                         .textFieldStyle(.roundedBorder)
-                        .textContentType(.emailAddress)
-                        .autocapitalization(.none)
-                        .keyboardType(.emailAddress)
                     
                     SecureField("Password", text: $viewModel.password)
                         .textFieldStyle(.roundedBorder)
@@ -81,7 +78,6 @@ public struct LoginView: View {
                 }
                 .padding(.bottom, 32)
             }
-            .navigationBarHidden(true)
         }
     }
 }

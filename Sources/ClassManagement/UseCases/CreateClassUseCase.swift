@@ -25,7 +25,7 @@ public final class CreateClassUseCase {
         return try await classRepository.createClass(classItem)
     }
     
-    private func validateTimeSlots(_ timeSlots: [TimeSlot]) throws {
+    private func validateTimeSlots(_ timeSlots: [Class.TimeSlot]) throws {
         let sortedSlots = timeSlots.sorted { $0.startTime < $1.startTime }
         
         for i in 0..<sortedSlots.count {

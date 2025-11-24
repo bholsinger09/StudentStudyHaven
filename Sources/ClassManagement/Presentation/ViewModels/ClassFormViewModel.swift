@@ -9,7 +9,7 @@ public final class ClassFormViewModel: ObservableObject {
     @Published public var courseCode: String = ""
     @Published public var professor: String = ""
     @Published public var location: String = ""
-    @Published public var timeSlots: [TimeSlot] = []
+    @Published public var timeSlots: [Class.TimeSlot] = []
     @Published public var isLoading: Bool = false
     @Published public var errorMessage: String?
     @Published public var isSaved: Bool = false
@@ -70,7 +70,7 @@ public final class ClassFormViewModel: ObservableObject {
         isLoading = false
     }
     
-    public func addTimeSlot(_ timeSlot: TimeSlot) {
+    public func addTimeSlot(_ timeSlot: Class.TimeSlot) {
         timeSlots.append(timeSlot)
     }
     

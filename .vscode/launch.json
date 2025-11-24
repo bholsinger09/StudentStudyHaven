@@ -1,0 +1,24 @@
+{
+    "configurations": [
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:StudentStudyHaven}",
+            "name": "Debug StudentStudyHaven",
+            "target": "StudentStudyHaven",
+            "configuration": "debug",
+            "preLaunchTask": "swift: Build Debug StudentStudyHaven"
+        },
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:StudentStudyHaven}",
+            "name": "Release StudentStudyHaven",
+            "target": "StudentStudyHaven",
+            "configuration": "release",
+            "preLaunchTask": "swift: Build Release StudentStudyHaven"
+        }
+    ]
+}
