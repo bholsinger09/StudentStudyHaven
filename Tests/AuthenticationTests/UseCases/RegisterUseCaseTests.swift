@@ -1,23 +1,24 @@
 import XCTest
+
 @testable import Authentication
 @testable import Core
 
 final class RegisterUseCaseTests: XCTestCase {
     var mockRepository: MockAuthRepository!
     var sut: RegisterUseCase!
-    
+
     override func setUp() {
         super.setUp()
         mockRepository = MockAuthRepository()
         sut = RegisterUseCase(authRepository: mockRepository)
     }
-    
+
     override func tearDown() {
         sut = nil
         mockRepository = nil
         super.tearDown()
     }
-    
+
     func testRegisterWithValidData() async throws {
         // Given
         let data = RegistrationData(
@@ -26,21 +27,22 @@ final class RegisterUseCaseTests: XCTestCase {
             name: "Test User"
         )
         let expectedUser = User(email: data.email, name: data.name)
-        mockRepository.registerResult = .success(AuthSession(
-            user: expectedUser,
-            token: "test-token",
-            expiresAt: Date().addingTimeInterval(3600)
-        ))
-        
+        mockRepository.registerResult = .success(
+            AuthSession(
+                user: expectedUser,
+                token: "test-token",
+                expiresAt: Date().addingTimeInterval(3600)
+            ))
+
         // When
         let session = try await sut.execute(data: data)
-        
+
         // Then
         XCTAssertEqual(session.user.email, data.email)
         XCTAssertEqual(session.user.name, data.name)
         XCTAssertEqual(mockRepository.registerCallCount, 1)
     }
-    
+
     func testRegisterWithEmptyEmail() async {
         // Given
         let data = RegistrationData(
@@ -48,7 +50,7 @@ final class RegisterUseCaseTests: XCTestCase {
             password: "password123",
             name: "Test User"
         )
-        
+
         // When/Then
         do {
             _ = try await sut.execute(data: data)
@@ -63,7 +65,7 @@ final class RegisterUseCaseTests: XCTestCase {
             XCTFail("Wrong error type")
         }
     }
-    
+
     func testRegisterWithShortPassword() async {
         // Given
         let data = RegistrationData(
@@ -71,7 +73,7 @@ final class RegisterUseCaseTests: XCTestCase {
             password: "short",
             name: "Test User"
         )
-        
+
         // When/Then
         do {
             _ = try await sut.execute(data: data)
@@ -86,7 +88,7 @@ final class RegisterUseCaseTests: XCTestCase {
             XCTFail("Wrong error type")
         }
     }
-    
+
     func testRegisterWithEmptyName() async {
         // Given
         let data = RegistrationData(
@@ -94,7 +96,7 @@ final class RegisterUseCaseTests: XCTestCase {
             password: "password123",
             name: ""
         )
-        
+
         // When/Then
         do {
             _ = try await sut.execute(data: data)
@@ -109,7 +111,7 @@ final class RegisterUseCaseTests: XCTestCase {
             XCTFail("Wrong error type")
         }
     }
-    
+
     func testRegisterWithInvalidEmailFormat() async {
         // Given
         let data = RegistrationData(
@@ -117,7 +119,7 @@ final class RegisterUseCaseTests: XCTestCase {
             password: "password123",
             name: "Test User"
         )
-        
+
         // When/Then
         do {
             _ = try await sut.execute(data: data)

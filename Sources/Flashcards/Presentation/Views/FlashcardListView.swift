@@ -1,16 +1,16 @@
-import SwiftUI
 import Core
 import Flashcards
+import SwiftUI
 
 /// Flashcard list view
 public struct FlashcardListView: View {
     @StateObject private var viewModel: FlashcardListViewModel
     @State private var showingStudyView = false
-    
+
     public init(viewModel: FlashcardListViewModel) {
         _viewModel = StateObject(wrappedValue: viewModel)
     }
-    
+
     public var body: some View {
         Group {
             if viewModel.isLoading {
@@ -25,33 +25,33 @@ public struct FlashcardListView: View {
                             HStack {
                                 ZStack {
                                     Circle()
-                                        .fill(Color.green.opacity(0.2))
+                                        .fill(Color(red: 0.73, green: 0.33, blue: 0.83).opacity(0.2))
                                         .frame(width: 50, height: 50)
-                                    
+
                                     Image(systemName: "play.fill")
                                         .font(.title3)
-                                        .foregroundColor(.green)
+                                        .foregroundColor(Color(red: 0.73, green: 0.33, blue: 0.83))
                                 }
-                                
+
                                 VStack(alignment: .leading, spacing: 4) {
                                     Text("Start Studying")
                                         .font(.headline)
-                                        .foregroundColor(.primary)
-                                    
+                                        .foregroundColor(.white)
+
                                     Text("\(viewModel.flashcards.count) cards ready to review")
                                         .font(.caption)
-                                        .foregroundColor(.secondary)
+                                        .foregroundColor(.gray)
                                 }
-                                
+
                                 Spacer()
-                                
+
                                 Image(systemName: "chevron.right")
-                                    .foregroundColor(.secondary)
+                                    .foregroundColor(.gray)
                             }
                             .padding(.vertical, 8)
                         }
                     }
-                    
+
                     // Flashcards List
                     Section("All Flashcards") {
                         ForEach(viewModel.flashcards) { flashcard in
@@ -59,6 +59,8 @@ public struct FlashcardListView: View {
                         }
                     }
                 }
+                .scrollContentBackground(.hidden)
+                .background(Color.black)
             }
         }
         .navigationTitle("Flashcards")
@@ -92,27 +94,28 @@ public struct FlashcardListView: View {
 /// Flashcard row in list
 struct FlashcardListRow: View {
     let flashcard: Flashcard
-    
+
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
                 Text(flashcard.front)
                     .font(.headline)
-                
+                    .foregroundColor(.white)
+
                 Spacer()
-                
+
                 if flashcard.lastReviewedAt != nil {
                     Image(systemName: "checkmark.circle.fill")
-                        .foregroundColor(.green)
+                        .foregroundColor(Color(red: 0.73, green: 0.33, blue: 0.83))
                         .font(.caption)
                 }
             }
-            
+
             Text(flashcard.back)
                 .font(.subheadline)
-                .foregroundColor(.secondary)
+                .foregroundColor(.gray)
                 .lineLimit(2)
-            
+
             if let lastReviewed = flashcard.lastReviewedAt {
                 HStack {
                     Image(systemName: "clock")
@@ -120,7 +123,7 @@ struct FlashcardListRow: View {
                     Text("Last reviewed \(lastReviewed, style: .relative)")
                         .font(.caption2)
                 }
-                .foregroundColor(.secondary)
+                .foregroundColor(.gray)
             }
         }
         .padding(.vertical, 4)
@@ -130,46 +133,58 @@ struct FlashcardListRow: View {
 /// Empty state for flashcards
 struct EmptyFlashcardsStateView: View {
     var body: some View {
-        VStack(spacing: 24) {
-            Image(systemName: "rectangle.stack")
-                .font(.system(size: 70))
-                .foregroundColor(.green.opacity(0.5))
+        ZStack {
+            // Black background
+            Color.black
+                .ignoresSafeArea()
             
-            VStack(spacing: 8) {
-                Text("No Flashcards Yet")
-                    .font(.title2)
-                    .fontWeight(.bold)
-                
-                Text("Create flashcards manually or generate them from your notes")
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
-                    .multilineTextAlignment(.center)
-                    .padding(.horizontal, 40)
-            }
-            
-            VStack(spacing: 12) {
-                Button(action: {}) {
-                    Label("Create Flashcard", systemImage: "plus")
-                        .font(.headline)
+            VStack(spacing: 24) {
+                Image(systemName: "rectangle.stack")
+                    .font(.system(size: 70))
+                    .foregroundColor(Color(red: 0.73, green: 0.33, blue: 0.83))
+
+                VStack(spacing: 8) {
+                    Text("No Flashcards Yet")
+                        .font(.title2)
+                        .fontWeight(.bold)
                         .foregroundColor(.white)
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(Color.green)
-                        .cornerRadius(12)
+
+                    Text("Create flashcards manually or generate them from your notes")
+                        .font(.subheadline)
+                        .foregroundColor(.gray)
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal, 40)
                 }
-                
-                Button(action: {}) {
-                    Label("Generate from Notes", systemImage: "wand.and.stars")
-                        .font(.headline)
-                        .foregroundColor(.green)
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(Color.green.opacity(0.1))
-                        .cornerRadius(12)
+
+                VStack(spacing: 12) {
+                    Button(action: {}) {
+                        Label("Create Flashcard", systemImage: "plus")
+                            .font(.headline)
+                            .fontWeight(.semibold)
+                            .foregroundColor(Color(red: 0.9, green: 0.4, blue: 0.5))
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(Color(red: 0.0, green: 0.2, blue: 0.4))
+                            .cornerRadius(12)
+                            .shadow(color: Color(red: 0.0, green: 0.2, blue: 0.4).opacity(0.3), radius: 8, x: 0, y: 4)
+                    }
+                    .buttonStyle(.plain)
+
+                    Button(action: {}) {
+                        Label("Generate from Notes", systemImage: "wand.and.stars")
+                            .font(.headline)
+                            .fontWeight(.semibold)
+                            .foregroundColor(Color(red: 0.73, green: 0.33, blue: 0.83))
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(Color.white.opacity(0.1))
+                            .cornerRadius(12)
+                    }
+                    .buttonStyle(.plain)
                 }
+                .padding(.horizontal, 40)
             }
-            .padding(.horizontal, 40)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 }

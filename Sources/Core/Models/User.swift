@@ -2,18 +2,18 @@ import Foundation
 
 /// Core domain model representing a User in the system
 public struct User: Identifiable, Codable, Equatable {
-    public let id: UUID
+    public let id: String
     public var email: String
     public var name: String
-    public var collegeId: UUID?
+    public var collegeId: String?
     public var createdAt: Date
     public var updatedAt: Date
-    
+
     public init(
-        id: UUID = UUID(),
+        id: String = UUID().uuidString,
         email: String,
         name: String,
-        collegeId: UUID? = nil,
+        collegeId: String? = nil,
         createdAt: Date = Date(),
         updatedAt: Date = Date()
     ) {

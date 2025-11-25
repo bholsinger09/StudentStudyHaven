@@ -1,14 +1,14 @@
-import SwiftUI
-import Core
 import Authentication
 import ClassManagement
+import Core
 import Flashcards
 import Notes
+import SwiftUI
 
 /// Root view that handles authentication state
 struct RootView: View {
     @EnvironmentObject var appState: AppState
-    
+
     var body: some View {
         if appState.isAuthenticated {
             MainTabView()
@@ -21,7 +21,7 @@ struct RootView: View {
 /// Authentication coordinator
 struct AuthenticationCoordinator: View {
     @EnvironmentObject var appState: AppState
-    
+
     var body: some View {
         LoginView(
             viewModel: LoginViewModel(
@@ -41,24 +41,24 @@ struct AuthenticationCoordinator: View {
 /// Main tab view after authentication
 struct MainTabView: View {
     @EnvironmentObject var appState: AppState
-    
+
     var body: some View {
         TabView {
             ClassesTab()
                 .tabItem {
                     Label("Classes", systemImage: "book.fill")
                 }
-            
+
             NotesTab()
                 .tabItem {
                     Label("Notes", systemImage: "note.text")
                 }
-            
+
             FlashcardsTab()
                 .tabItem {
                     Label("Flashcards", systemImage: "rectangle.stack.fill")
                 }
-            
+
             ProfileTab()
                 .tabItem {
                     Label("Profile", systemImage: "person.fill")
@@ -70,13 +70,14 @@ struct MainTabView: View {
 /// Classes tab
 struct ClassesTab: View {
     @EnvironmentObject var appState: AppState
-    
+
     var body: some View {
         NavigationStack {
             ClassManagement.ClassListView(
                 viewModel: ClassListViewModel(
                     getClassesUseCase: GetClassesUseCase(classRepository: appState.classRepository),
-                    deleteClassUseCase: DeleteClassUseCase(classRepository: appState.classRepository),
+                    deleteClassUseCase: DeleteClassUseCase(
+                        classRepository: appState.classRepository),
                     userId: appState.currentUser?.id ?? UUID()
                 ),
                 createClassUseCase: CreateClassUseCase(classRepository: appState.classRepository),
@@ -94,7 +95,7 @@ struct ClassListView: View {
     @State private var classes: [Class] = []
     @State private var isLoading = false
     @State private var showingAddClass = false
-    
+
     var body: some View {
         Group {
             if isLoading {
@@ -125,17 +126,20 @@ struct ClassListView: View {
             }
         }
         .sheet(isPresented: $showingAddClass) {
-            AddClassView(viewModel: ClassFormViewModel(
-                createClassUseCase: CreateClassUseCase(classRepository: appState.classRepository),
-                updateClassUseCase: UpdateClassUseCase(classRepository: appState.classRepository),
-                userId: userId
-            ))
+            AddClassView(
+                viewModel: ClassFormViewModel(
+                    createClassUseCase: CreateClassUseCase(
+                        classRepository: appState.classRepository),
+                    updateClassUseCase: UpdateClassUseCase(
+                        classRepository: appState.classRepository),
+                    userId: userId
+                ))
         }
         .task {
             await loadClasses()
         }
     }
-    
+
     private func loadClasses() async {
         isLoading = true
         do {
@@ -146,7 +150,7 @@ struct ClassListView: View {
         }
         isLoading = false
     }
-    
+
     private func deleteClasses(at offsets: IndexSet) {
         Task {
             let useCase = DeleteClassUseCase(classRepository: appState.classRepository)
@@ -165,21 +169,21 @@ struct ClassListView: View {
 /// Empty state for classes
 struct EmptyClassesView: View {
     let onAddClass: () -> Void
-    
+
     var body: some View {
         VStack(spacing: 20) {
             Image(systemName: "book.closed.fill")
                 .font(.system(size: 60))
                 .foregroundColor(.blue)
-            
+
             Text("No Classes Yet")
                 .font(.title2)
                 .fontWeight(.semibold)
-            
+
             Text("Add your first class to get started")
                 .font(.subheadline)
                 .foregroundColor(.secondary)
-            
+
             Button(action: onAddClass) {
                 Label("Add Class", systemImage: "plus")
                     .font(.headline)
@@ -195,7 +199,7 @@ struct EmptyClassesView: View {
 
 struct ClassRow: View {
     let classItem: Class
-    
+
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
             Text(classItem.name)
@@ -214,17 +218,19 @@ struct NotesTab: View {
     @State private var notes: [Note] = []
     @State private var selectedClass: Class?
     @State private var showingNoteEditor = false
-    
+
     var body: some View {
         NavigationStack {
             List {
                 ForEach(notes) { note in
-                    NavigationLink(destination: 
-                        NoteEditorView(viewModel: NoteEditorViewModel(
-                            note: note,
-                            classId: note.classId,
-                            userId: appState.currentUser?.id ?? UUID()
-                        ))
+                    NavigationLink(
+                        destination:
+                            NoteEditorView(
+                                viewModel: NoteEditorViewModel(
+                                    note: note,
+                                    classId: note.classId,
+                                    userId: appState.currentUser?.id ?? UUID()
+                                ))
                     ) {
                         NoteRowView(note: note)
                     }
@@ -240,10 +246,11 @@ struct NotesTab: View {
             }
             .sheet(isPresented: $showingNoteEditor) {
                 if let classId = selectedClass?.id ?? appState.currentUser?.collegeId {
-                    NoteEditorView(viewModel: NoteEditorViewModel(
-                        classId: classId,
-                        userId: appState.currentUser?.id ?? UUID()
-                    ))
+                    NoteEditorView(
+                        viewModel: NoteEditorViewModel(
+                            classId: classId,
+                            userId: appState.currentUser?.id ?? UUID()
+                        ))
                 }
             }
         }
@@ -253,17 +260,17 @@ struct NotesTab: View {
 /// Note row view
 struct NoteRowView: View {
     let note: Note
-    
+
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
             Text(note.title)
                 .font(.headline)
-            
+
             Text(note.content.prefix(100))
                 .font(.caption)
                 .foregroundColor(.secondary)
                 .lineLimit(2)
-            
+
             if !note.tags.isEmpty {
                 HStack(spacing: 4) {
                     ForEach(note.tags.prefix(3), id: \.self) { tag in
@@ -283,7 +290,7 @@ struct FlashcardsTab: View {
     @EnvironmentObject var appState: AppState
     @State private var flashcards: [Flashcard] = []
     @State private var showingStudyView = false
-    
+
     var body: some View {
         NavigationStack {
             Group {
@@ -310,7 +317,7 @@ struct FlashcardsTab: View {
                                 .padding(.vertical, 8)
                             }
                         }
-                        
+
                         Section("All Flashcards") {
                             ForEach(flashcards) { flashcard in
                                 FlashcardRowView(flashcard: flashcard)
@@ -332,7 +339,7 @@ struct FlashcardsTab: View {
 /// Flashcard row view
 struct FlashcardRowView: View {
     let flashcard: Flashcard
-    
+
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
             Text(flashcard.front)
@@ -353,11 +360,11 @@ struct EmptyFlashcardsView: View {
             Image(systemName: "rectangle.stack.fill")
                 .font(.system(size: 60))
                 .foregroundColor(.green)
-            
+
             Text("No Flashcards Yet")
                 .font(.title2)
                 .fontWeight(.semibold)
-            
+
             Text("Create notes and generate flashcards to start studying")
                 .font(.subheadline)
                 .foregroundColor(.secondary)
@@ -371,7 +378,7 @@ struct EmptyFlashcardsView: View {
 /// Profile tab
 struct ProfileTab: View {
     @EnvironmentObject var appState: AppState
-    
+
     var body: some View {
         NavigationStack {
             List {
@@ -383,7 +390,7 @@ struct ProfileTab: View {
                             Text(user.name)
                                 .foregroundColor(.secondary)
                         }
-                        
+
                         HStack {
                             Text("Email")
                             Spacer()
@@ -392,13 +399,16 @@ struct ProfileTab: View {
                         }
                     }
                 }
-                
+
                 Section {
-                    Button(role: .destructive, action: {
-                        Task {
-                            await appState.logout()
+                    Button(
+                        role: .destructive,
+                        action: {
+                            Task {
+                                await appState.logout()
+                            }
                         }
-                    }) {
+                    ) {
                         HStack {
                             Spacer()
                             Text("Logout")

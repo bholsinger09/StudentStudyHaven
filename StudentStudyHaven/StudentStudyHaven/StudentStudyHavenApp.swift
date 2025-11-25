@@ -5,34 +5,34 @@
 //  Created by Ben H on 11/24/25.
 //
 
-import SwiftUI
-import Core
 import Authentication
 import ClassManagement
+import Core
 import Flashcards
 import Notes
+import SwiftUI
 
 @main
 struct StudentStudyHavenApp: App {
-    // @StateObject private var appState = AppState()
+    @StateObject private var appState = AppState()
     
     var body: some Scene {
         WindowGroup {
             TestLoginView()
+                .environmentObject(appState)
         }
     }
-}
-
-struct TestLoginView: View {
+}struct TestLoginView: View {
     @State private var email = "demo@studyhaven.com"
     @State private var password = "Demo2025!"
     @State private var showingMainApp = false
+    @EnvironmentObject var appState: AppState
     @Environment(\.colorScheme) var colorScheme
-    
+
     var body: some View {
         ZStack {
             backgroundGradient
-            
+
             VStack(spacing: 30) {
                 headerSection
                 loginFormSection
@@ -44,7 +44,7 @@ struct TestLoginView: View {
             DemoMainView()
         }
     }
-    
+
     private var backgroundGradient: some View {
         LinearGradient(
             colors: colorScheme == .dark ? darkColors : lightColors,
@@ -53,23 +53,23 @@ struct TestLoginView: View {
         )
         .ignoresSafeArea()
     }
-    
+
     private var darkColors: [Color] {
         [
             Color(red: 0.15, green: 0.05, blue: 0.20),
             Color(red: 0.20, green: 0.10, blue: 0.25),
-            Color(red: 0.25, green: 0.15, blue: 0.30)
+            Color(red: 0.25, green: 0.15, blue: 0.30),
         ]
     }
-    
+
     private var lightColors: [Color] {
         [
             Color(red: 0.95, green: 0.85, blue: 0.98),
             Color(red: 0.90, green: 0.75, blue: 0.95),
-            Color(red: 0.85, green: 0.65, blue: 0.90)
+            Color(red: 0.85, green: 0.65, blue: 0.90),
         ]
     }
-    
+
     private var headerSection: some View {
         VStack(spacing: 8) {
             Image(systemName: "book.circle.fill")
@@ -82,18 +82,18 @@ struct TestLoginView: View {
                     )
                 )
                 .shadow(color: .purple.opacity(0.3), radius: 10, x: 0, y: 5)
-            
+
             Text("Student Study Haven")
                 .font(.system(size: 32, weight: .bold, design: .rounded))
                 .foregroundColor(colorScheme == .dark ? .white : .purple)
-            
+
             Text("Your academic companion")
                 .font(.subheadline)
                 .foregroundColor(colorScheme == .dark ? .white.opacity(0.7) : .purple.opacity(0.7))
         }
         .padding(.top, 40)
     }
-    
+
     private var loginFormSection: some View {
         VStack(spacing: 20) {
             emailField
@@ -107,45 +107,67 @@ struct TestLoginView: View {
         .overlay(formBorder)
         .padding(.horizontal, 40)
     }
-    
+
     private var emailField: some View {
         VStack(alignment: .leading, spacing: 8) {
             Label("Email", systemImage: "envelope.fill")
                 .font(.subheadline)
                 .foregroundColor(colorScheme == .dark ? .pink : .purple)
                 .fontWeight(.medium)
-            
+
             TextField("student@university.edu", text: $email)
                 .textFieldStyle(.plain)
                 .padding()
-                .background(colorScheme == .dark ? Color.white.opacity(0.15) : Color.white.opacity(0.95))
+                .background(
+                    colorScheme == .dark ? Color.white.opacity(0.15) : Color.white.opacity(0.95)
+                )
                 .foregroundColor(colorScheme == .dark ? .white : .primary)
                 .cornerRadius(12)
-                .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.purple.opacity(0.3), lineWidth: 1))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 12).stroke(
+                        Color.purple.opacity(0.3), lineWidth: 1)
+                )
                 .shadow(color: .purple.opacity(0.2), radius: 8, x: 0, y: 4)
         }
     }
-    
+
     private var passwordField: some View {
         VStack(alignment: .leading, spacing: 8) {
             Label("Password", systemImage: "lock.fill")
                 .font(.subheadline)
                 .foregroundColor(colorScheme == .dark ? .pink : .purple)
                 .fontWeight(.medium)
-            
+
             SecureField("Enter your password", text: $password)
                 .textFieldStyle(.plain)
                 .padding()
-                .background(colorScheme == .dark ? Color.white.opacity(0.15) : Color.white.opacity(0.95))
+                .background(
+                    colorScheme == .dark ? Color.white.opacity(0.15) : Color.white.opacity(0.95)
+                )
                 .foregroundColor(colorScheme == .dark ? .white : .primary)
                 .cornerRadius(12)
-                .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.purple.opacity(0.3), lineWidth: 1))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 12).stroke(
+                        Color.purple.opacity(0.3), lineWidth: 1)
+                )
                 .shadow(color: .purple.opacity(0.2), radius: 8, x: 0, y: 4)
         }
     }
-    
+
     private var signInButton: some View {
-        Button(action: { showingMainApp = true }) {
+        Button(action: { 
+            // Create a demo user and log in
+            let demoUser = User(
+                id: UUID(),
+                name: "Demo User",
+                email: email,
+                collegeId: UUID(),
+                collegeName: "Demo University",
+                createdAt: Date()
+            )
+            appState.login(user: demoUser)
+            showingMainApp = true
+        }) {
             HStack {
                 Text("Sign In")
                     .font(.headline)
@@ -154,14 +176,16 @@ struct TestLoginView: View {
             .foregroundColor(.white)
             .frame(maxWidth: .infinity)
             .padding()
-            .background(LinearGradient(colors: [.purple, .pink], startPoint: .leading, endPoint: .trailing))
+            .background(
+                LinearGradient(colors: [.purple, .pink], startPoint: .leading, endPoint: .trailing)
+            )
             .cornerRadius(12)
             .shadow(color: .purple.opacity(0.5), radius: 10, x: 0, y: 6)
         }
         .buttonStyle(.plain)
         .padding(.top, 10)
     }
-    
+
     private var signUpLink: some View {
         HStack {
             Text("Don't have an account?")
@@ -174,7 +198,7 @@ struct TestLoginView: View {
         }
         .font(.subheadline)
     }
-    
+
     private var demoCredentials: some View {
         VStack(spacing: 4) {
             Text("Demo Account")
@@ -190,7 +214,7 @@ struct TestLoginView: View {
         }
         .padding(.top, 8)
     }
-    
+
     private var formBackground: some View {
         RoundedRectangle(cornerRadius: 20)
             .fill(colorScheme == .dark ? Color.white.opacity(0.1) : Color.white.opacity(0.4))
@@ -201,17 +225,19 @@ struct TestLoginView: View {
                 y: 10
             )
     }
-    
+
     private var formBorder: some View {
         RoundedRectangle(cornerRadius: 20)
-            .stroke(colorScheme == .dark ? Color.purple.opacity(0.3) : Color.white.opacity(0.5), lineWidth: 1)
+            .stroke(
+                colorScheme == .dark ? Color.purple.opacity(0.3) : Color.white.opacity(0.5),
+                lineWidth: 1)
     }
 }
 
 // Demo main app view to show after login
 struct DemoMainView: View {
     @Environment(\.dismiss) var dismiss
-    
+
     var body: some View {
         TabView {
             NavigationStack {
@@ -219,16 +245,18 @@ struct DemoMainView: View {
                     Image(systemName: "book.fill")
                         .font(.system(size: 60))
                         .foregroundStyle(
-                            LinearGradient(colors: [.purple, .pink], startPoint: .topLeading, endPoint: .bottomTrailing)
+                            LinearGradient(
+                                colors: [.purple, .pink], startPoint: .topLeading,
+                                endPoint: .bottomTrailing)
                         )
                     Text("Classes")
                         .font(.largeTitle)
                         .fontWeight(.bold)
                     Text("Your class schedule and management")
                         .foregroundColor(.secondary)
-                    
+
                     Spacer()
-                    
+
                     Button("Logout") {
                         dismiss()
                     }
@@ -240,13 +268,15 @@ struct DemoMainView: View {
             .tabItem {
                 Label("Classes", systemImage: "book.fill")
             }
-            
+
             NavigationStack {
                 VStack(spacing: 20) {
                     Image(systemName: "note.text")
                         .font(.system(size: 60))
                         .foregroundStyle(
-                            LinearGradient(colors: [.purple, .pink], startPoint: .topLeading, endPoint: .bottomTrailing)
+                            LinearGradient(
+                                colors: [.purple, .pink], startPoint: .topLeading,
+                                endPoint: .bottomTrailing)
                         )
                     Text("Notes")
                         .font(.largeTitle)
@@ -260,13 +290,15 @@ struct DemoMainView: View {
             .tabItem {
                 Label("Notes", systemImage: "note.text")
             }
-            
+
             NavigationStack {
                 VStack(spacing: 20) {
                     Image(systemName: "rectangle.stack.fill")
                         .font(.system(size: 60))
                         .foregroundStyle(
-                            LinearGradient(colors: [.purple, .pink], startPoint: .topLeading, endPoint: .bottomTrailing)
+                            LinearGradient(
+                                colors: [.purple, .pink], startPoint: .topLeading,
+                                endPoint: .bottomTrailing)
                         )
                     Text("Flashcards")
                         .font(.largeTitle)
@@ -280,18 +312,20 @@ struct DemoMainView: View {
             .tabItem {
                 Label("Flashcards", systemImage: "rectangle.stack.fill")
             }
-            
+
             NavigationStack {
                 VStack(spacing: 20) {
                     Image(systemName: "person.circle.fill")
                         .font(.system(size: 60))
                         .foregroundStyle(
-                            LinearGradient(colors: [.purple, .pink], startPoint: .topLeading, endPoint: .bottomTrailing)
+                            LinearGradient(
+                                colors: [.purple, .pink], startPoint: .topLeading,
+                                endPoint: .bottomTrailing)
                         )
                     Text("Profile")
                         .font(.largeTitle)
                         .fontWeight(.bold)
-                    
+
                     VStack(spacing: 8) {
                         Text("Demo User")
                             .font(.headline)
@@ -300,9 +334,9 @@ struct DemoMainView: View {
                             .foregroundColor(.secondary)
                     }
                     .padding()
-                    
+
                     Spacer()
-                    
+
                     Button("Logout") {
                         dismiss()
                     }

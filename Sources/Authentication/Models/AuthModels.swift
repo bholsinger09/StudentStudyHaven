@@ -1,11 +1,11 @@
-import Foundation
 import Core
+import Foundation
 
 /// Credentials for user login
 public struct LoginCredentials: Equatable {
     public let email: String
     public let password: String
-    
+
     public init(email: String, password: String) {
         self.email = email
         self.password = password
@@ -17,9 +17,9 @@ public struct RegistrationData: Equatable {
     public let email: String
     public let password: String
     public let name: String
-    public let collegeId: UUID?
-    
-    public init(email: String, password: String, name: String, collegeId: UUID? = nil) {
+    public let collegeId: String?
+
+    public init(email: String, password: String, name: String, collegeId: String? = nil) {
         self.email = email
         self.password = password
         self.name = name
@@ -32,7 +32,7 @@ public struct AuthSession: Equatable {
     public let user: User
     public let token: String
     public let expiresAt: Date
-    
+
     public init(user: User, token: String, expiresAt: Date) {
         self.user = user
         self.token = token

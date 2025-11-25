@@ -1,61 +1,62 @@
-import SwiftUI
-import Core
 import ClassManagement
+import Core
+import SwiftUI
 
 /// Class list view
 public struct ClassListView: View {
     @StateObject private var viewModel: ClassListViewModel
     @State private var showingAddClass = false
-    
+
     private let createClassUseCase: CreateClassUseCase
     private let updateClassUseCase: UpdateClassUseCase
-    private let userId: UUID
-    
+    private let userId: String
+
     public init(
         viewModel: ClassListViewModel,
         createClassUseCase: CreateClassUseCase,
         updateClassUseCase: UpdateClassUseCase,
-        userId: UUID
+        userId: String
     ) {
         _viewModel = StateObject(wrappedValue: viewModel)
         self.createClassUseCase = createClassUseCase
         self.updateClassUseCase = updateClassUseCase
         self.userId = userId
     }
-    
+
     public var body: some View {
         contentView
             .navigationTitle("Classes")
-        .toolbar {
-            ToolbarItem(placement: .primaryAction) {
-                Button(action: { showingAddClass = true }) {
-                    Image(systemName: "plus")
+            .toolbar {
+                ToolbarItem(placement: .primaryAction) {
+                    Button(action: { showingAddClass = true }) {
+                        Image(systemName: "plus")
+                    }
                 }
             }
-        }
-        .sheet(isPresented: $showingAddClass) {
-            NavigationStack {
-                AddClassView(viewModel: ClassFormViewModel(
-                    createClassUseCase: createClassUseCase,
-                    updateClassUseCase: updateClassUseCase,
-                    userId: userId
-                ))
+            .sheet(isPresented: $showingAddClass) {
+                NavigationStack {
+                    AddClassView(
+                        viewModel: ClassFormViewModel(
+                            createClassUseCase: createClassUseCase,
+                            updateClassUseCase: updateClassUseCase,
+                            userId: userId
+                        ))
+                }
             }
-        }
-        .task {
-            await viewModel.loadClasses()
-        }
-        .alert("Error", isPresented: .constant(viewModel.errorMessage != nil)) {
-            Button("OK") {
-                viewModel.errorMessage = nil
+            .task {
+                await viewModel.loadClasses()
             }
-        } message: {
-            if let error = viewModel.errorMessage {
-                Text(error)
+            .alert("Error", isPresented: .constant(viewModel.errorMessage != nil)) {
+                Button("OK") {
+                    viewModel.errorMessage = nil
+                }
+            } message: {
+                if let error = viewModel.errorMessage {
+                    Text(error)
+                }
             }
-        }
     }
-    
+
     @ViewBuilder
     private var contentView: some View {
         if viewModel.isLoading {
@@ -76,7 +77,7 @@ public struct ClassListView: View {
                         }
                     }
                 }
-                
+
                 // All Classes Section
                 Section("All Classes") {
                     ForEach(viewModel.classes) { classItem in
@@ -98,7 +99,7 @@ public struct ClassListView: View {
 /// Today's class row with next class time
 struct TodayClassRow: View {
     let classItem: Class
-    
+
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
@@ -106,31 +107,31 @@ struct TodayClassRow: View {
                 Circle()
                     .fill(Color.blue)
                     .frame(width: 12, height: 12)
-                
+
                 VStack(alignment: .leading, spacing: 4) {
                     Text(classItem.name)
                         .font(.headline)
-                    
+
                     Text(classItem.courseCode)
                         .font(.subheadline)
                         .foregroundColor(.secondary)
                 }
-                
+
                 Spacer()
-                
+
                 if let nextTime = classItem.nextClassTime {
                     VStack(alignment: .trailing, spacing: 2) {
                         Text(nextTime, style: .time)
                             .font(.headline)
                             .foregroundColor(.blue)
-                        
+
                         Text(timeUntil(nextTime))
                             .font(.caption)
                             .foregroundColor(.secondary)
                     }
                 }
             }
-            
+
             // Today's schedule
             if let todaySchedule = todaySchedule {
                 HStack(spacing: 4) {
@@ -143,7 +144,7 @@ struct TodayClassRow: View {
                 }
                 .foregroundColor(.secondary)
             }
-            
+
             if let location = classItem.location {
                 HStack(spacing: 4) {
                     Image(systemName: "location")
@@ -156,19 +157,19 @@ struct TodayClassRow: View {
         }
         .padding(.vertical, 4)
     }
-    
+
     private var todaySchedule: [Class.TimeSlot]? {
         let today = Calendar.current.component(.weekday, from: Date())
         let dayOfWeek = DayOfWeek.fromWeekday(today)
-        
+
         let slots = classItem.schedule.filter { $0.dayOfWeek == dayOfWeek }
         return slots.isEmpty ? nil : slots
     }
-    
+
     private func timeUntil(_ date: Date) -> String {
         let interval = date.timeIntervalSinceNow
         let minutes = Int(interval / 60)
-        
+
         if minutes < 60 {
             return "in \(minutes)m"
         } else {
@@ -181,15 +182,15 @@ struct TodayClassRow: View {
 /// Regular class row
 struct ClassRowView: View {
     let classItem: Class
-    
+
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
                 Text(classItem.name)
                     .font(.headline)
-                
+
                 Spacer()
-                
+
                 // Schedule badge
                 Text("\(classItem.schedule.count) sessions")
                     .font(.caption)
@@ -199,11 +200,11 @@ struct ClassRowView: View {
                     .background(Color.blue.opacity(0.1))
                     .cornerRadius(8)
             }
-            
+
             Text(classItem.courseCode)
                 .font(.subheadline)
                 .foregroundColor(.secondary)
-            
+
             if let professor = classItem.professor {
                 HStack(spacing: 4) {
                     Image(systemName: "person")
@@ -213,7 +214,7 @@ struct ClassRowView: View {
                 }
                 .foregroundColor(.secondary)
             }
-            
+
             // Weekly schedule preview
             HStack(spacing: 6) {
                 ForEach(uniqueDays, id: \.self) { day in
@@ -229,7 +230,7 @@ struct ClassRowView: View {
         }
         .padding(.vertical, 4)
     }
-    
+
     private var uniqueDays: [DayOfWeek] {
         let days = classItem.schedule.map { $0.dayOfWeek }
         return Array(Set(days)).sorted { $0.rawValue < $1.rawValue }
@@ -239,36 +240,46 @@ struct ClassRowView: View {
 /// Empty state for classes
 struct EmptyClassesView: View {
     let onCreate: () -> Void
-    
+
     var body: some View {
-        VStack(spacing: 24) {
-            Image(systemName: "calendar.badge.plus")
-                .font(.system(size: 70))
-                .foregroundColor(.blue.opacity(0.5))
+        ZStack {
+            // Black background
+            Color.black
+                .ignoresSafeArea()
             
-            VStack(spacing: 8) {
-                Text("No Classes Yet")
-                    .font(.title2)
-                    .fontWeight(.bold)
-                
-                Text("Add your classes to keep track of your schedule")
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
-                    .multilineTextAlignment(.center)
-                    .padding(.horizontal, 40)
+            VStack(spacing: 24) {
+                Image(systemName: "calendar.badge.plus")
+                    .font(.system(size: 70))
+                    .foregroundColor(Color(red: 0.73, green: 0.33, blue: 0.83))
+
+                VStack(spacing: 8) {
+                    Text("No Classes Yet")
+                        .font(.title2)
+                        .fontWeight(.bold)
+                        .foregroundColor(.white)
+
+                    Text("Add your classes to keep track of your schedule")
+                        .font(.subheadline)
+                        .foregroundColor(.gray)
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal, 40)
+                }
+
+                Button(action: onCreate) {
+                    Label("Add Class", systemImage: "plus")
+                        .font(.headline)
+                        .fontWeight(.semibold)
+                        .foregroundColor(Color(red: 0.9, green: 0.4, blue: 0.5))
+                        .padding()
+                        .frame(maxWidth: 200)
+                        .background(Color(red: 0.0, green: 0.2, blue: 0.4))
+                        .cornerRadius(12)
+                        .shadow(color: Color(red: 0.0, green: 0.2, blue: 0.4).opacity(0.3), radius: 8, x: 0, y: 4)
+                }
+                .buttonStyle(.plain)
             }
-            
-            Button(action: onCreate) {
-                Label("Add Class", systemImage: "plus")
-                    .font(.headline)
-                    .foregroundColor(.white)
-                    .padding()
-                    .frame(maxWidth: 200)
-                    .background(Color.blue)
-                    .cornerRadius(12)
-            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 }
 
@@ -290,7 +301,7 @@ extension Class {
     var todayClasses: [Class.TimeSlot] {
         let today = Calendar.current.component(.weekday, from: Date())
         let dayOfWeek = DayOfWeek.fromWeekday(today)
-        
+
         return schedule.filter { $0.dayOfWeek == dayOfWeek }
     }
 }

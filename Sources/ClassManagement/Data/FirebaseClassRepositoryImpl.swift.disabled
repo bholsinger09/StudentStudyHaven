@@ -1,0 +1,109 @@
+import Core
+import FirebaseFirestore
+import FirebaseFirestoreSwift
+import Foundation
+
+/// Firebase implementation of ClassRepositoryProtocol
+/// Handles class/course management using Firestore
+public class FirebaseClassRepositoryImpl: ClassRepositoryProtocol {
+    
+    private let firestore = Firestore.firestore()
+    private let classesCollection = "classes"
+    
+    public init() {}
+    
+    // MARK: - ClassRepositoryProtocol Implementation
+    
+    public func getClasses(for userId: String) async throws -> [Class] {
+        do {
+            let snapshot = try await firestore
+                .collection(classesCollection)
+                .whereField("userId", isEqualTo: userId)
+                .order(by: "createdAt", descending: true)
+                .getDocuments()
+            
+            let classes = try snapshot.documents.compactMap { document in
+                try document.data(as: Class.self)
+            }
+            
+            return classes
+        } catch {
+            throw mapFirestoreError(error)
+        }
+    }
+    
+    public func getClass(by id: String) async throws -> Class {
+        do {
+            let document = try await firestore
+                .collection(classesCollection)
+                .document(id)
+                .getDocument()
+            
+            guard let classItem = try? document.data(as: Class.self) else {
+                throw AppError.dataNotFound
+            }
+            
+            return classItem
+        } catch {
+            throw mapFirestoreError(error)
+        }
+    }
+    
+    public func createClass(_ classItem: Class) async throws -> Class {
+        do {
+            var newClass = classItem
+            newClass.createdAt = Date()
+            newClass.updatedAt = Date()
+            
+            let docRef = firestore.collection(classesCollection).document(newClass.id)
+            try docRef.setData(from: newClass)
+            
+            return newClass
+        } catch {
+            throw mapFirestoreError(error)
+        }
+    }
+    
+    public func updateClass(_ classItem: Class) async throws -> Class {
+        do {
+            var updatedClass = classItem
+            updatedClass.updatedAt = Date()
+            
+            let docRef = firestore.collection(classesCollection).document(updatedClass.id)
+            try docRef.setData(from: updatedClass, merge: true)
+            
+            return updatedClass
+        } catch {
+            throw mapFirestoreError(error)
+        }
+    }
+    
+    public func deleteClass(id: String) async throws {
+        do {
+            try await firestore
+                .collection(classesCollection)
+                .document(id)
+                .delete()
+        } catch {
+            throw mapFirestoreError(error)
+        }
+    }
+    
+    // MARK: - Private Helper Methods
+    
+    private func mapFirestoreError(_ error: Error) -> AppError {
+        if let firestoreError = error as NSError? {
+            switch firestoreError.code {
+            case FirestoreErrorCode.notFound.rawValue:
+                return AppError.dataNotFound
+            case FirestoreErrorCode.permissionDenied.rawValue:
+                return AppError.unauthorized
+            case FirestoreErrorCode.unavailable.rawValue:
+                return AppError.networkError
+            default:
+                return AppError.unknown(firestoreError.localizedDescription)
+            }
+        }
+        return AppError.unknown(error.localizedDescription)
+    }
+}

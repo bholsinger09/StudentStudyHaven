@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!-- 
+	========================================================
+	IMPORTANT: SETUP INSTRUCTIONS FOR FIREBASE
+	========================================================
+	
+	This is a TEMPLATE file. To use Firebase in your app:
+	
+	1. Go to https://console.firebase.google.com/
+	2. Create a new Firebase project (or use existing one)
+	3. Click "Add app" and choose iOS
+	4. Register your app with bundle ID: com.studyhaven.StudentStudyHaven
+	5. Download the GoogleService-Info.plist file
+	6. Replace THIS file with your downloaded GoogleService-Info.plist
+	
+	SECURITY NOTE:
+	- Never commit the real GoogleService-Info.plist to public repositories
+	- Add it to .gitignore for production apps
+	- This template is for development setup only
+	
+	For local development, you can use these placeholder values,
+	but Firebase features will NOT work until you add your real config.
+	========================================================
+	-->
+	
+	<key>API_KEY</key>
+	<string>YOUR_API_KEY_HERE</string>
+	<key>GCM_SENDER_ID</key>
+	<string>YOUR_SENDER_ID_HERE</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.studyhaven.StudentStudyHaven</string>
+	<key>PROJECT_ID</key>
+	<string>your-project-id</string>
+	<key>STORAGE_BUCKET</key>
+	<string>your-project-id.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false/>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false/>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true/>
+	<key>IS_GCM_ENABLED</key>
+	<true/>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true/>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:000000000000:ios:0000000000000000000000</string>
+</dict>
+</plist>

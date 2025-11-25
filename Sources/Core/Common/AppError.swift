@@ -12,7 +12,7 @@ public enum AppError: Error, LocalizedError, Equatable {
     case unauthorized
     case serverError(String)
     case unknown(String)
-    
+
     public var errorDescription: String? {
         switch self {
         case .networkError(let message):

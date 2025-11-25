@@ -1,32 +1,32 @@
-import SwiftUI
-import Core
 import ClassManagement
+import Core
+import SwiftUI
 
 /// View for adding or editing a class
 public struct AddClassView: View {
     @StateObject private var viewModel: ClassFormViewModel
     @Environment(\.dismiss) private var dismiss
-    
+
     @State private var showingTimeSlotPicker = false
-    
+
     public init(viewModel: ClassFormViewModel) {
         _viewModel = StateObject(wrappedValue: viewModel)
     }
-    
+
     public var body: some View {
         NavigationStack {
             Form {
                 // Basic Information
                 Section("Class Information") {
                     TextField("Class Name", text: $viewModel.name)
-                    
+
                     TextField("Course Code", text: $viewModel.courseCode)
-                    
+
                     TextField("Professor (Optional)", text: $viewModel.professor)
-                    
+
                     TextField("Location (Optional)", text: $viewModel.location)
                 }
-                
+
                 // Schedule Section
                 Section("Schedule") {
                     if viewModel.timeSlots.isEmpty {
@@ -41,12 +41,12 @@ public struct AddClassView: View {
                             viewModel.removeTimeSlot(at: indexSet)
                         }
                     }
-                    
+
                     Button(action: { showingTimeSlotPicker = true }) {
                         Label("Add Time Slot", systemImage: "plus.circle.fill")
                     }
                 }
-                
+
                 // Error Message
                 if let errorMessage = viewModel.errorMessage {
                     Section {
@@ -63,7 +63,7 @@ public struct AddClassView: View {
                         dismiss()
                     }
                 }
-                
+
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Save") {
                         Task {
@@ -91,13 +91,13 @@ public struct AddClassView: View {
 /// Cell for displaying a time slot
 struct TimeSlotCell: View {
     let timeSlot: Class.TimeSlot
-    
+
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
             Text(timeSlot.dayOfWeek.rawValue)
                 .font(.subheadline)
                 .fontWeight(.semibold)
-            
+
             HStack {
                 Text(timeSlot.startTime, style: .time)
                 Text("–")
@@ -112,13 +112,13 @@ struct TimeSlotCell: View {
 /// Time slot picker view
 struct TimeSlotPickerView: View {
     @Environment(\.dismiss) private var dismiss
-    
+
     @State private var selectedDay: DayOfWeek = .monday
     @State private var startTime = Date()
     @State private var endTime = Date().addingTimeInterval(3600)
-    
+
     let onSave: (Class.TimeSlot) -> Void
-    
+
     var body: some View {
         NavigationStack {
             Form {
@@ -130,10 +130,11 @@ struct TimeSlotPickerView: View {
                     }
                     .pickerStyle(.inline)
                 }
-                
+
                 Section("Time") {
-                    DatePicker("Start Time", selection: $startTime, displayedComponents: .hourAndMinute)
-                    
+                    DatePicker(
+                        "Start Time", selection: $startTime, displayedComponents: .hourAndMinute)
+
                     DatePicker("End Time", selection: $endTime, displayedComponents: .hourAndMinute)
                 }
             }
@@ -144,7 +145,7 @@ struct TimeSlotPickerView: View {
                         dismiss()
                     }
                 }
-                
+
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Add") {
                         let timeSlot = Class.TimeSlot(

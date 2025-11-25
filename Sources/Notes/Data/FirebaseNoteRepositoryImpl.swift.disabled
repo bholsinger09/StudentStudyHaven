@@ -1,0 +1,225 @@
+import Core
+import FirebaseFirestore
+import FirebaseFirestoreSwift
+import Foundation
+
+/// Firebase implementation of NoteRepositoryProtocol
+/// Handles note management and linking using Firestore
+public class FirebaseNoteRepositoryImpl: NoteRepositoryProtocol {
+    
+    private let firestore = Firestore.firestore()
+    private let notesCollection = "notes"
+    
+    public init() {}
+    
+    // MARK: - NoteRepositoryProtocol Implementation
+    
+    public func getNotes(for classId: String) async throws -> [Note] {
+        do {
+            let snapshot = try await firestore
+                .collection(notesCollection)
+                .whereField("classId", isEqualTo: classId)
+                .order(by: "updatedAt", descending: true)
+                .getDocuments()
+            
+            let notes = try snapshot.documents.compactMap { document in
+                try document.data(as: Note.self)
+            }
+            
+            return notes
+        } catch {
+            throw mapFirestoreError(error)
+        }
+    }
+    
+    public func getNote(by id: String) async throws -> Note {
+        do {
+            let document = try await firestore
+                .collection(notesCollection)
+                .document(id)
+                .getDocument()
+            
+            guard let note = try? document.data(as: Note.self) else {
+                throw AppError.dataNotFound
+            }
+            
+            return note
+        } catch {
+            throw mapFirestoreError(error)
+        }
+    }
+    
+    public func createNote(_ note: Note) async throws -> Note {
+        do {
+            var newNote = note
+            newNote.createdAt = Date()
+            newNote.updatedAt = Date()
+            
+            let docRef = firestore.collection(notesCollection).document(newNote.id)
+            try docRef.setData(from: newNote)
+            
+            return newNote
+        } catch {
+            throw mapFirestoreError(error)
+        }
+    }
+    
+    public func updateNote(_ note: Note) async throws -> Note {
+        do {
+            var updatedNote = note
+            updatedNote.updatedAt = Date()
+            
+            let docRef = firestore.collection(notesCollection).document(updatedNote.id)
+            try docRef.setData(from: updatedNote, merge: true)
+            
+            return updatedNote
+        } catch {
+            throw mapFirestoreError(error)
+        }
+    }
+    
+    public func deleteNote(id: String) async throws {
+        do {
+            try await firestore
+                .collection(notesCollection)
+                .document(id)
+                .delete()
+        } catch {
+            throw mapFirestoreError(error)
+        }
+    }
+    
+    public func linkNotes(noteId: String, linkedNoteId: String) async throws {
+        do {
+            // Get the source note
+            var note = try await getNote(by: noteId)
+            
+            // Add linked note ID if not already linked
+            if !note.linkedNoteIds.contains(linkedNoteId) {
+                note.linkedNoteIds.append(linkedNoteId)
+                note.updatedAt = Date()
+                
+                try firestore
+                    .collection(notesCollection)
+                    .document(noteId)
+                    .setData(from: note)
+            }
+            
+            // Create bidirectional link - update the linked note as well
+            if var linkedNote = try? await getNote(by: linkedNoteId) {
+                if !linkedNote.linkedNoteIds.contains(noteId) {
+                    linkedNote.linkedNoteIds.append(noteId)
+                    linkedNote.updatedAt = Date()
+                    
+                    try firestore
+                        .collection(notesCollection)
+                        .document(linkedNoteId)
+                        .setData(from: linkedNote)
+                }
+            }
+        } catch {
+            throw mapFirestoreError(error)
+        }
+    }
+    
+    public func unlinkNotes(noteId: String, linkedNoteId: String) async throws {
+        do {
+            // Remove link from source note
+            if var note = try? await getNote(by: noteId) {
+                note.linkedNoteIds.removeAll { $0 == linkedNoteId }
+                note.updatedAt = Date()
+                
+                try firestore
+                    .collection(notesCollection)
+                    .document(noteId)
+                    .setData(from: note)
+            }
+            
+            // Remove link from linked note (bidirectional)
+            if var linkedNote = try? await getNote(by: linkedNoteId) {
+                linkedNote.linkedNoteIds.removeAll { $0 == noteId }
+                linkedNote.updatedAt = Date()
+                
+                try firestore
+                    .collection(notesCollection)
+                    .document(linkedNoteId)
+                    .setData(from: linkedNote)
+            }
+        } catch {
+            throw mapFirestoreError(error)
+        }
+    }
+    
+    public func getLinkedNotes(for noteId: String) async throws -> [Note] {
+        do {
+            // First get the note to find its linked note IDs
+            let note = try await getNote(by: noteId)
+            
+            // If no linked notes, return empty array
+            guard !note.linkedNoteIds.isEmpty else {
+                return []
+            }
+            
+            // Fetch all linked notes
+            var linkedNotes: [Note] = []
+            for linkedNoteId in note.linkedNoteIds {
+                if let linkedNote = try? await getNote(by: linkedNoteId) {
+                    linkedNotes.append(linkedNote)
+                }
+            }
+            
+            return linkedNotes
+        } catch {
+            throw mapFirestoreError(error)
+        }
+    }
+    
+    public func searchNotes(query: String, classId: String?) async throws -> [Note] {
+        do {
+            var firestoreQuery: Query = firestore.collection(notesCollection)
+            
+            // Filter by classId if provided
+            if let classId = classId {
+                firestoreQuery = firestoreQuery.whereField("classId", isEqualTo: classId)
+            }
+            
+            // Get all notes and filter in memory
+            // Note: Firestore doesn't support full-text search natively
+            let snapshot = try await firestoreQuery.getDocuments()
+            
+            let allNotes = try snapshot.documents.compactMap { document in
+                try document.data(as: Note.self)
+            }
+            
+            // Filter notes by query in title, content, or tags
+            let searchQuery = query.lowercased()
+            let filteredNotes = allNotes.filter { note in
+                note.title.lowercased().contains(searchQuery) ||
+                note.content.lowercased().contains(searchQuery) ||
+                note.tags.contains { $0.lowercased().contains(searchQuery) }
+            }
+            
+            return filteredNotes
+        } catch {
+            throw mapFirestoreError(error)
+        }
+    }
+    
+    // MARK: - Private Helper Methods
+    
+    private func mapFirestoreError(_ error: Error) -> AppError {
+        if let firestoreError = error as NSError? {
+            switch firestoreError.code {
+            case FirestoreErrorCode.notFound.rawValue:
+                return AppError.dataNotFound
+            case FirestoreErrorCode.permissionDenied.rawValue:
+                return AppError.unauthorized
+            case FirestoreErrorCode.unavailable.rawValue:
+                return AppError.networkError
+            default:
+                return AppError.unknown(firestoreError.localizedDescription)
+            }
+        }
+        return AppError.unknown(error.localizedDescription)
+    }
+}

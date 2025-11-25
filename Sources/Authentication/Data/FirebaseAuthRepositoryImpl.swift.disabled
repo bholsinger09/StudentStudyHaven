@@ -1,0 +1,155 @@
+import Core
+import FirebaseAuth
+import FirebaseFirestore
+import FirebaseFirestoreSwift
+import Foundation
+
+/// Firebase implementation of AuthRepositoryProtocol
+/// Handles user authentication and profile management using Firebase Auth and Firestore
+public class FirebaseAuthRepositoryImpl: AuthRepositoryProtocol {
+    
+    private let auth = Auth.auth()
+    private let firestore = Firestore.firestore()
+    private let usersCollection = "users"
+    
+    public init() {}
+    
+    // MARK: - AuthRepositoryProtocol Implementation
+    
+    public func login(credentials: LoginCredentials) async throws -> AuthSession {
+        do {
+            // Authenticate with Firebase Auth
+            let authResult = try await auth.signIn(withEmail: credentials.email, password: credentials.password)
+            
+            // Fetch user profile from Firestore
+            let user = try await fetchUserProfile(userId: authResult.user.uid)
+            
+            // Get ID token for session
+            let token = try await authResult.user.getIDToken()
+            
+            // Create auth session (Firebase tokens typically expire in 1 hour)
+            let expiresAt = Date().addingTimeInterval(3600)
+            let session = AuthSession(user: user, token: token, expiresAt: expiresAt)
+            
+            return session
+        } catch let error as NSError {
+            // Map Firebase errors to AppError
+            throw mapFirebaseError(error)
+        }
+    }
+    
+    public func register(data: RegistrationData) async throws -> AuthSession {
+        do {
+            // Create Firebase Auth user
+            let authResult = try await auth.createUser(withEmail: data.email, password: data.password)
+            let userId = authResult.user.uid
+            
+            // Create user profile in Firestore
+            let user = User(
+                id: userId,
+                email: data.email,
+                name: data.name,
+                collegeId: data.collegeId
+            )
+            
+            try await saveUserProfile(user)
+            
+            // Get ID token for session
+            let token = try await authResult.user.getIDToken()
+            
+            // Create auth session
+            let expiresAt = Date().addingTimeInterval(3600)
+            let session = AuthSession(user: user, token: token, expiresAt: expiresAt)
+            
+            return session
+        } catch let error as NSError {
+            throw mapFirebaseError(error)
+        }
+    }
+    
+    public func logout() async throws {
+        do {
+            try auth.signOut()
+        } catch let error as NSError {
+            throw AppError.unknown(error.localizedDescription)
+        }
+    }
+    
+    public func getCurrentSession() async -> AuthSession? {
+        guard let currentUser = auth.currentUser else {
+            return nil
+        }
+        
+        do {
+            let user = try await fetchUserProfile(userId: currentUser.uid)
+            let token = try await currentUser.getIDToken()
+            let expiresAt = Date().addingTimeInterval(3600)
+            
+            return AuthSession(user: user, token: token, expiresAt: expiresAt)
+        } catch {
+            // If user profile doesn't exist in Firestore, return nil
+            return nil
+        }
+    }
+    
+    public func refreshToken() async throws -> AuthSession {
+        guard let currentUser = auth.currentUser else {
+            throw AppError.unauthorized
+        }
+        
+        do {
+            let user = try await fetchUserProfile(userId: currentUser.uid)
+            let token = try await currentUser.getIDToken(forcingRefresh: true)
+            let expiresAt = Date().addingTimeInterval(3600)
+            
+            return AuthSession(user: user, token: token, expiresAt: expiresAt)
+        } catch let error as NSError {
+            throw mapFirebaseError(error)
+        }
+    }
+    
+    // MARK: - Private Helper Methods
+    
+    private func fetchUserProfile(userId: String) async throws -> User {
+        let document = try await firestore
+            .collection(usersCollection)
+            .document(userId)
+            .getDocument()
+        
+        guard let user = try? document.data(as: User.self) else {
+            throw AppError.dataNotFound
+        }
+        
+        return user
+    }
+    
+    private func saveUserProfile(_ user: User) async throws {
+        try firestore
+            .collection(usersCollection)
+            .document(user.id)
+            .setData(from: user)
+    }
+    
+    private func mapFirebaseError(_ error: NSError) -> AppError {
+        guard let errorCode = AuthErrorCode.Code(rawValue: error.code) else {
+            return AppError.unknown(error.localizedDescription)
+        }
+        
+        switch errorCode {
+        case .wrongPassword, .userNotFound:
+            return AppError.invalidCredentials
+        case .emailAlreadyInUse:
+            return AppError.validation("Email already in use")
+        case .invalidEmail:
+            return AppError.validation("Invalid email address")
+        case .weakPassword:
+            return AppError.validation("Password is too weak")
+        case .networkError:
+            return AppError.networkError
+        case .tooManyRequests:
+            return AppError.unknown("Too many requests. Please try again later.")
+        default:
+            return AppError.unknown(error.localizedDescription)
+        }
+    }
+}

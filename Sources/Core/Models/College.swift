@@ -2,13 +2,13 @@ import Foundation
 
 /// Domain model representing a College/University
 public struct College: Identifiable, Codable, Equatable {
-    public let id: UUID
+    public let id: String
     public var name: String
     public var location: String
     public var createdAt: Date
-    
+
     public init(
-        id: UUID = UUID(),
+        id: String = UUID().uuidString,
         name: String,
         location: String,
         createdAt: Date = Date()

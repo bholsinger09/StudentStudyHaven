@@ -2,23 +2,23 @@ import Foundation
 
 /// Domain model representing a Note
 public struct Note: Identifiable, Codable, Equatable {
-    public let id: UUID
-    public var classId: UUID
-    public var userId: UUID
+    public let id: String
+    public var classId: String
+    public var userId: String
     public var title: String
     public var content: String
-    public var linkedNoteIds: [UUID]
+    public var linkedNoteIds: [String]
     public var tags: [String]
     public var createdAt: Date
     public var updatedAt: Date
-    
+
     public init(
-        id: UUID = UUID(),
-        classId: UUID,
-        userId: UUID,
+        id: String = UUID().uuidString,
+        classId: String,
+        userId: String,
         title: String,
         content: String,
-        linkedNoteIds: [UUID] = [],
+        linkedNoteIds: [String] = [],
         tags: [String] = [],
         createdAt: Date = Date(),
         updatedAt: Date = Date()

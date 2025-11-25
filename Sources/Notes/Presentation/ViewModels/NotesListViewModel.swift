@@ -1,6 +1,6 @@
-import Foundation
-import Core
 import Combine
+import Core
+import Foundation
 
 /// ViewModel for notes list
 @MainActor
@@ -9,38 +9,38 @@ public final class NotesListViewModel: ObservableObject {
     @Published public var searchQuery: String = ""
     @Published public var isLoading: Bool = false
     @Published public var errorMessage: String?
-    
+
     private let getNotesUseCase: GetNotesUseCase
     private let deleteNoteUseCase: DeleteNoteUseCase
-    private let classId: UUID?
-    
+    private let classId: String?
+
     public var filteredNotes: [Note] {
         if searchQuery.isEmpty {
             return notes
         }
         return notes.filter {
-            $0.title.localizedCaseInsensitiveContains(searchQuery) ||
-            $0.content.localizedCaseInsensitiveContains(searchQuery) ||
-            $0.tags.contains { $0.localizedCaseInsensitiveContains(searchQuery) }
+            $0.title.localizedCaseInsensitiveContains(searchQuery)
+                || $0.content.localizedCaseInsensitiveContains(searchQuery)
+                || $0.tags.contains { $0.localizedCaseInsensitiveContains(searchQuery) }
         }
     }
-    
+
     public init(
         getNotesUseCase: GetNotesUseCase,
         deleteNoteUseCase: DeleteNoteUseCase,
-        classId: UUID? = nil
+        classId: String? = nil
     ) {
         self.getNotesUseCase = getNotesUseCase
         self.deleteNoteUseCase = deleteNoteUseCase
         self.classId = classId
     }
-    
+
     public func loadNotes() async {
         guard let classId = classId else { return }
-        
+
         isLoading = true
         errorMessage = nil
-        
+
         do {
             notes = try await getNotesUseCase.execute(classId: classId)
         } catch let error as AppError {
@@ -48,10 +48,10 @@ public final class NotesListViewModel: ObservableObject {
         } catch {
             errorMessage = "Failed to load notes"
         }
-        
+
         isLoading = false
     }
-    
+
     public func deleteNote(at offsets: IndexSet) async {
         for index in offsets {
             let note = notes[index]

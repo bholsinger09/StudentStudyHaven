@@ -1,5 +1,5 @@
-import Foundation
 import Core
+import Foundation
 
 /// Protocol for Authentication Repository
 public protocol AuthRepositoryProtocol {

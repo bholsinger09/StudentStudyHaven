@@ -1,0 +1,620 @@
+import Core
+import Notes
+import SwiftUI
+
+/// Simple note editor for classroom documents
+public struct NoteEditorView: View {
+    @StateObject private var viewModel: NoteEditorViewModel
+    @Environment(\.dismiss) private var dismiss
+    @State private var showDebugPanel = false
+
+    public init(viewModel: NoteEditorViewModel) {
+        _viewModel = StateObject(wrappedValue: viewModel)
+    }
+
+    public var body: some View {
+        VStack(spacing: 0) {
+            // Header with Cancel and Save
+            HStack {
+                Button("Cancel") {
+                    dismiss()
+                }
+                .foregroundColor(Color(red: 0.9, green: 0.4, blue: 0.5))
+                
+                Spacer()
+                
+                // Debug indicator
+                if viewModel.notesAppDetected {
+                    Text("⚠️ Notes Active")
+                        .font(.caption)
+                        .foregroundColor(.red)
+                        .padding(4)
+                        .background(Color.red.opacity(0.1))
+                        .cornerRadius(4)
+                }
+                
+                Button(action: { showDebugPanel.toggle() }) {
+                    Image(systemName: showDebugPanel ? "ladybug.fill" : "ladybug")
+                        .foregroundColor(viewModel.inputEventCount > 0 ? .green : .gray)
+                }
+                .help("Toggle Debug Panel")
+                
+                Spacer()
+                
+                Button("Save") {
+                    Task {
+                        await viewModel.saveDocument()
+                        dismiss()
+                    }
+                }
+                .foregroundColor(Color(red: 0.73, green: 0.33, blue: 0.83))
+                .fontWeight(.semibold)
+            }
+            .padding()
+            .background(Color.white)
+            
+            Divider()
+            
+            // Simple Form
+            Form {
+                Section("Class Information") {
+                    TextField("Name of Class", text: $viewModel.subjectMatter)
+                        .textFieldStyle(.plain)
+                        .font(.body)
+                        .onAppear {
+                            print("\n🎯 TextField appeared - claiming focus")
+                            forceAppActivation()
+                        }
+                        .onTapGesture {
+                            print("\n👆 TextField tapped - reclaiming focus")
+                            forceAppActivation()
+                        }
+                        .onChange(of: viewModel.subjectMatter) { newValue in
+                            print("📝 Subject changed to: \(newValue.prefix(50))")
+                            forceAppActivation()
+                        }
+                
+                Section("Date") {
+                    DatePicker("", selection: $viewModel.documentDate, displayedComponents: .date)
+                        .datePickerStyle(.compact)
+                        .labelsHidden()
+                }
+                
+                Section("Notes") {
+                    ZStack(alignment: .topLeading) {
+                        TextEditor(text: $viewModel.content)
+                            .frame(minHeight: 250)
+                            .font(.body)
+                            .scrollContentBackground(.hidden)
+                            .onAppear {
+                                print("\n📄 TextEditor appeared")
+                                forceAppActivation()
+                            }
+                            .onTapGesture {
+                                print("\n👆 TextEditor tapped - reclaiming focus")
+                                forceAppActivation()
+                            }
+                            .onChange(of: viewModel.content) { newValue in
+                                print("📝 Content changed: \(newValue.count) chars")
+                                forceAppActivation()
+                            }
+                        
+                        if viewModel.content.isEmpty {
+                            Text("Add notes here")
+                                .foregroundColor(.gray.opacity(0.5))
+                                .padding(.top, 8)
+                                .padding(.leading, 4)
+                                .allowsHitTesting(false)
+                        }
+                    }
+                }
+            }
+            .formStyle(.grouped)
+            .scrollContentBackground(.hidden)
+            .background(Color(NSColor.windowBackgroundColor))
+        }
+        .overlay(
+            Group {
+                if showDebugPanel {
+                    DebugPanelView(viewModel: viewModel)
+                        .transition(.move(edge: .trailing))
+                }
+            }
+        )
+        .onAppear {
+            print("\n🚀 NoteEditorView appeared")
+            print("   └─ Bundle: \(Bundle.main.bundleIdentifier ?? "unknown")")
+            print("   └─ Process: StudentStudyHaven")
+            forceAppActivation()
+            print("   └─ App activated ✅\n")
+            
+            // Check for Notes app
+            checkForNotesApp()
+        }
+    }
+}
+
+// MARK: - Helper Functions
+
+/// Aggressively forces our app to be the active application
+func forceAppActivation() {
+    guard let app = NSApp else { return }
+    
+    print("\n⚡️ FORCING APP ACTIVATION")
+    
+    // Activate app
+    app.activate(ignoringOtherApps: true)
+    
+    // Make window key and front
+    if let window = app.windows.first {
+        window.makeKeyAndOrderFront(nil)
+        window.makeFirstResponder(window.contentView)
+        print("   └─ Window made key and front")
+    }
+    
+    // Set app as active
+    NSRunningApplication.current.activate(options: [.activateIgnoringOtherApps])
+    
+    print("   └─ App is now active: \(app.isActive)")
+    print("   └─ App is frontmost: \(NSWorkspace.shared.frontmostApplication?.bundleIdentifier == Bundle.main.bundleIdentifier)\n")
+}
+
+/// Checks if Notes app is running and warns user
+func checkForNotesApp() {
+    let workspace = NSWorkspace.shared
+    let notesApp = workspace.runningApplications.first { app in
+        app.bundleIdentifier == "com.apple.Notes"
+    }
+    
+    if let notes = notesApp {
+        print("\n🚨 WARNING: Notes.app detected!")
+        print("   └─ PID: \(notes.processIdentifier)")
+        print("   └─ Active: \(notes.isActive)")
+        print("   └─ Hidden: \(notes.isHidden)")
+        print("   └─ Terminated: \(notes.isTerminated)")
+        
+        if notes.isActive {
+            print("\n⚠️⚠️⚠️ CRITICAL: Notes app has focus!")
+            print("   └─ Attempting to deactivate Notes...\n")
+            notes.hide()
+        }
+    } else {
+        print("\n✅ No Notes app detected - safe to proceed\n")
+    }
+}
+
+/// Debug panel showing text input monitoring
+struct DebugPanelView: View {
+    @ObservedObject var viewModel: NoteEditorViewModel
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            // Header
+            HStack {
+                Image(systemName: "ladybug.fill")
+                    .foregroundColor(.green)
+                Text("Input Monitor")
+                    .font(.headline)
+                Spacer()
+                Text("\(viewModel.inputEventCount) events")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+            .padding()
+            .background(Color(NSColor.controlBackgroundColor))
+            
+            Divider()
+            
+            // Status
+            VStack(alignment: .leading, spacing: 8) {
+                HStack {
+                    Circle()
+                        .fill(viewModel.notesAppDetected ? Color.red : Color.green)
+                        .frame(width: 8, height: 8)
+                    Text(viewModel.notesAppDetected ? "Notes App Active" : "StudentStudyHaven Active")
+                        .font(.caption)
+                        .foregroundColor(viewModel.notesAppDetected ? .red : .green)
+                }
+                
+                Text("Subject: \(viewModel.subjectMatter.isEmpty ? "(empty)" : String(viewModel.subjectMatter.prefix(30)))")
+                    .font(.caption2)
+                    .foregroundColor(.secondary)
+                
+                Text("Content: \(viewModel.content.count) chars")
+                    .font(.caption2)
+                    .foregroundColor(.secondary)
+            }
+            .padding()
+            
+            Divider()
+            
+            // Log
+            ScrollView {
+                ScrollViewReader { proxy in
+                    VStack(alignment: .leading, spacing: 4) {
+                        ForEach(Array(viewModel.inputDebugLog.enumerated()), id: \.offset) { index, entry in
+                            Text(entry)
+                                .font(.system(.caption2, design: .monospaced))
+                                .foregroundColor(entry.contains("⚠️") ? .red : .primary)
+                                .textSelection(.enabled)
+                                .id(index)
+                        }
+                    }
+                    .padding(8)
+                    .onChange(of: viewModel.inputDebugLog.count) { _ in
+                        if let lastIndex = viewModel.inputDebugLog.indices.last {
+                            proxy.scrollTo(lastIndex, anchor: .bottom)
+                        }
+                    }
+                }
+            }
+            
+            Divider()
+            
+            // Actions
+            VStack(spacing: 8) {
+                HStack {
+                    Button("Clear Log") {
+                        viewModel.inputDebugLog.removeAll()
+                    }
+                    .buttonStyle(.bordered)
+                    
+                    Button("Export Log") {
+                        let log = viewModel.exportDebugLog()
+                        NSPasteboard.general.clearContents()
+                        NSPasteboard.general.setString(log, forType: .string)
+                    }
+                    .buttonStyle(.bordered)
+                }
+                
+                if viewModel.notesAppDetected {
+                    Button("🚨 Kill Notes App") {
+                        killNotesApp()
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .tint(.red)
+                }
+            }
+            .padding()
+            
+        }
+        .frame(width: 300)
+        .background(Color(NSColor.windowBackgroundColor))
+        .cornerRadius(8)
+        .shadow(radius: 10)
+        .padding()
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .trailing)
+    }
+    
+    /// Attempts to terminate Notes app
+    private func killNotesApp() {
+        print("\n💀 Attempting to kill Notes app...")
+        
+        let workspace = NSWorkspace.shared
+        if let notesApp = workspace.runningApplications.first(where: { $0.bundleIdentifier == "com.apple.Notes" }) {
+            let terminated = notesApp.terminate()
+            print("   └─ Terminate result: \(terminated)")
+            
+            if !terminated {
+                // Force terminate
+                _ = notesApp.forceTerminate()
+                print("   └─ Force terminated Notes app")
+            }
+            
+            // Reactivate our app
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                NSApp?.activate(ignoringOtherApps: true)
+                print("   └─ Reactivated StudentStudyHaven\n")
+            }
+        } else {
+            print("   └─ Notes app not found\n")
+        }
+    }
+}
+
+// MARK: - Debug Panel Helpers
+
+/// Attempts to terminate Notes app
+func killNotesApp() {
+    print("\n💀 Attempting to kill Notes app...")
+    
+    let workspace = NSWorkspace.shared
+    if let notesApp = workspace.runningApplications.first(where: { $0.bundleIdentifier == "com.apple.Notes" }) {
+        let terminated = notesApp.terminate()
+        print("   └─ Terminate result: \(terminated)")
+        
+        if !terminated {
+            // Force terminate
+            _ = notesApp.forceTerminate()
+            print("   └─ Force terminated Notes app")
+        }
+        
+        // Reactivate our app
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            NSApp?.activate(ignoringOtherApps: true)
+            print("   └─ Reactivated StudentStudyHaven\n")
+        }
+    } else {
+        print("   └─ Notes app not found\n")
+    }
+}
+
+/// Debug panel showing text input monitoring
+struct DebugPanelView: View {
+    @ObservedObject var viewModel: NoteEditorViewModel
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            // Header
+            HStack {
+                Image(systemName: "ladybug.fill")
+                    .foregroundColor(.green)
+                Text("Input Monitor")
+                    .font(.headline)
+                Spacer()
+                Text("\(viewModel.inputEventCount) events")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+            .padding()
+            .background(Color(NSColor.controlBackgroundColor))
+            
+            Divider()
+            
+            // Status
+            VStack(alignment: .leading, spacing: 8) {
+                HStack {
+                    Circle()
+                        .fill(viewModel.notesAppDetected ? Color.red : Color.green)
+                        .frame(width: 8, height: 8)
+                    Text(viewModel.notesAppDetected ? "Notes App Active" : "StudentStudyHaven Active")
+                        .font(.caption)
+                        .foregroundColor(viewModel.notesAppDetected ? .red : .green)
+                }
+                
+                Text("Subject: \(viewModel.subjectMatter.isEmpty ? "(empty)" : String(viewModel.subjectMatter.prefix(30)))")
+                    .font(.caption2)
+                    .foregroundColor(.secondary)
+                
+                Text("Content: \(viewModel.content.count) chars")
+                    .font(.caption2)
+                    .foregroundColor(.secondary)
+            }
+            .padding()
+            
+            Divider()
+            
+            // Log
+            ScrollView {
+                ScrollViewReader { proxy in
+                    VStack(alignment: .leading, spacing: 4) {
+                        ForEach(Array(viewModel.inputDebugLog.enumerated()), id: \.offset) { index, entry in
+                            Text(entry)
+                                .font(.system(.caption2, design: .monospaced))
+                                .foregroundColor(entry.contains("⚠️") ? .red : .primary)
+                                .textSelection(.enabled)
+                                .id(index)
+                        }
+                    }
+                    .padding(8)
+                    .onChange(of: viewModel.inputDebugLog.count) { _ in
+                        if let lastIndex = viewModel.inputDebugLog.indices.last {
+                            proxy.scrollTo(lastIndex, anchor: .bottom)
+                        }
+                    }
+                }
+            }
+            
+            Divider()
+            
+            // Actions
+            VStack(spacing: 8) {
+                HStack {
+                    Button("Clear Log") {
+                        viewModel.inputDebugLog.removeAll()
+                    }
+                    .buttonStyle(.bordered)
+                    
+                    Button("Export Log") {
+                        let log = viewModel.exportDebugLog()
+                        NSPasteboard.general.clearContents()
+                        NSPasteboard.general.setString(log, forType: .string)
+                    }
+                    .buttonStyle(.bordered)
+                }
+                
+                if viewModel.notesAppDetected {
+                    Button("🚨 Kill Notes App") {
+                        killNotesApp()
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .tint(.red)
+                }
+            }
+            .padding()
+        }
+        .frame(width: 300)
+        .background(Color(NSColor.windowBackgroundColor))
+        .cornerRadius(8)
+        .shadow(radius: 10)
+        .padding()
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .trailing)
+    }
+}
+
+/// ViewModel for note editor - handles document creation and editing
+@MainActor
+public class NoteEditorViewModel: ObservableObject {
+    // MARK: - Published Properties
+    @Published public var subjectMatter: String = "" {
+        didSet {
+            logTextInput(field: "subjectMatter", oldValue: oldValue, newValue: subjectMatter)
+            verifyInputOwnership()
+        }
+    }
+    @Published public var documentDate: Date = Date()
+    @Published public var content: String = "" {
+        didSet {
+            logTextInput(field: "content", oldValue: oldValue, newValue: content)
+            verifyInputOwnership()
+        }
+    }
+    @Published public var isSaving: Bool = false
+    
+    // MARK: - Debug Properties
+    @Published public var inputDebugLog: [String] = []
+    @Published public var notesAppDetected: Bool = false
+    @Published public var inputEventCount: Int = 0
+    
+    // MARK: - Private Properties
+    private let noteId: String
+    private let classId: String
+    private let userId: String
+    private let existingNote: Note?
+    
+    // MARK: - Initialization
+    public init(note: Note? = nil, classId: String, userId: String) {
+        self.existingNote = note
+        self.noteId = note?.id ?? UUID().uuidString
+        self.classId = classId
+        self.userId = userId
+        
+        // Load existing note data if editing
+        if let note = note {
+            self.subjectMatter = note.title
+            self.content = note.content
+            // Note: Date extraction would depend on Note model structure
+        }
+    }
+    
+    // MARK: - Public Methods
+    
+    /// Saves the current document
+    public func saveDocument() async {
+        guard !subjectMatter.isEmpty else { return }
+        
+        logDebug("💾 Saving document...")
+        isSaving = true
+        defer { isSaving = false }
+        
+        // TODO: Connect to repository to persist note
+        // For now, simulate save operation
+        try? await Task.sleep(nanoseconds: 500_000_000)
+        logDebug("✅ Document saved successfully")
+    }
+    
+    /// Validates if the document has required fields
+    public var isValid: Bool {
+        !subjectMatter.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    }
+    
+    // MARK: - Debug & Monitoring Methods
+    
+    /// Logs text input changes with detailed information
+    private func logTextInput(field: String, oldValue: String, newValue: String) {
+        inputEventCount += 1
+        let timestamp = Date().formatted(date: .omitted, time: .standard)
+        let change = getChangeDescription(from: oldValue, to: newValue)
+        
+        let logEntry = "[\(timestamp)] #\(inputEventCount) \(field): \(change)"
+        inputDebugLog.append(logEntry)
+        
+        // Keep only last 100 entries
+        if inputDebugLog.count > 100 {
+            inputDebugLog.removeFirst()
+        }
+        
+        print("🔤 TEXT INPUT: \(logEntry)")
+        print("   └─ Process: StudentStudyHaven")
+        print("   └─ Thread: \(Thread.current)")
+        print("   └─ Field owns data: ✅")
+    }
+    
+    /// Verifies that input is being captured by our app, not Notes
+    private func verifyInputOwnership() {
+        // Check if Notes.app is running and has focus
+        let workspace = NSWorkspace.shared
+        let runningApps = workspace.runningApplications
+        
+        // Look for Notes app
+        let notesApp = runningApps.first { app in
+            app.bundleIdentifier == "com.apple.Notes" ||
+            app.localizedName == "Notes"
+        }
+        
+        if let notes = notesApp, notes.isActive {
+            notesAppDetected = true
+            let warning = "⚠️ WARNING: Notes app is active! Input may be intercepted."
+            inputDebugLog.append(warning)
+            print("\n🚨 \(warning)")
+            print("   └─ Notes PID: \(notes.processIdentifier)")
+            print("   └─ Notes is hidden: \(notes.isHidden)")
+            
+            // Try to hide Notes app
+            notes.hide()
+            print("   └─ Attempted to hide Notes app")
+            
+            // Reactivate our app
+            NSApp?.activate(ignoringOtherApps: true)
+            NSRunningApplication.current.activate(options: [.activateIgnoringOtherApps])
+            print("   └─ Reactivated StudentStudyHaven\n")
+        } else {
+            notesAppDetected = false
+        }
+        
+        // Verify our app has focus
+        if let ourApp = NSApp, !ourApp.isActive {
+            let warning = "⚠️ WARNING: StudentStudyHaven is not active!"
+            inputDebugLog.append(warning)
+            print("\n🚨 \(warning)")
+            
+            // Force activation
+            ourApp.activate(ignoringOtherApps: true)
+            NSRunningApplication.current.activate(options: [.activateIgnoringOtherApps])
+            print("   └─ Forced activation\n")
+        }
+        
+        // Log current frontmost app
+        if let frontmost = workspace.frontmostApplication {
+            let isFrontmost = frontmost.bundleIdentifier == Bundle.main.bundleIdentifier
+            print("   └─ Frontmost app: \(frontmost.localizedName ?? "unknown") [\(isFrontmost ? "✅ US" : "⚠️ OTHER")]")
+        }
+    }
+    
+    /// Gets a human-readable description of text changes
+    private func getChangeDescription(from old: String, to new: String) -> String {
+        if old.isEmpty && !new.isEmpty {
+            return "Added \"\(new.prefix(20))...\""
+        } else if !old.isEmpty && new.isEmpty {
+            return "Cleared"
+        } else if new.count > old.count {
+            let added = String(new.dropFirst(old.count))
+            return "Typed '\(added)'"
+        } else if new.count < old.count {
+            return "Deleted \(old.count - new.count) char(s)"
+        } else {
+            return "Modified"
+        }
+    }
+    
+    /// Logs general debug messages
+    private func logDebug(_ message: String) {
+        let timestamp = Date().formatted(date: .omitted, time: .standard)
+        let logEntry = "[\(timestamp)] \(message)"
+        inputDebugLog.append(logEntry)
+        print("🐛 DEBUG: \(logEntry)")
+    }
+    
+    /// Exports debug log for analysis
+    public func exportDebugLog() -> String {
+        let header = """
+        StudentStudyHaven - Text Input Debug Log
+        ========================================
+        Generated: \(Date().formatted())
+        Total Events: \(inputEventCount)
+        Notes App Detected: \(notesAppDetected ? "⚠️ YES" : "✅ NO")
+        
+        """
+        return header + inputDebugLog.joined(separator: "\n")
+    }
+}

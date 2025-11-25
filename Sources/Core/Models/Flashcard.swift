@@ -2,23 +2,23 @@ import Foundation
 
 /// Domain model representing a Flashcard
 public struct Flashcard: Identifiable, Codable, Equatable {
-    public let id: UUID
-    public var classId: UUID
-    public var userId: UUID
+    public let id: String
+    public var classId: String
+    public var userId: String
     public var front: String
     public var back: String
-    public var noteIds: [UUID]
+    public var noteIds: [String]
     public var lastReviewedAt: Date?
     public var createdAt: Date
     public var updatedAt: Date
-    
+
     public init(
-        id: UUID = UUID(),
-        classId: UUID,
-        userId: UUID,
+        id: String = UUID().uuidString,
+        classId: String,
+        userId: String,
         front: String,
         back: String,
-        noteIds: [UUID] = [],
+        noteIds: [String] = [],
         lastReviewedAt: Date? = nil,
         createdAt: Date = Date(),
         updatedAt: Date = Date()

@@ -1,32 +1,32 @@
-import SwiftUI
 import Core
 import Flashcards
+import SwiftUI
 
 /// Flashcard study view with flip animations
 public struct FlashcardStudyView: View {
     let flashcards: [Flashcard]
     @Environment(\.dismiss) private var dismiss
-    
+
     @State private var currentIndex = 0
     @State private var isShowingAnswer = false
     @State private var offset: CGSize = .zero
     @State private var rotation: Double = 0
     @State private var studiedCount = 0
-    
+
     public init(flashcards: [Flashcard]) {
         self.flashcards = flashcards
     }
-    
+
     private var currentCard: Flashcard? {
         guard currentIndex < flashcards.count else { return nil }
         return flashcards[currentIndex]
     }
-    
+
     private var progress: Double {
         guard !flashcards.isEmpty else { return 0 }
         return Double(studiedCount) / Double(flashcards.count)
     }
-    
+
     public var body: some View {
         VStack(spacing: 20) {
             // Progress Bar
@@ -35,21 +35,21 @@ public struct FlashcardStudyView: View {
                     Text("Progress")
                         .font(.caption)
                         .foregroundColor(.secondary)
-                    
+
                     Spacer()
-                    
+
                     Text("\(studiedCount) / \(flashcards.count)")
                         .font(.caption)
                         .fontWeight(.semibold)
                 }
-                
+
                 ProgressView(value: progress)
                     .progressViewStyle(.linear)
                     .tint(.blue)
             }
             .padding(.horizontal)
             .padding(.top)
-            
+
             // Flashcard Stack
             ZStack {
                 if let card = currentCard {
@@ -83,7 +83,7 @@ public struct FlashcardStudyView: View {
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
-            
+
             // Action Buttons
             if currentCard != nil {
                 HStack(spacing: 40) {
@@ -92,13 +92,13 @@ public struct FlashcardStudyView: View {
                         color: .red,
                         action: { swipeLeft() }
                     )
-                    
+
                     ActionButtonView(
                         icon: "arrow.clockwise",
                         color: .blue,
                         action: { flipCard() }
                     )
-                    
+
                     ActionButtonView(
                         icon: "checkmark",
                         color: .green,
@@ -119,10 +119,10 @@ public struct FlashcardStudyView: View {
             }
         }
     }
-    
+
     private func handleSwipe(_ gesture: DragGesture.Value) {
         let swipeThreshold: CGFloat = 100
-        
+
         if gesture.translation.width > swipeThreshold {
             swipeRight()
         } else if gesture.translation.width < -swipeThreshold {
@@ -134,46 +134,46 @@ public struct FlashcardStudyView: View {
             }
         }
     }
-    
+
     private func swipeLeft() {
         withAnimation(.spring()) {
             offset = CGSize(width: -500, height: 0)
             rotation = -20
         }
-        
+
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
             moveToNextCard()
         }
     }
-    
+
     private func swipeRight() {
         withAnimation(.spring()) {
             offset = CGSize(width: 500, height: 0)
             rotation = 20
         }
-        
+
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
             moveToNextCard()
         }
     }
-    
+
     private func flipCard() {
         withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) {
             isShowingAnswer.toggle()
         }
     }
-    
+
     private func moveToNextCard() {
         studiedCount += 1
         currentIndex += 1
         isShowingAnswer = false
-        
+
         withAnimation(.spring()) {
             offset = .zero
             rotation = 0
         }
     }
-    
+
     private func restart() {
         currentIndex = 0
         studiedCount = 0
@@ -187,7 +187,7 @@ public struct FlashcardStudyView: View {
 struct FlashcardView: View {
     let flashcard: Flashcard
     let isShowingAnswer: Bool
-    
+
     var body: some View {
         ZStack {
             RoundedRectangle(cornerRadius: 20)
@@ -199,20 +199,20 @@ struct FlashcardView: View {
                     )
                 )
                 .shadow(radius: 10)
-            
+
             VStack(spacing: 20) {
                 Text(isShowingAnswer ? "Answer" : "Question")
                     .font(.caption)
                     .fontWeight(.semibold)
                     .foregroundColor(.white.opacity(0.8))
-                
+
                 Text(isShowingAnswer ? flashcard.back : flashcard.front)
                     .font(.title2)
                     .fontWeight(.bold)
                     .foregroundColor(.white)
                     .multilineTextAlignment(.center)
                     .padding(.horizontal, 40)
-                
+
                 Text("Tap to flip")
                     .font(.caption)
                     .foregroundColor(.white.opacity(0.6))
@@ -231,7 +231,7 @@ struct ActionButtonView: View {
     let icon: String
     let color: Color
     let action: () -> Void
-    
+
     var body: some View {
         Button(action: action) {
             Image(systemName: icon)
@@ -251,21 +251,21 @@ struct CompletedView: View {
     let totalCards: Int
     let onRestart: () -> Void
     let onDismiss: () -> Void
-    
+
     var body: some View {
         VStack(spacing: 30) {
             Image(systemName: "checkmark.circle.fill")
                 .font(.system(size: 80))
                 .foregroundColor(.green)
-            
+
             Text("Great Job!")
                 .font(.title)
                 .fontWeight(.bold)
-            
+
             Text("You've studied \(totalCards) flashcards")
                 .font(.subheadline)
                 .foregroundColor(.secondary)
-            
+
             VStack(spacing: 16) {
                 Button(action: onRestart) {
                     Text("Study Again")
@@ -276,7 +276,7 @@ struct CompletedView: View {
                         .background(Color.blue)
                         .cornerRadius(12)
                 }
-                
+
                 Button(action: onDismiss) {
                     Text("Done")
                         .fontWeight(.semibold)

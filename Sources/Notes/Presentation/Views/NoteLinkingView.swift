@@ -1,36 +1,36 @@
-import SwiftUI
 import Core
 import Notes
+import SwiftUI
 
 /// View for linking notes together
 public struct NoteLinkingView: View {
-    let currentNoteId: UUID
-    let linkedNoteIds: [UUID]
-    let onLink: (UUID) -> Void
-    
+    let currentNoteId: String
+    let linkedNoteIds: [String]
+    let onLink: (String) -> Void
+
     @Environment(\.dismiss) private var dismiss
     @State private var searchText = ""
     @State private var availableNotes: [Note] = []
-    @State private var selectedNotes: Set<UUID> = []
-    
-    public init(currentNoteId: UUID, linkedNoteIds: [UUID], onLink: @escaping (UUID) -> Void) {
+    @State private var selectedNotes: Set<String> = []
+
+    public init(currentNoteId: String, linkedNoteIds: [String], onLink: @escaping (String) -> Void) {
         self.currentNoteId = currentNoteId
         self.linkedNoteIds = linkedNoteIds
         self.onLink = onLink
         _selectedNotes = State(initialValue: Set(linkedNoteIds))
     }
-    
+
     private var filteredNotes: [Note] {
         if searchText.isEmpty {
             return availableNotes
         }
         return availableNotes.filter {
-            $0.title.localizedCaseInsensitiveContains(searchText) ||
-            $0.content.localizedCaseInsensitiveContains(searchText) ||
-            $0.tags.contains { $0.localizedCaseInsensitiveContains(searchText) }
+            $0.title.localizedCaseInsensitiveContains(searchText)
+                || $0.content.localizedCaseInsensitiveContains(searchText)
+                || $0.tags.contains { $0.localizedCaseInsensitiveContains(searchText) }
         }
     }
-    
+
     public var body: some View {
         NavigationStack {
             VStack(spacing: 0) {
@@ -38,21 +38,21 @@ public struct NoteLinkingView: View {
                 HStack {
                     Image(systemName: "magnifyingglass")
                         .foregroundColor(.secondary)
-                    
+
                     TextField("Search notes...", text: $searchText)
                         .textFieldStyle(.plain)
-                    
+
                     if !searchText.isEmpty {
                         Button(action: { searchText = "" }) {
                             Image(systemName: "xmark.circle.fill")
                                 .foregroundColor(.secondary)
                         }
+                    }
                 }
-            }
-            .padding()
-            .background(Color.gray.opacity(0.1))
-            .cornerRadius(10)
-            .padding()                // Linked Notes Count
+                .padding()
+                .background(Color.gray.opacity(0.1))
+                .cornerRadius(10)
+                .padding()  // Linked Notes Count
                 if !selectedNotes.isEmpty {
                     HStack {
                         Image(systemName: "link")
@@ -64,15 +64,17 @@ public struct NoteLinkingView: View {
                     }
                     .padding(.horizontal)
                 }
-                
+
                 Divider()
-                
+
                 // Notes List
                 if filteredNotes.isEmpty {
                     EmptyStateView(
                         icon: "note.text",
                         title: "No Notes Found",
-                        message: searchText.isEmpty ? "Create some notes to link them together" : "No notes match your search"
+                        message: searchText.isEmpty
+                            ? "Create some notes to link them together"
+                            : "No notes match your search"
                     )
                 } else {
                     List(filteredNotes) { note in
@@ -95,7 +97,7 @@ public struct NoteLinkingView: View {
                         dismiss()
                     }
                 }
-                
+
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Done") {
                         saveLinks()
@@ -105,15 +107,15 @@ public struct NoteLinkingView: View {
             }
         }
     }
-    
-    private func toggleNoteSelection(_ noteId: UUID) {
+
+    private func toggleNoteSelection(_ noteId: String) {
         if selectedNotes.contains(noteId) {
             selectedNotes.remove(noteId)
         } else {
             selectedNotes.insert(noteId)
         }
     }
-    
+
     private func saveLinks() {
         for noteId in selectedNotes {
             if !linkedNoteIds.contains(noteId) {
@@ -127,23 +129,23 @@ public struct NoteLinkingView: View {
 struct NoteLinkRow: View {
     let note: Note
     let isLinked: Bool
-    
+
     var body: some View {
         HStack(spacing: 12) {
             // Link indicator
             Image(systemName: isLinked ? "link.circle.fill" : "circle")
                 .foregroundColor(isLinked ? .blue : .secondary)
                 .font(.title3)
-            
+
             VStack(alignment: .leading, spacing: 4) {
                 Text(note.title)
                     .font(.headline)
-                
+
                 Text(note.content.prefix(100))
                     .font(.caption)
                     .foregroundColor(.secondary)
                     .lineLimit(2)
-                
+
                 if !note.tags.isEmpty {
                     HStack(spacing: 4) {
                         ForEach(note.tags.prefix(3), id: \.self) { tag in
@@ -158,9 +160,9 @@ struct NoteLinkRow: View {
                     }
                 }
             }
-            
+
             Spacer()
-            
+
             if isLinked {
                 Image(systemName: "checkmark")
                     .foregroundColor(.blue)
@@ -175,16 +177,16 @@ struct EmptyStateView: View {
     let icon: String
     let title: String
     let message: String
-    
+
     var body: some View {
         VStack(spacing: 16) {
             Image(systemName: icon)
                 .font(.system(size: 60))
                 .foregroundColor(.secondary)
-            
+
             Text(title)
                 .font(.headline)
-            
+
             Text(message)
                 .font(.subheadline)
                 .foregroundColor(.secondary)
@@ -199,30 +201,30 @@ struct EmptyStateView: View {
 public struct NoteConnectionsView: View {
     let note: Note
     let linkedNotes: [Note]
-    
+
     public init(note: Note, linkedNotes: [Note]) {
         self.note = note
         self.linkedNotes = linkedNotes
     }
-    
+
     public var body: some View {
         ScrollView {
             VStack(spacing: 20) {
                 // Central Note
                 NoteCard(note: note, isCenter: true)
                     .padding(.top)
-                
+
                 Text("Connected Notes")
                     .font(.headline)
                     .foregroundColor(.secondary)
-                
+
                 // Linked Notes
                 ForEach(linkedNotes) { linkedNote in
                     HStack {
                         Rectangle()
                             .fill(Color.blue.opacity(0.3))
                             .frame(width: 2)
-                        
+
                         NavigationLink(destination: Text("Note Detail")) {
                             NoteCard(note: linkedNote, isCenter: false)
                         }
@@ -240,27 +242,27 @@ public struct NoteConnectionsView: View {
 struct NoteCard: View {
     let note: Note
     let isCenter: Bool
-    
+
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
                 Text(note.title)
                     .font(.headline)
-                
+
                 Spacer()
-                
+
                 if isCenter {
                     Image(systemName: "star.fill")
                         .foregroundColor(.yellow)
                         .font(.caption)
                 }
             }
-            
+
             Text(note.content.prefix(150))
                 .font(.caption)
                 .foregroundColor(.secondary)
                 .lineLimit(3)
-            
+
             if !note.tags.isEmpty {
                 HStack(spacing: 4) {
                     ForEach(note.tags.prefix(3), id: \.self) { tag in

@@ -2,8 +2,8 @@ import Foundation
 
 /// Domain model representing a Class/Course
 public struct Class: Identifiable, Codable, Equatable {
-    public let id: UUID
-    public var userId: UUID
+    public let id: String
+    public var userId: String
     public var name: String
     public var courseCode: String
     public var schedule: [TimeSlot]
@@ -11,10 +11,10 @@ public struct Class: Identifiable, Codable, Equatable {
     public var location: String?
     public var createdAt: Date
     public var updatedAt: Date
-    
+
     public init(
-        id: UUID = UUID(),
-        userId: UUID,
+        id: String = UUID().uuidString,
+        userId: String,
         name: String,
         courseCode: String,
         schedule: [TimeSlot] = [],
@@ -33,16 +33,16 @@ public struct Class: Identifiable, Codable, Equatable {
         self.createdAt = createdAt
         self.updatedAt = updatedAt
     }
-    
+
     /// Represents a time slot for a class
     public struct TimeSlot: Codable, Equatable, Identifiable {
-        public let id: UUID
+        public let id: String
         public var dayOfWeek: DayOfWeek
         public var startTime: Date
         public var endTime: Date
-        
+
         public init(
-            id: UUID = UUID(),
+            id: String = UUID().uuidString,
             dayOfWeek: DayOfWeek,
             startTime: Date,
             endTime: Date

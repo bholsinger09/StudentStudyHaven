@@ -1,15 +1,15 @@
-import SwiftUI
 import Core
+import SwiftUI
 
 /// Registration screen view
 public struct RegisterView: View {
     @StateObject private var viewModel: RegisterViewModel
     @Environment(\.dismiss) private var dismiss
-    
+
     public init(viewModel: RegisterViewModel) {
         _viewModel = StateObject(wrappedValue: viewModel)
     }
-    
+
     public var body: some View {
         ScrollView {
             VStack(spacing: 20) {
@@ -23,44 +23,46 @@ public struct RegisterView: View {
                         .fontWeight(.bold)
                 }
                 .padding(.top, 40)
-                
+
                 // Registration Form
                 VStack(spacing: 16) {
                     TextField("Full Name", text: $viewModel.name)
                         .textFieldStyle(.roundedBorder)
-                    
+
                     TextField("Email", text: $viewModel.email)
                         .textFieldStyle(.roundedBorder)
-                    
+
                     SecureField("Password", text: $viewModel.password)
                         .textFieldStyle(.roundedBorder)
-                    
+
                     SecureField("Confirm Password", text: $viewModel.confirmPassword)
                         .textFieldStyle(.roundedBorder)
-                    
+
                     // College Selection Button
                     Button(action: {
                         // Show college selection
                     }) {
                         HStack {
-                            Text(viewModel.selectedCollegeId != nil ? "College Selected" : "Select College (Optional)")
+                            Text(
+                                viewModel.selectedCollegeId != nil
+                                    ? "College Selected" : "Select College (Optional)")
                             Spacer()
-                        Image(systemName: "chevron.right")
-                            .foregroundColor(.secondary)
+                            Image(systemName: "chevron.right")
+                                .foregroundColor(.secondary)
+                        }
+                        .padding()
+                        .background(Color.gray.opacity(0.1))
+                        .cornerRadius(8)
                     }
-                    .padding()
-                    .background(Color.gray.opacity(0.1))
-                    .cornerRadius(8)
-                }
-                .buttonStyle(.plain)
-                    
+                    .buttonStyle(.plain)
+
                     if let errorMessage = viewModel.errorMessage {
                         Text(errorMessage)
                             .foregroundColor(.red)
                             .font(.caption)
                             .multilineTextAlignment(.center)
                     }
-                    
+
                     Button(action: {
                         Task {
                             await viewModel.register()
@@ -84,7 +86,7 @@ public struct RegisterView: View {
                 }
                 .padding(.horizontal, 32)
                 .padding(.top, 20)
-                
+
                 Spacer()
             }
         }

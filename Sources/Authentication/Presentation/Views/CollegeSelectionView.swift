@@ -1,16 +1,16 @@
-import SwiftUI
-import Core
 import Authentication
+import Core
+import SwiftUI
 
 /// College selection view for registration
 public struct CollegeSelectionView: View {
     @StateObject private var viewModel: CollegeSelectionViewModel
     @Environment(\.dismiss) private var dismiss
-    
+
     public init(viewModel: CollegeSelectionViewModel) {
         _viewModel = StateObject(wrappedValue: viewModel)
     }
-    
+
     public var body: some View {
         NavigationStack {
             VStack(spacing: 0) {
@@ -18,25 +18,25 @@ public struct CollegeSelectionView: View {
                 HStack {
                     Image(systemName: "magnifyingglass")
                         .foregroundColor(.secondary)
-                    
+
                     TextField("Search colleges...", text: $viewModel.searchQuery)
                         .textFieldStyle(.plain)
-                    
+
                     if !viewModel.searchQuery.isEmpty {
                         Button(action: { viewModel.searchQuery = "" }) {
                             Image(systemName: "xmark.circle.fill")
                                 .foregroundColor(.secondary)
                         }
+                    }
                 }
-            }
-            .padding()
-            .background(Color.gray.opacity(0.1))
-            .cornerRadius(10)
-            .padding()
-            
-            Divider()
-            
-            // College List
+                .padding()
+                .background(Color.gray.opacity(0.1))
+                .cornerRadius(10)
+                .padding()
+
+                Divider()
+
+                // College List
                 if viewModel.isLoading {
                     ProgressView()
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -54,7 +54,7 @@ public struct CollegeSelectionView: View {
                                 .onTapGesture {
                                     viewModel.selectCollege(college)
                                 }
-                                
+
                                 Divider()
                                     .padding(.leading, 16)
                             }
@@ -69,7 +69,7 @@ public struct CollegeSelectionView: View {
                         dismiss()
                     }
                 }
-                
+
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Done") {
                         dismiss()
@@ -92,26 +92,26 @@ public class CollegeSelectionViewModel: ObservableObject {
     @Published public var selectedCollege: College?
     @Published public var isLoading: Bool = false
     @Published public var errorMessage: String?
-    
+
     public var filteredColleges: [College] {
         if searchQuery.isEmpty {
             return colleges
         }
         return colleges.filter {
-            $0.name.localizedCaseInsensitiveContains(searchQuery) ||
-            $0.location.localizedCaseInsensitiveContains(searchQuery)
+            $0.name.localizedCaseInsensitiveContains(searchQuery)
+                || $0.location.localizedCaseInsensitiveContains(searchQuery)
         }
     }
-    
+
     public init() {}
-    
+
     public func loadColleges() async {
         isLoading = true
         errorMessage = nil
-        
+
         // Simulate loading colleges
         try? await Task.sleep(nanoseconds: 500_000_000)
-        
+
         // Mock data for demonstration
         colleges = [
             College(name: "Stanford University", location: "Stanford, CA"),
@@ -123,12 +123,12 @@ public class CollegeSelectionViewModel: ObservableObject {
             College(name: "Princeton University", location: "Princeton, NJ"),
             College(name: "Columbia University", location: "New York, NY"),
             College(name: "University of Chicago", location: "Chicago, IL"),
-            College(name: "Caltech", location: "Pasadena, CA")
+            College(name: "Caltech", location: "Pasadena, CA"),
         ]
-        
+
         isLoading = false
     }
-    
+
     public func selectCollege(_ college: College) {
         selectedCollege = college
     }
@@ -138,7 +138,7 @@ public class CollegeSelectionViewModel: ObservableObject {
 struct CollegeRow: View {
     let college: College
     let isSelected: Bool
-    
+
     var body: some View {
         HStack(spacing: 16) {
             // College Icon
@@ -146,17 +146,17 @@ struct CollegeRow: View {
                 Circle()
                     .fill(isSelected ? Color.blue : Color.blue.opacity(0.1))
                     .frame(width: 50, height: 50)
-                
+
                 Image(systemName: "building.columns.fill")
                     .foregroundColor(isSelected ? .white : .blue)
                     .font(.title3)
             }
-            
+
             // College Info
             VStack(alignment: .leading, spacing: 4) {
                 Text(college.name)
                     .font(.headline)
-                
+
                 HStack(spacing: 4) {
                     Image(systemName: "location.fill")
                         .font(.caption)
@@ -165,9 +165,9 @@ struct CollegeRow: View {
                 }
                 .foregroundColor(.secondary)
             }
-            
+
             Spacer()
-            
+
             // Selection Indicator
             if isSelected {
                 Image(systemName: "checkmark.circle.fill")
@@ -183,16 +183,16 @@ struct CollegeRow: View {
 /// Empty state for college search
 struct EmptyCollegeState: View {
     let hasSearch: Bool
-    
+
     var body: some View {
         VStack(spacing: 20) {
             Image(systemName: "building.columns")
                 .font(.system(size: 60))
                 .foregroundColor(.secondary)
-            
+
             Text(hasSearch ? "No Colleges Found" : "Loading Colleges")
                 .font(.headline)
-            
+
             Text(hasSearch ? "Try a different search term" : "Please wait while we load colleges")
                 .font(.subheadline)
                 .foregroundColor(.secondary)
@@ -206,11 +206,11 @@ struct EmptyCollegeState: View {
 /// College detail view (optional)
 public struct CollegeDetailView: View {
     let college: College
-    
+
     public init(college: College) {
         self.college = college
     }
-    
+
     public var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
@@ -219,12 +219,12 @@ public struct CollegeDetailView: View {
                     Image(systemName: "building.columns.fill")
                         .font(.system(size: 80))
                         .foregroundColor(.blue)
-                    
+
                     Text(college.name)
                         .font(.title)
                         .fontWeight(.bold)
                         .multilineTextAlignment(.center)
-                    
+
                     HStack {
                         Image(systemName: "location.fill")
                         Text(college.location)
@@ -242,20 +242,20 @@ public struct CollegeDetailView: View {
                     )
                 )
                 .cornerRadius(16)
-                
+
                 // Info Sections
                 InfoSection(
                     icon: "info.circle.fill",
                     title: "About",
                     content: "Information about \(college.name) would appear here."
                 )
-                
+
                 InfoSection(
                     icon: "person.3.fill",
                     title: "Student Body",
                     content: "Student population and demographics information."
                 )
-                
+
                 InfoSection(
                     icon: "book.fill",
                     title: "Academics",
@@ -273,7 +273,7 @@ struct InfoSection: View {
     let icon: String
     let title: String
     let content: String
-    
+
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
@@ -282,7 +282,7 @@ struct InfoSection: View {
                 Text(title)
                     .font(.headline)
             }
-            
+
             Text(content)
                 .font(.subheadline)
                 .foregroundColor(.secondary)

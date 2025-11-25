@@ -11,28 +11,39 @@
 
 ## ✨ Features
 
+### 🔥 **NEW: Firebase Backend Integration**
+- **Real user authentication** with Firebase Auth
+- **Persistent data storage** with Firestore
+- **Offline support** with automatic sync
+- **Real-time updates** across devices
+- Toggle between mock and live data for testing
+
 ### 🔐 Authentication System
 - **Secure Login & Registration** with email validation
 - College selection during registration
-- Session management
+- Session management with token refresh
+- Firebase Auth integration
 
 ### 📚 Class Management
 - Add and organize classes with course codes
 - **Smart Time Slots** with automatic overlap detection
 - Professor and location tracking
 - Weekly schedule view
+- Persistent storage in Firestore
 
 ### 🎴 Smart Flashcards
 - **Auto-generate flashcards** from your notes using AI-like pattern matching
 - Manual flashcard creation
 - Review tracking with last-reviewed timestamps
 - Link flashcards to source notes
+- Cloud sync for study sessions
 
 ### 📝 Intelligent Note Taking
 - Create and organize notes per class
 - **Link related notes** together to build a knowledge graph
 - Tag system for organization
 - Full-text search across all notes
+- Real-time sync for collaborative note-taking
 
 ### 🎯 Cross-platform
 - iOS 16+ support
@@ -84,6 +95,7 @@ Built with **Clean Architecture** principles and modern Swift practices:
 - **Xcode** 15.0+ 
 - **Swift** 5.9+
 - **iOS** 16.0+ or **macOS** 13.0+
+- **Firebase Account** (free)
 
 ### Installation
 
@@ -91,6 +103,9 @@ Built with **Clean Architecture** principles and modern Swift practices:
 # Clone the repository
 git clone https://github.com/bholsinger09/StudentStudyHaven.git
 cd StudentStudyHaven
+
+# Set up Firebase (required for backend features)
+# Follow instructions in FIREBASE_SETUP.md (5 minutes)
 
 # Open in Xcode
 open Package.swift
@@ -101,10 +116,11 @@ swift test
 
 ### Running the App
 
-1. Open `Package.swift` in Xcode
-2. Choose your target (iOS Simulator or macOS)
-3. Press `Cmd + R` to run
-4. Press `Cmd + U` to run tests
+1. **Set up Firebase** (one-time, 5 minutes) - See [FIREBASE_SETUP.md](FIREBASE_SETUP.md)
+2. Open `Package.swift` in Xcode
+3. Choose your target (iOS Simulator or macOS)
+4. Press `Cmd + R` to run
+5. Register a new account to start using the app!
 
 **See [QUICKSTART.md](QUICKSTART.md) for detailed setup instructions.**
 
@@ -135,10 +151,16 @@ swift test --filter NotesTests
 
 Comprehensive documentation included:
 
+### Getting Started
+- **[FIREBASE_SETUP.md](FIREBASE_SETUP.md)** - Firebase setup guide (5 minutes) ⭐
 - **[QUICKSTART.md](QUICKSTART.md)** - Get started in 5 minutes
 - **[SETUP.md](SETUP.md)** - Detailed setup and build instructions
+
+### Technical Documentation
 - **[ARCHITECTURE.md](ARCHITECTURE.md)** - Technical deep dive (500+ lines)
 - **[PROJECT_SUMMARY.md](PROJECT_SUMMARY.md)** - Complete project overview
+- **[PHASE_1_COMPLETE.md](PHASE_1_COMPLETE.md)** - Phase 1: UI Implementation
+- **[PHASE_2_COMPLETE.md](PHASE_2_COMPLETE.md)** - Phase 2: Firebase Integration ⭐
 
 ## License
 

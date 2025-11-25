@@ -1,415 +1,284 @@
-import SwiftUI
 import Core
 import Notes
+import SwiftUI
+import AppKit
 
-/// Rich text note editor
+/// Simple note editor for classroom documents
 public struct NoteEditorView: View {
     @StateObject private var viewModel: NoteEditorViewModel
     @Environment(\.dismiss) private var dismiss
+    @FocusState private var focusedField: Field?
+    @State private var keyMonitor: Any?
     
-    @FocusState private var isTitleFocused: Bool
-    @FocusState private var isContentFocused: Bool
-    
+    enum Field: Hashable {
+        case subject
+        case notes
+    }
+
     public init(viewModel: NoteEditorViewModel) {
         _viewModel = StateObject(wrappedValue: viewModel)
     }
-    
+
     public var body: some View {
         VStack(spacing: 0) {
-            // Toolbar
-            HStack {
-                Button(action: { dismiss() }) {
-                    Image(systemName: "xmark")
-                        .foregroundColor(.primary)
+            // Header with Cancel and Save
+            HStack(spacing: 16) {
+                Button(action: {
+                    dismiss()
+                }) {
+                    Text("Cancel")
+                        .font(.system(size: 16, weight: .medium))
+                        .foregroundColor(.white)
+                        .frame(minWidth: 100, minHeight: 40)
+                        .background(Color(red: 0.9, green: 0.4, blue: 0.5))
+                        .cornerRadius(8)
                 }
+                .buttonStyle(.plain)
                 
                 Spacer()
                 
-                if viewModel.isSaving {
-                    ProgressView()
-                        .progressViewStyle(.circular)
-                } else {
-                    Text(viewModel.lastSaved)
-                        .font(.caption)
-                        .foregroundColor(.secondary)
+                Button(action: {
+                    Task {
+                        await viewModel.saveDocument()
+                        dismiss()
+                    }
+                }) {
+                    Text("Save Note")
+                        .font(.system(size: 16, weight: .semibold))
+                        .foregroundColor(.white)
+                        .frame(minWidth: 120, minHeight: 40)
+                        .background(Color(red: 0.73, green: 0.33, blue: 0.83))
+                        .cornerRadius(8)
                 }
-                
-                Spacer()
-                
-                Menu {
-                    Button(action: { viewModel.generateFlashcards() }) {
-                        Label("Generate Flashcards", systemImage: "rectangle.stack.fill.badge.plus")
-                    }
-                    
-                    Button(action: { viewModel.showLinkNotes.toggle() }) {
-                        Label("Link Notes", systemImage: "link")
-                    }
-                    
-                    Divider()
-                    
-                    Button(role: .destructive, action: { viewModel.deleteNote() }) {
-                        Label("Delete Note", systemImage: "trash")
-                    }
-                } label: {
-                    Image(systemName: "ellipsis.circle")
-                        .foregroundColor(.primary)
-                }
+                .buttonStyle(.plain)
+                .disabled(!viewModel.isValid)
+                .opacity(viewModel.isValid ? 1.0 : 0.5)
             }
             .padding()
-            .background(Color.white)
+            .background(Color.black)
             
             Divider()
             
-            // Editor Content
-            ScrollView {
-                VStack(alignment: .leading, spacing: 16) {
-                    // Title
-                    TextField("Title", text: $viewModel.title)
-                        .font(.title)
-                        .fontWeight(.bold)
-                        .focused($isTitleFocused)
-                        .padding(.horizontal)
-                        .padding(.top)
-                    
-                    // Tags
-                    TagsView(
-                        tags: $viewModel.tags,
-                        onAddTag: { tag in
-                            viewModel.addTag(tag)
-                        },
-                        onRemoveTag: { tag in
-                            viewModel.removeTag(tag)
-                        }
-                    )
-                    .padding(.horizontal)
-                    
-                    // Linked Notes Preview
-                    if !viewModel.linkedNotes.isEmpty {
-                        LinkedNotesPreview(notes: viewModel.linkedNotes) {
-                            viewModel.showLinkNotes = true
-                        }
-                        .padding(.horizontal)
-                    }
-                    
-                    Divider()
-                        .padding(.horizontal)
-                    
-                    // Content Editor
-                    TextEditor(text: $viewModel.content)
+            // Simple Form
+            Form {
+                Section("Class Information") {
+                    TextField("Name of Class", text: $viewModel.subjectMatter)
+                        .textFieldStyle(.plain)
                         .font(.body)
-                        .focused($isContentFocused)
-                        .frame(minHeight: 400)
-                        .padding(.horizontal)
+                        .focused($focusedField, equals: .subject)
+                        .onChange(of: viewModel.subjectMatter) { newValue in
+                            print("📝 [\(Date().formatted(date: .omitted, time: .standard))] Subject changed: '\(newValue)'")
+                            logInputEvent("TextField", newValue)
+                        }
+                        .onTapGesture {
+                            print("👆 TextField tapped - requesting focus")
+                            focusedField = .subject
+                            checkAppState()
+                        }
                 }
-                .padding(.bottom, 100)
+                
+                Section("Date") {
+                    DatePicker("", selection: $viewModel.documentDate, displayedComponents: .date)
+                        .datePickerStyle(.compact)
+                        .labelsHidden()
+                }
+                
+                Section("Notes") {
+                    ZStack(alignment: .topLeading) {
+                        TextEditor(text: $viewModel.content)
+                            .frame(minHeight: 250)
+                            .font(.body)
+                            .scrollContentBackground(.hidden)
+                            .focused($focusedField, equals: .notes)
+                            .onChange(of: viewModel.content) { newValue in
+                                print("📝 [\(Date().formatted(date: .omitted, time: .standard))] Content changed: \(newValue.count) chars")
+                                logInputEvent("TextEditor", newValue)
+                            }
+                            .onTapGesture {
+                                print("👆 TextEditor tapped - requesting focus")
+                                focusedField = .notes
+                                checkAppState()
+                            }
+                        
+                        if viewModel.content.isEmpty {
+                            Text("Add notes here")
+                                .foregroundColor(.gray.opacity(0.5))
+                                .padding(.top, 8)
+                                .padding(.leading, 4)
+                                .allowsHitTesting(false)
+                        }
+                    }
+                }
             }
-            
-            // Formatting Toolbar
-            FormattingToolbar(
-                onBold: { /* Add bold formatting */ },
-                onItalic: { /* Add italic formatting */ },
-                onBullet: { viewModel.insertBulletPoint() },
-                onNumbered: { viewModel.insertNumberedList() },
-                onHeading: { viewModel.insertHeading() }
-            )
+            .formStyle(.grouped)
+            .scrollContentBackground(.hidden)
+            .background(Color(NSColor.windowBackgroundColor))
+        }
+        .onChange(of: focusedField) { newFocus in
+            print("🎯 Focus changed to: \(newFocus?.description ?? "none")")
         }
         .onAppear {
-            isTitleFocused = viewModel.title.isEmpty
-        }
-        .sheet(isPresented: $viewModel.showLinkNotes) {
-            NoteLinkingView(
-                currentNoteId: viewModel.noteId,
-                linkedNoteIds: viewModel.note?.linkedNoteIds ?? [],
-                onLink: { noteId in
-                    Task {
-                        await viewModel.linkNote(noteId)
-                    }
-                }
-            )
-        }
-        .alert("Generate Flashcards", isPresented: $viewModel.showGenerateAlert) {
-            Button("Generate") {
-                Task {
-                    await viewModel.confirmGenerateFlashcards()
-                }
+            print("\n" + String(repeating: "=", count: 60))
+            print("🚀 NOTE EDITOR OPENED")
+            print(String(repeating: "=", count: 60))
+            checkAppState()
+            print(String(repeating: "=", count: 60) + "\n")
+            
+            // Install global keyboard event monitor
+            setupKeyboardMonitor()
+            
+            // Force focus to subject field
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                focusedField = .subject
+                print("⚡ Auto-focused to subject field")
             }
-            Button("Cancel", role: .cancel) {}
-        } message: {
-            Text("Generate flashcards from this note?")
+        }
+        .onDisappear {
+            if let monitor = keyMonitor {
+                NSEvent.removeMonitor(monitor)
+                print("🛑 Removed keyboard monitor")
+            }
+        }
+    }
+    
+    // MARK: - Debugging Helpers
+    
+    private func logInputEvent(_ source: String, _ text: String) {
+        print("⌨️  INPUT EVENT from \(source):")
+        print("   └─ Text: '\(text)'")
+        print("   └─ Length: \(text.count)")
+        print("   └─ Time: \(Date().formatted(date: .omitted, time: .standard))")
+    }
+    
+    private func setupKeyboardMonitor() {
+        print("⌨️  Installing GLOBAL keyboard event monitor...")
+        
+        keyMonitor = NSEvent.addLocalMonitorForEvents(matching: [.keyDown, .keyUp]) { event in
+            let char = event.characters ?? ""
+            let keyCode = event.keyCode
+            print("⌨️  KEYBOARD EVENT DETECTED:")
+            print("   ├─ Type: \(event.type == .keyDown ? "KEY DOWN" : "KEY UP")")
+            print("   ├─ Character: '\(char)'")
+            print("   ├─ Key Code: \(keyCode)")
+            print("   ├─ Modifiers: \(event.modifierFlags)")
+            print("   ├─ Window: \(NSApp?.keyWindow?.title ?? "none")")
+            print("   └─ First Responder: \(NSApp?.keyWindow?.firstResponder?.className ?? "none")")
+            return event
+        }
+        
+        print("✅ Keyboard monitor installed!")
+    }
+    
+    private func checkAppState() {
+        guard let app = NSApp else { return }
+        
+        print("\n📊 APP STATE CHECK:")
+        print("   ├─ App is active: \(app.isActive)")
+        print("   ├─ App is hidden: \(app.isHidden)")
+        print("   ├─ Main window key: \(app.mainWindow?.isKeyWindow ?? false)")
+        print("   ├─ First responder: \(app.keyWindow?.firstResponder?.className ?? "none")")
+        
+        // Check for Notes app
+        let notesRunning = isNotesAppRunning()
+        let notesActive = NSWorkspace.shared.frontmostApplication?.bundleIdentifier == "com.apple.Notes"
+        print("   ├─ Notes.app running: \(notesRunning ? "⚠️ YES" : "✅ NO")")
+        print("   └─ Notes.app frontmost: \(notesActive ? "⚠️ YES" : "✅ NO")")
+        
+        // Try to activate
+        app.activate(ignoringOtherApps: true)
+        print("   └─ Attempted app activation")
+        print("")
+    }
+}
+
+extension NoteEditorView.Field {
+    var description: String {
+        switch self {
+        case .subject: return "Subject Field"
+        case .notes: return "Notes Field"
         }
     }
 }
 
-/// ViewModel for note editor
+func isNotesAppRunning() -> Bool {
+    NSWorkspace.shared.runningApplications.contains { $0.bundleIdentifier == "com.apple.Notes" }
+}
+
 @MainActor
 public class NoteEditorViewModel: ObservableObject {
-    @Published public var title: String = ""
+    @Published public var subjectMatter: String = ""
+    @Published public var documentDate: Date = Date()
     @Published public var content: String = ""
-    @Published public var tags: [String] = []
-    @Published public var linkedNotes: [Note] = []
     @Published public var isSaving: Bool = false
-    @Published public var lastSaved: String = "Not saved"
-    @Published public var showLinkNotes: Bool = false
-    @Published public var showGenerateAlert: Bool = false
     
-    public var note: Note?
-    public let noteId: UUID
-    private let classId: UUID
-    private let userId: UUID
+    private let noteId: String
+    private let classId: String
+    private let userId: String
+    private let existingNote: Note?
+    private let createNoteUseCase: CreateNoteUseCase?
+    private let updateNoteUseCase: UpdateNoteUseCase?
     
-    public init(note: Note? = nil, classId: UUID, userId: UUID) {
-        self.note = note
-        self.noteId = note?.id ?? UUID()
+    public init(
+        note: Note? = nil, 
+        classId: String, 
+        userId: String,
+        createNoteUseCase: CreateNoteUseCase? = nil,
+        updateNoteUseCase: UpdateNoteUseCase? = nil
+    ) {
+        self.existingNote = note
+        self.noteId = note?.id ?? UUID().uuidString
         self.classId = classId
         self.userId = userId
+        self.createNoteUseCase = createNoteUseCase
+        self.updateNoteUseCase = updateNoteUseCase
         
         if let note = note {
-            self.title = note.title
+            self.subjectMatter = note.title
             self.content = note.content
-            self.tags = note.tags
+            self.documentDate = note.createdAt
         }
     }
     
-    public func addTag(_ tag: String) {
-        guard !tag.isEmpty && !tags.contains(tag) else { return }
-        tags.append(tag)
-        saveNote()
-    }
-    
-    public func removeTag(_ tag: String) {
-        tags.removeAll { $0 == tag }
-        saveNote()
-    }
-    
-    public func insertBulletPoint() {
-        content += "\n• "
-    }
-    
-    public func insertNumberedList() {
-        let nextNumber = content.components(separatedBy: "\n").filter { $0.hasPrefix("1.") }.count + 1
-        content += "\n\(nextNumber). "
-    }
-    
-    public func insertHeading() {
-        content += "\n## "
-    }
-    
-    public func generateFlashcards() {
-        showGenerateAlert = true
-    }
-    
-    public func confirmGenerateFlashcards() async {
-        // Implementation would call flashcard generation use case
-    }
-    
-    public func linkNote(_ noteId: UUID) async {
-        // Implementation would call link notes use case
-    }
-    
-    public func deleteNote() {
-        // Implementation would call delete note use case
-    }
-    
-    private func saveNote() {
+    public func saveDocument() async {
+        guard !subjectMatter.isEmpty else { return }
+        
+        print("💾 Saving note...")
         isSaving = true
+        defer { isSaving = false }
         
-        // Auto-save implementation
-        Task {
-            try? await Task.sleep(nanoseconds: 500_000_000)
-            isSaving = false
-            lastSaved = "Saved \(Date().formatted(date: .omitted, time: .shortened))"
-        }
-    }
-}
-
-/// Tags input view
-struct TagsView: View {
-    @Binding var tags: [String]
-    let onAddTag: (String) -> Void
-    let onRemoveTag: (String) -> Void
-    
-    @State private var newTag = ""
-    @FocusState private var isTagFieldFocused: Bool
-    
-    var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            if !tags.isEmpty {
-                FlowLayout(spacing: 8) {
-                    ForEach(tags, id: \.self) { tag in
-                        TagChip(tag: tag) {
-                            onRemoveTag(tag)
-                        }
-                    }
-                }
+        do {
+            let note = Note(
+                id: noteId,
+                classId: classId,
+                userId: userId,
+                title: subjectMatter,
+                content: content,
+                tags: [],
+                createdAt: documentDate,
+                updatedAt: Date()
+            )
+            
+            if existingNote != nil {
+                // Update existing note
+                _ = try await updateNoteUseCase?.execute(note: note)
+                print("✅ Note updated!")
+            } else {
+                // Create new note
+                _ = try await createNoteUseCase?.execute(note: note)
+                print("✅ Note created!")
             }
             
-            HStack {
-                TextField("Add tag...", text: $newTag)
-                    .textFieldStyle(.roundedBorder)
-                    .focused($isTagFieldFocused)
-                    .onSubmit {
-                        onAddTag(newTag)
-                        newTag = ""
-                    }
-                
-                Button(action: {
-                    onAddTag(newTag)
-                    newTag = ""
-                }) {
-                    Image(systemName: "plus.circle.fill")
-                        .foregroundColor(.blue)
-                }
-                .disabled(newTag.isEmpty)
-            }
-        }
-    }
-}
-
-/// Tag chip component
-struct TagChip: View {
-    let tag: String
-    let onRemove: () -> Void
-    
-    var body: some View {
-        HStack(spacing: 4) {
-            Text("#\(tag)")
-                .font(.caption)
-            
-            Button(action: onRemove) {
-                Image(systemName: "xmark.circle.fill")
-                    .font(.caption)
-            }
-        }
-        .padding(.horizontal, 12)
-        .padding(.vertical, 6)
-        .background(Color.blue.opacity(0.2))
-        .foregroundColor(.blue)
-        .cornerRadius(16)
-    }
-}
-
-/// Linked notes preview
-struct LinkedNotesPreview: View {
-    let notes: [Note]
-    let onTap: () -> Void
-    
-    var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack {
-                Image(systemName: "link")
-                    .foregroundColor(.blue)
-                Text("Linked Notes (\(notes.count))")
-                    .font(.subheadline)
-                    .fontWeight(.semibold)
-                
-                Spacer()
-                
-                Button(action: onTap) {
-                    Text("Manage")
-                        .font(.caption)
-                }
-            }
-            
-            ForEach(notes.prefix(3)) { note in
-                HStack {
-                    Image(systemName: "note.text")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                    
-                    Text(note.title)
-                        .font(.caption)
-                        .lineLimit(1)
-                    
-                    Spacer()
-                }
-                .padding(.vertical, 4)
-            }
-        }
-        .padding()
-        .background(Color.blue.opacity(0.05))
-        .cornerRadius(12)
-    }
-}
-
-/// Formatting toolbar
-struct FormattingToolbar: View {
-    let onBold: () -> Void
-    let onItalic: () -> Void
-    let onBullet: () -> Void
-    let onNumbered: () -> Void
-    let onHeading: () -> Void
-    
-    var body: some View {
-        HStack(spacing: 20) {
-            ToolbarButton(icon: "bold", action: onBold)
-            ToolbarButton(icon: "italic", action: onItalic)
-            ToolbarButton(icon: "list.bullet", action: onBullet)
-            ToolbarButton(icon: "list.number", action: onNumbered)
-            ToolbarButton(icon: "textformat.size", action: onHeading)
-        }
-        .padding()
-        .background(Color.gray.opacity(0.1))
-    }
-}
-
-struct ToolbarButton: View {
-    let icon: String
-    let action: () -> Void
-    
-    var body: some View {
-        Button(action: action) {
-            Image(systemName: icon)
-                .foregroundColor(.primary)
-                .frame(width: 44, height: 44)
-        }
-    }
-}
-
-/// Flow layout for tags
-struct FlowLayout: Layout {
-    var spacing: CGFloat = 8
-    
-    func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
-        let result = FlowResult(in: proposal.replacingUnspecifiedDimensions().width, subviews: subviews, spacing: spacing)
-        return result.size
-    }
-    
-    func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) {
-        let result = FlowResult(in: bounds.width, subviews: subviews, spacing: spacing)
-        for (index, subview) in subviews.enumerated() {
-            subview.place(at: CGPoint(x: bounds.minX + result.positions[index].x, y: bounds.minY + result.positions[index].y), proposal: .unspecified)
+            // Notify that note was saved
+            NotificationCenter.default.post(
+                name: NSNotification.Name("NoteDidSave"),
+                object: note
+            )
+        } catch {
+            print("❌ Save failed: \(error)")
         }
     }
     
-    struct FlowResult {
-        var size: CGSize
-        var positions: [CGPoint]
-        
-        init(in maxWidth: CGFloat, subviews: Subviews, spacing: CGFloat) {
-            var positions: [CGPoint] = []
-            var size: CGSize = .zero
-            var currentX: CGFloat = 0
-            var currentY: CGFloat = 0
-            var lineHeight: CGFloat = 0
-            
-            for subview in subviews {
-                let subviewSize = subview.sizeThatFits(.unspecified)
-                
-                if currentX + subviewSize.width > maxWidth && currentX > 0 {
-                    currentX = 0
-                    currentY += lineHeight + spacing
-                    lineHeight = 0
-                }
-                
-                positions.append(CGPoint(x: currentX, y: currentY))
-                currentX += subviewSize.width + spacing
-                lineHeight = max(lineHeight, subviewSize.height)
-                size.width = max(size.width, currentX)
-            }
-            
-            size.height = currentY + lineHeight
-            self.size = size
-            self.positions = positions
-        }
+    public var isValid: Bool {
+        !subjectMatter.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
     }
 }

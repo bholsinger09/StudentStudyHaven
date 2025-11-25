@@ -1,6 +1,6 @@
-import Foundation
-import Core
 import Combine
+import Core
+import Foundation
 
 /// ViewModel for Add/Edit Class screen
 @MainActor
@@ -13,23 +13,23 @@ public final class ClassFormViewModel: ObservableObject {
     @Published public var isLoading: Bool = false
     @Published public var errorMessage: String?
     @Published public var isSaved: Bool = false
-    
+
     private let createClassUseCase: CreateClassUseCase
     private let updateClassUseCase: UpdateClassUseCase
-    private let userId: UUID
+    private let userId: String
     private var existingClass: Class?
-    
+
     public init(
         createClassUseCase: CreateClassUseCase,
         updateClassUseCase: UpdateClassUseCase,
-        userId: UUID,
+        userId: String,
         existingClass: Class? = nil
     ) {
         self.createClassUseCase = createClassUseCase
         self.updateClassUseCase = updateClassUseCase
         self.userId = userId
         self.existingClass = existingClass
-        
+
         if let existing = existingClass {
             self.name = existing.name
             self.courseCode = existing.courseCode
@@ -38,14 +38,14 @@ public final class ClassFormViewModel: ObservableObject {
             self.timeSlots = existing.schedule
         }
     }
-    
+
     public func save() async {
         isLoading = true
         errorMessage = nil
-        
+
         do {
             let classItem = Class(
-                id: existingClass?.id ?? UUID(),
+                id: existingClass?.id ?? UUID().uuidString,
                 userId: userId,
                 name: name,
                 courseCode: courseCode,
@@ -53,27 +53,27 @@ public final class ClassFormViewModel: ObservableObject {
                 professor: professor.isEmpty ? nil : professor,
                 location: location.isEmpty ? nil : location
             )
-            
+
             if existingClass != nil {
                 _ = try await updateClassUseCase.execute(classItem: classItem)
             } else {
                 _ = try await createClassUseCase.execute(classItem: classItem)
             }
-            
+
             isSaved = true
         } catch let error as AppError {
             errorMessage = error.localizedDescription
         } catch {
             errorMessage = "Failed to save class"
         }
-        
+
         isLoading = false
     }
-    
+
     public func addTimeSlot(_ timeSlot: Class.TimeSlot) {
         timeSlots.append(timeSlot)
     }
-    
+
     public func removeTimeSlot(at offsets: IndexSet) {
         timeSlots.remove(atOffsets: offsets)
     }
