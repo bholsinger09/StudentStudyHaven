@@ -61,6 +61,12 @@ public final class ClassFormViewModel: ObservableObject {
             }
 
             isSaved = true
+            
+            // Notify that a class was saved
+            NotificationCenter.default.post(
+                name: NSNotification.Name("ClassDidSave"),
+                object: nil
+            )
         } catch let error as AppError {
             errorMessage = error.localizedDescription
         } catch {

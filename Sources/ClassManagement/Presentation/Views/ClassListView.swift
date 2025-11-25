@@ -46,6 +46,11 @@ public struct ClassListView: View {
             .task {
                 await viewModel.loadClasses()
             }
+            .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("ClassDidSave"))) { _ in
+                Task {
+                    await viewModel.loadClasses()
+                }
+            }
             .alert("Error", isPresented: .constant(viewModel.errorMessage != nil)) {
                 Button("OK") {
                     viewModel.errorMessage = nil

@@ -44,6 +44,11 @@ struct MainTabView: View {
 
     var body: some View {
         TabView {
+            HomeView()
+                .tabItem {
+                    Label("Home", systemImage: "house.fill")
+                }
+
             ClassesTab()
                 .tabItem {
                     Label("Classes", systemImage: "book.fill")

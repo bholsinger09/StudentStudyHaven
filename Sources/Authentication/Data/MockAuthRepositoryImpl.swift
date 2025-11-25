@@ -13,7 +13,7 @@ public final class MockAuthRepositoryImpl: AuthRepositoryProtocol {
             id: "demo-user-123",
             email: "demo@studyhaven.com",
             name: "Demo User",
-            collegeId: "college-1"
+            collegeId: "Boise State University"
         )
         users["demo@studyhaven.com"] = (testUser, "demo123")
     }
