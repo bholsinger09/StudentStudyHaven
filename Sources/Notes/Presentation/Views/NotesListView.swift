@@ -13,8 +13,8 @@ public struct NotesListView: View {
     let updateNoteUseCase: UpdateNoteUseCase
 
     public init(
-        viewModel: NotesListViewModel, 
-        classId: String, 
+        viewModel: NotesListViewModel,
+        classId: String,
         userId: String,
         createNoteUseCase: CreateNoteUseCase,
         updateNoteUseCase: UpdateNoteUseCase
@@ -53,27 +53,27 @@ public struct NotesListView: View {
                     }
                     .buttonStyle(.plain)
                     .padding()
-                    
+
                     List {
                         ForEach(viewModel.filteredNotes) { note in
-                        NavigationLink(
-                            destination:
-                                NoteEditorView(
-                                    viewModel: NoteEditorViewModel(
-                                        note: note,
-                                        classId: classId,
-                                        userId: userId,
-                                        createNoteUseCase: createNoteUseCase,
-                                        updateNoteUseCase: updateNoteUseCase
-                                    ))
-                        ) {
-                            NoteListRowView(note: note)
+                            NavigationLink(
+                                destination:
+                                    NoteEditorView(
+                                        viewModel: NoteEditorViewModel(
+                                            note: note,
+                                            classId: classId,
+                                            userId: userId,
+                                            createNoteUseCase: createNoteUseCase,
+                                            updateNoteUseCase: updateNoteUseCase
+                                        ))
+                            ) {
+                                NoteListRowView(note: note)
+                            }
                         }
-                    }
-                    .onDelete { indexSet in
-                        Task {
-                            await viewModel.deleteNote(at: indexSet)
-                        }
+                        .onDelete { indexSet in
+                            Task {
+                                await viewModel.deleteNote(at: indexSet)
+                            }
                         }
                     }
                     .scrollContentBackground(.hidden)
@@ -97,7 +97,8 @@ public struct NotesListView: View {
         .task {
             await viewModel.loadNotes()
         }
-        .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("NoteDidSave"))) { _ in
+        .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("NoteDidSave"))) {
+            _ in
             Task {
                 await viewModel.loadNotes()
             }
@@ -171,10 +172,10 @@ struct EmptyNotesStateView: View {
             // Black background
             Color.black
                 .ignoresSafeArea()
-            
+
             VStack {
                 Spacer()
-                
+
                 Button(action: onCreate) {
                     Text("Add A Note For Class")
                         .font(.title2)
@@ -184,10 +185,12 @@ struct EmptyNotesStateView: View {
                         .padding(.vertical, 20)
                         .background(Color(red: 0.73, green: 0.33, blue: 0.83))
                         .cornerRadius(15)
-                        .shadow(color: Color(red: 0.73, green: 0.33, blue: 0.83).opacity(0.5), radius: 10, x: 0, y: 5)
+                        .shadow(
+                            color: Color(red: 0.73, green: 0.33, blue: 0.83).opacity(0.5),
+                            radius: 10, x: 0, y: 5)
                 }
                 .buttonStyle(.plain)
-                
+
                 Spacer()
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)

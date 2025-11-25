@@ -25,7 +25,7 @@ public final class LoginViewModel: ObservableObject {
             let credentials = LoginCredentials(email: email, password: password)
             let session = try await loginUseCase.execute(credentials: credentials)
             isLoggedIn = true
-            
+
             // Notify AppState that user logged in
             NotificationCenter.default.post(
                 name: .userDidLogin,

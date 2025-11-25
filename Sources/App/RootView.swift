@@ -222,7 +222,8 @@ struct NotesTab: View {
                 NotesListView(
                     viewModel: NotesListViewModel(
                         getNotesUseCase: GetNotesUseCase(noteRepository: appState.noteRepository),
-                        deleteNoteUseCase: DeleteNoteUseCase(noteRepository: appState.noteRepository),
+                        deleteNoteUseCase: DeleteNoteUseCase(
+                            noteRepository: appState.noteRepository),
                         classId: appState.currentUser?.collegeId ?? ""
                     ),
                     classId: appState.currentUser?.collegeId ?? "",
@@ -272,48 +273,27 @@ struct NoteRowView: View {
 /// Flashcards tab
 struct FlashcardsTab: View {
     @EnvironmentObject var appState: AppState
-    @State private var flashcards: [Flashcard] = []
-    @State private var showingStudyView = false
 
     var body: some View {
         NavigationStack {
-            Group {
-                if flashcards.isEmpty {
-                    EmptyFlashcardsView()
-                } else {
-                    List {
-                        Section {
-                            Button(action: { showingStudyView = true }) {
-                                HStack {
-                                    Image(systemName: "play.fill")
-                                        .font(.title3)
-                                    VStack(alignment: .leading) {
-                                        Text("Start Studying")
-                                            .font(.headline)
-                                        Text("\(flashcards.count) cards ready")
-                                            .font(.caption)
-                                            .foregroundColor(.secondary)
-                                    }
-                                    Spacer()
-                                    Image(systemName: "chevron.right")
-                                        .foregroundColor(.secondary)
-                                }
-                                .padding(.vertical, 8)
-                            }
-                        }
-
-                        Section("All Flashcards") {
-                            ForEach(flashcards) { flashcard in
-                                FlashcardRowView(flashcard: flashcard)
-                            }
-                        }
-                    }
-                }
-            }
-            .navigationTitle("Flashcards")
-            .sheet(isPresented: $showingStudyView) {
-                NavigationStack {
-                    FlashcardStudyView(flashcards: flashcards)
+            if let userId = appState.currentUser?.id {
+                FlashcardListView(
+                    viewModel: FlashcardListViewModel(
+                        getFlashcardsUseCase: GetFlashcardsUseCase(
+                            flashcardRepository: appState.flashcardRepository),
+                        updateFlashcardUseCase: UpdateFlashcardUseCase(
+                            flashcardRepository: appState.flashcardRepository),
+                        createFlashcardUseCase: CreateFlashcardUseCase(
+                            flashcardRepository: appState.flashcardRepository),
+                        classId: appState.currentUser?.collegeId ?? "",
+                        userId: userId
+                    )
+                )
+            } else {
+                ZStack {
+                    Color.black.ignoresSafeArea()
+                    Text("Please log in to view flashcards")
+                        .foregroundColor(.white)
                 }
             }
         }
@@ -339,23 +319,40 @@ struct FlashcardRowView: View {
 
 /// Empty state for flashcards
 struct EmptyFlashcardsView: View {
+    let onCreateFlashcard: () -> Void
+
     var body: some View {
-        VStack(spacing: 20) {
-            Image(systemName: "rectangle.stack.fill")
-                .font(.system(size: 60))
-                .foregroundColor(.green)
+        ZStack {
+            Color.black.ignoresSafeArea()
 
-            Text("No Flashcards Yet")
-                .font(.title2)
-                .fontWeight(.semibold)
+            VStack(spacing: 20) {
+                Image(systemName: "rectangle.stack.fill")
+                    .font(.system(size: 70))
+                    .foregroundColor(.green)
 
-            Text("Create notes and generate flashcards to start studying")
-                .font(.subheadline)
-                .foregroundColor(.secondary)
-                .multilineTextAlignment(.center)
-                .padding(.horizontal, 40)
+                Text("No Flashcards Yet")
+                    .font(.title2)
+                    .fontWeight(.semibold)
+                    .foregroundColor(.white)
+
+                Text("Create notes and generate flashcards to start studying")
+                    .font(.subheadline)
+                    .foregroundColor(.gray)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 40)
+
+                Button(action: onCreateFlashcard) {
+                    Text("Create Flashcard")
+                        .font(.system(size: 16, weight: .semibold))
+                        .foregroundColor(.white)
+                        .frame(minWidth: 180, minHeight: 44)
+                        .background(Color(red: 0.73, green: 0.33, blue: 0.83))
+                        .cornerRadius(10)
+                }
+                .buttonStyle(.plain)
+                .padding(.top, 10)
+            }
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 }
 

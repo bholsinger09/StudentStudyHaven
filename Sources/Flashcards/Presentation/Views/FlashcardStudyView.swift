@@ -190,10 +190,33 @@ struct FlashcardView: View {
 
     var body: some View {
         ZStack {
+            // Front of card
+            if !isShowingAnswer {
+                cardSide(
+                    label: "Question",
+                    text: flashcard.front,
+                    colors: [.blue.opacity(0.8), .blue]
+                )
+            }
+            
+            // Back of card
+            if isShowingAnswer {
+                cardSide(
+                    label: "Answer",
+                    text: flashcard.back,
+                    colors: [.purple.opacity(0.8), .purple]
+                )
+            }
+        }
+        .frame(maxWidth: 350, maxHeight: 500)
+    }
+    
+    private func cardSide(label: String, text: String, colors: [Color]) -> some View {
+        ZStack {
             RoundedRectangle(cornerRadius: 20)
                 .fill(
                     LinearGradient(
-                        colors: [.blue.opacity(0.8), .blue],
+                        colors: colors,
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
                     )
@@ -201,12 +224,12 @@ struct FlashcardView: View {
                 .shadow(radius: 10)
 
             VStack(spacing: 20) {
-                Text(isShowingAnswer ? "Answer" : "Question")
+                Text(label)
                     .font(.caption)
                     .fontWeight(.semibold)
                     .foregroundColor(.white.opacity(0.8))
 
-                Text(isShowingAnswer ? flashcard.back : flashcard.front)
+                Text(text)
                     .font(.title2)
                     .fontWeight(.bold)
                     .foregroundColor(.white)
@@ -218,11 +241,7 @@ struct FlashcardView: View {
                     .foregroundColor(.white.opacity(0.6))
             }
         }
-        .frame(maxWidth: 350, maxHeight: 500)
-        .rotation3DEffect(
-            .degrees(isShowingAnswer ? 180 : 0),
-            axis: (x: 0, y: 1, z: 0)
-        )
+        .transition(.opacity)
     }
 }
 

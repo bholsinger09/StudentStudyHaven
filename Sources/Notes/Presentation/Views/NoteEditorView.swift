@@ -1,7 +1,7 @@
+import AppKit
 import Core
 import Notes
 import SwiftUI
-import AppKit
 
 /// Simple note editor for classroom documents
 public struct NoteEditorView: View {
@@ -9,7 +9,7 @@ public struct NoteEditorView: View {
     @Environment(\.dismiss) private var dismiss
     @FocusState private var focusedField: Field?
     @State private var keyMonitor: Any?
-    
+
     enum Field: Hashable {
         case subject
         case notes
@@ -34,9 +34,9 @@ public struct NoteEditorView: View {
                         .cornerRadius(8)
                 }
                 .buttonStyle(.plain)
-                
+
                 Spacer()
-                
+
                 Button(action: {
                     Task {
                         await viewModel.saveDocument()
@@ -56,9 +56,9 @@ public struct NoteEditorView: View {
             }
             .padding()
             .background(Color.black)
-            
+
             Divider()
-            
+
             // Simple Form
             Form {
                 Section("Class Information") {
@@ -67,7 +67,9 @@ public struct NoteEditorView: View {
                         .font(.body)
                         .focused($focusedField, equals: .subject)
                         .onChange(of: viewModel.subjectMatter) { newValue in
-                            print("📝 [\(Date().formatted(date: .omitted, time: .standard))] Subject changed: '\(newValue)'")
+                            print(
+                                "📝 [\(Date().formatted(date: .omitted, time: .standard))] Subject changed: '\(newValue)'"
+                            )
                             logInputEvent("TextField", newValue)
                         }
                         .onTapGesture {
@@ -76,13 +78,13 @@ public struct NoteEditorView: View {
                             checkAppState()
                         }
                 }
-                
+
                 Section("Date") {
                     DatePicker("", selection: $viewModel.documentDate, displayedComponents: .date)
                         .datePickerStyle(.compact)
                         .labelsHidden()
                 }
-                
+
                 Section("Notes") {
                     ZStack(alignment: .topLeading) {
                         TextEditor(text: $viewModel.content)
@@ -91,7 +93,9 @@ public struct NoteEditorView: View {
                             .scrollContentBackground(.hidden)
                             .focused($focusedField, equals: .notes)
                             .onChange(of: viewModel.content) { newValue in
-                                print("📝 [\(Date().formatted(date: .omitted, time: .standard))] Content changed: \(newValue.count) chars")
+                                print(
+                                    "📝 [\(Date().formatted(date: .omitted, time: .standard))] Content changed: \(newValue.count) chars"
+                                )
                                 logInputEvent("TextEditor", newValue)
                             }
                             .onTapGesture {
@@ -99,7 +103,7 @@ public struct NoteEditorView: View {
                                 focusedField = .notes
                                 checkAppState()
                             }
-                        
+
                         if viewModel.content.isEmpty {
                             Text("Add notes here")
                                 .foregroundColor(.gray.opacity(0.5))
@@ -123,10 +127,10 @@ public struct NoteEditorView: View {
             print(String(repeating: "=", count: 60))
             checkAppState()
             print(String(repeating: "=", count: 60) + "\n")
-            
+
             // Install global keyboard event monitor
             setupKeyboardMonitor()
-            
+
             // Force focus to subject field
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
                 focusedField = .subject
@@ -140,19 +144,19 @@ public struct NoteEditorView: View {
             }
         }
     }
-    
+
     // MARK: - Debugging Helpers
-    
+
     private func logInputEvent(_ source: String, _ text: String) {
         print("⌨️  INPUT EVENT from \(source):")
         print("   └─ Text: '\(text)'")
         print("   └─ Length: \(text.count)")
         print("   └─ Time: \(Date().formatted(date: .omitted, time: .standard))")
     }
-    
+
     private func setupKeyboardMonitor() {
         print("⌨️  Installing GLOBAL keyboard event monitor...")
-        
+
         keyMonitor = NSEvent.addLocalMonitorForEvents(matching: [.keyDown, .keyUp]) { event in
             let char = event.characters ?? ""
             let keyCode = event.keyCode
@@ -165,25 +169,26 @@ public struct NoteEditorView: View {
             print("   └─ First Responder: \(NSApp?.keyWindow?.firstResponder?.className ?? "none")")
             return event
         }
-        
+
         print("✅ Keyboard monitor installed!")
     }
-    
+
     private func checkAppState() {
         guard let app = NSApp else { return }
-        
+
         print("\n📊 APP STATE CHECK:")
         print("   ├─ App is active: \(app.isActive)")
         print("   ├─ App is hidden: \(app.isHidden)")
         print("   ├─ Main window key: \(app.mainWindow?.isKeyWindow ?? false)")
         print("   ├─ First responder: \(app.keyWindow?.firstResponder?.className ?? "none")")
-        
+
         // Check for Notes app
         let notesRunning = isNotesAppRunning()
-        let notesActive = NSWorkspace.shared.frontmostApplication?.bundleIdentifier == "com.apple.Notes"
+        let notesActive =
+            NSWorkspace.shared.frontmostApplication?.bundleIdentifier == "com.apple.Notes"
         print("   ├─ Notes.app running: \(notesRunning ? "⚠️ YES" : "✅ NO")")
         print("   └─ Notes.app frontmost: \(notesActive ? "⚠️ YES" : "✅ NO")")
-        
+
         // Try to activate
         app.activate(ignoringOtherApps: true)
         print("   └─ Attempted app activation")
@@ -210,17 +215,17 @@ public class NoteEditorViewModel: ObservableObject {
     @Published public var documentDate: Date = Date()
     @Published public var content: String = ""
     @Published public var isSaving: Bool = false
-    
+
     private let noteId: String
     private let classId: String
     private let userId: String
     private let existingNote: Note?
     private let createNoteUseCase: CreateNoteUseCase?
     private let updateNoteUseCase: UpdateNoteUseCase?
-    
+
     public init(
-        note: Note? = nil, 
-        classId: String, 
+        note: Note? = nil,
+        classId: String,
         userId: String,
         createNoteUseCase: CreateNoteUseCase? = nil,
         updateNoteUseCase: UpdateNoteUseCase? = nil
@@ -231,21 +236,21 @@ public class NoteEditorViewModel: ObservableObject {
         self.userId = userId
         self.createNoteUseCase = createNoteUseCase
         self.updateNoteUseCase = updateNoteUseCase
-        
+
         if let note = note {
             self.subjectMatter = note.title
             self.content = note.content
             self.documentDate = note.createdAt
         }
     }
-    
+
     public func saveDocument() async {
         guard !subjectMatter.isEmpty else { return }
-        
+
         print("💾 Saving note...")
         isSaving = true
         defer { isSaving = false }
-        
+
         do {
             let note = Note(
                 id: noteId,
@@ -257,7 +262,7 @@ public class NoteEditorViewModel: ObservableObject {
                 createdAt: documentDate,
                 updatedAt: Date()
             )
-            
+
             if existingNote != nil {
                 // Update existing note
                 _ = try await updateNoteUseCase?.execute(note: note)
@@ -267,7 +272,7 @@ public class NoteEditorViewModel: ObservableObject {
                 _ = try await createNoteUseCase?.execute(note: note)
                 print("✅ Note created!")
             }
-            
+
             // Notify that note was saved
             NotificationCenter.default.post(
                 name: NSNotification.Name("NoteDidSave"),
@@ -277,7 +282,7 @@ public class NoteEditorViewModel: ObservableObject {
             print("❌ Save failed: \(error)")
         }
     }
-    
+
     public var isValid: Bool {
         !subjectMatter.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
     }

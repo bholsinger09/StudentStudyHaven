@@ -13,7 +13,8 @@ public struct NoteLinkingView: View {
     @State private var availableNotes: [Note] = []
     @State private var selectedNotes: Set<String> = []
 
-    public init(currentNoteId: String, linkedNoteIds: [String], onLink: @escaping (String) -> Void) {
+    public init(currentNoteId: String, linkedNoteIds: [String], onLink: @escaping (String) -> Void)
+    {
         self.currentNoteId = currentNoteId
         self.linkedNoteIds = linkedNoteIds
         self.onLink = onLink

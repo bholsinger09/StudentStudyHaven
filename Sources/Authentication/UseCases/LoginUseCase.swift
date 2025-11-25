@@ -31,7 +31,9 @@ public final class LoginUseCase {
         // Simple validation: contains @ and a dot after @
         guard email.contains("@") else { return false }
         let components = email.components(separatedBy: "@")
-        guard components.count == 2, !components[0].isEmpty, !components[1].isEmpty else { return false }
+        guard components.count == 2, !components[0].isEmpty, !components[1].isEmpty else {
+            return false
+        }
         return components[1].contains(".")
     }
 }

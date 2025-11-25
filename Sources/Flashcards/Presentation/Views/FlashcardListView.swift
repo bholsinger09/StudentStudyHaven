@@ -6,6 +6,7 @@ import SwiftUI
 public struct FlashcardListView: View {
     @StateObject private var viewModel: FlashcardListViewModel
     @State private var showingStudyView = false
+    @State private var showingCreateFlashcard = false
 
     public init(viewModel: FlashcardListViewModel) {
         _viewModel = StateObject(wrappedValue: viewModel)
@@ -16,7 +17,7 @@ public struct FlashcardListView: View {
             if viewModel.isLoading {
                 ProgressView()
             } else if viewModel.flashcards.isEmpty {
-                EmptyFlashcardsStateView()
+                EmptyFlashcardsStateView(showingCreateFlashcard: $showingCreateFlashcard)
             } else {
                 List {
                     // Study Button Section
@@ -25,7 +26,9 @@ public struct FlashcardListView: View {
                             HStack {
                                 ZStack {
                                     Circle()
-                                        .fill(Color(red: 0.73, green: 0.33, blue: 0.83).opacity(0.2))
+                                        .fill(
+                                            Color(red: 0.73, green: 0.33, blue: 0.83).opacity(0.2)
+                                        )
                                         .frame(width: 50, height: 50)
 
                                     Image(systemName: "play.fill")
@@ -68,10 +71,10 @@ public struct FlashcardListView: View {
             if !viewModel.flashcards.isEmpty {
                 ToolbarItem(placement: .primaryAction) {
                     Menu {
-                        Button(action: {}) {
+                        Button(action: { showingCreateFlashcard = true }) {
                             Label("Create Flashcard", systemImage: "plus")
                         }
-                        Button(action: {}) {
+                        Button(action: { /* TODO: Generate from notes */  }) {
                             Label("Generate from Notes", systemImage: "wand.and.stars")
                         }
                     } label: {
@@ -84,6 +87,19 @@ public struct FlashcardListView: View {
             NavigationStack {
                 FlashcardStudyView(flashcards: viewModel.flashcards)
             }
+        }
+        .sheet(isPresented: $showingCreateFlashcard) {
+            FlashcardEditorView(
+                front: "",
+                back: "",
+                onSave: { front, back in
+                    Task {
+                        await viewModel.createFlashcard(front: front, back: back)
+                    }
+                    showingCreateFlashcard = false
+                }
+            )
+            .frame(width: 500, height: 400)
         }
         .task {
             await viewModel.loadFlashcards()
@@ -132,12 +148,14 @@ struct FlashcardListRow: View {
 
 /// Empty state for flashcards
 struct EmptyFlashcardsStateView: View {
+    @Binding var showingCreateFlashcard: Bool
+
     var body: some View {
         ZStack {
             // Black background
             Color.black
                 .ignoresSafeArea()
-            
+
             VStack(spacing: 24) {
                 Image(systemName: "rectangle.stack")
                     .font(.system(size: 70))
@@ -157,7 +175,7 @@ struct EmptyFlashcardsStateView: View {
                 }
 
                 VStack(spacing: 12) {
-                    Button(action: {}) {
+                    Button(action: { showingCreateFlashcard = true }) {
                         Label("Create Flashcard", systemImage: "plus")
                             .font(.headline)
                             .fontWeight(.semibold)
@@ -166,11 +184,13 @@ struct EmptyFlashcardsStateView: View {
                             .padding()
                             .background(Color(red: 0.0, green: 0.2, blue: 0.4))
                             .cornerRadius(12)
-                            .shadow(color: Color(red: 0.0, green: 0.2, blue: 0.4).opacity(0.3), radius: 8, x: 0, y: 4)
+                            .shadow(
+                                color: Color(red: 0.0, green: 0.2, blue: 0.4).opacity(0.3),
+                                radius: 8, x: 0, y: 4)
                     }
                     .buttonStyle(.plain)
 
-                    Button(action: {}) {
+                    Button(action: { /* TODO: Generate from notes */  }) {
                         Label("Generate from Notes", systemImage: "wand.and.stars")
                             .font(.headline)
                             .fontWeight(.semibold)

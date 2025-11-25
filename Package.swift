@@ -38,10 +38,10 @@ let package = Package(
         .executableTarget(
             name: "App",
             dependencies: [
-                "Core", 
-                "Authentication", 
-                "ClassManagement", 
-                "Flashcards", 
+                "Core",
+                "Authentication",
+                "ClassManagement",
+                "Flashcards",
                 "Notes",
                 // Firebase temporarily disabled
                 // .product(name: "FirebaseAuth", package: "firebase-ios-sdk"),
@@ -69,7 +69,7 @@ let package = Package(
         .target(
             name: "Authentication",
             dependencies: [
-                "Core",
+                "Core"
                 // Firebase temporarily disabled
                 // .product(name: "FirebaseAuth", package: "firebase-ios-sdk"),
                 // .product(name: "FirebaseFirestore", package: "firebase-ios-sdk"),
@@ -85,7 +85,7 @@ let package = Package(
         .target(
             name: "ClassManagement",
             dependencies: [
-                "Core",
+                "Core"
                 // Firebase temporarily disabled
                 // .product(name: "FirebaseFirestore", package: "firebase-ios-sdk"),
                 // .product(name: "FirebaseFirestoreSwift", package: "firebase-ios-sdk"),
@@ -100,7 +100,7 @@ let package = Package(
         .target(
             name: "Flashcards",
             dependencies: [
-                "Core",
+                "Core"
                 // Firebase temporarily disabled
                 // .product(name: "FirebaseFirestore", package: "firebase-ios-sdk"),
                 // .product(name: "FirebaseFirestoreSwift", package: "firebase-ios-sdk"),
@@ -115,7 +115,7 @@ let package = Package(
         .target(
             name: "Notes",
             dependencies: [
-                "Core",
+                "Core"
                 // Firebase temporarily disabled
                 // .product(name: "FirebaseFirestore", package: "firebase-ios-sdk"),
                 // .product(name: "FirebaseFirestoreSwift", package: "firebase-ios-sdk"),

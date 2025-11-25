@@ -16,10 +16,10 @@ public struct LoginView: View {
                 // Black background
                 Color.black
                     .ignoresSafeArea()
-                
+
                 VStack(spacing: 25) {
                     Spacer()
-                    
+
                     // App Logo/Title with softer styling
                     VStack(spacing: 12) {
                         Image(systemName: "book.fill")
@@ -50,10 +50,12 @@ public struct LoginView: View {
                                 .cornerRadius(12)
                                 .overlay(
                                     RoundedRectangle(cornerRadius: 12)
-                                        .stroke(Color(red: 0.73, green: 0.33, blue: 0.83).opacity(0.3), lineWidth: 1)
+                                        .stroke(
+                                            Color(red: 0.73, green: 0.33, blue: 0.83).opacity(0.3),
+                                            lineWidth: 1)
                                 )
                         }
-                        
+
                         // Password field
                         VStack(alignment: .leading, spacing: 8) {
                             Text("Password")
@@ -77,8 +79,11 @@ public struct LoginView: View {
                                 Button(action: {
                                     isPasswordVisible.toggle()
                                 }) {
-                                    Image(systemName: isPasswordVisible ? "eye.slash.fill" : "eye.fill")
-                                        .foregroundColor(Color(red: 0.73, green: 0.33, blue: 0.83))
+                                    Image(
+                                        systemName: isPasswordVisible
+                                            ? "eye.slash.fill" : "eye.fill"
+                                    )
+                                    .foregroundColor(Color(red: 0.73, green: 0.33, blue: 0.83))
                                 }
                                 .buttonStyle(.plain)
                             }
@@ -87,7 +92,9 @@ public struct LoginView: View {
                             .cornerRadius(12)
                             .overlay(
                                 RoundedRectangle(cornerRadius: 12)
-                                    .stroke(Color(red: 0.73, green: 0.33, blue: 0.83).opacity(0.3), lineWidth: 1)
+                                    .stroke(
+                                        Color(red: 0.73, green: 0.33, blue: 0.83).opacity(0.3),
+                                        lineWidth: 1)
                             )
                         }
 
@@ -122,7 +129,9 @@ public struct LoginView: View {
                             .padding()
                             .background(Color(red: 0.0, green: 0.2, blue: 0.4))
                             .cornerRadius(12)
-                            .shadow(color: Color(red: 0.0, green: 0.2, blue: 0.4).opacity(0.3), radius: 8, x: 0, y: 4)
+                            .shadow(
+                                color: Color(red: 0.0, green: 0.2, blue: 0.4).opacity(0.3),
+                                radius: 8, x: 0, y: 4)
                         }
                         .buttonStyle(.plain)
                         .disabled(viewModel.isLoading)

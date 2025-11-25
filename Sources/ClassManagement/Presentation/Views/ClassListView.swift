@@ -246,7 +246,7 @@ struct EmptyClassesView: View {
             // Black background
             Color.black
                 .ignoresSafeArea()
-            
+
             VStack(spacing: 24) {
                 Image(systemName: "calendar.badge.plus")
                     .font(.system(size: 70))
@@ -274,7 +274,9 @@ struct EmptyClassesView: View {
                         .frame(maxWidth: 200)
                         .background(Color(red: 0.0, green: 0.2, blue: 0.4))
                         .cornerRadius(12)
-                        .shadow(color: Color(red: 0.0, green: 0.2, blue: 0.4).opacity(0.3), radius: 8, x: 0, y: 4)
+                        .shadow(
+                            color: Color(red: 0.0, green: 0.2, blue: 0.4).opacity(0.3), radius: 8,
+                            x: 0, y: 4)
                 }
                 .buttonStyle(.plain)
             }
