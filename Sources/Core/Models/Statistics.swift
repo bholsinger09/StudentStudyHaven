@@ -288,7 +288,7 @@ public final class ProgressTracker {
         
         // Update accuracy
         if flashcardsReviewed > 0 {
-            let sessionAccuracy = Double(correctFlashcards) / Double(flashcardsReviewed)
+            let _ = Double(correctFlashcards) / Double(flashcardsReviewed)
             let totalCorrect = stats.flashcardAccuracy * Double(stats.totalFlashcardsReviewed - flashcardsReviewed) + Double(correctFlashcards)
             stats.flashcardAccuracy = totalCorrect / Double(stats.totalFlashcardsReviewed)
         }

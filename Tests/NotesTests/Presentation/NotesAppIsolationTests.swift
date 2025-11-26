@@ -1,7 +1,10 @@
 import XCTest
+#if canImport(AppKit)
 import AppKit
+#endif
 @testable import Notes
 
+#if os(macOS)
 /// Enhanced tests that verify Notes app doesn't intercept our text input
 @MainActor
 final class NotesAppIsolationTests: XCTestCase {
@@ -261,3 +264,4 @@ final class NotesAppIsolationTests: XCTestCase {
         print(\"\u2705 PASS: Debug log size limited (\\(viewModel.inputDebugLog.count) entries)\")
     }
 }
+#endif

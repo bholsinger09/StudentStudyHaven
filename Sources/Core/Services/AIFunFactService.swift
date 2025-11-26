@@ -8,21 +8,13 @@ public class AIFunFactService {
     
     /// Generate fun facts for a college using AI
     public func generateFunFacts(for collegeName: String) async throws -> [FunFact] {
-        // Use macOS native NaturalLanguage framework for simple generation
         // In production, this would call OpenAI, Claude, or similar API
-        
-        let prompt = """
-        Generate 5 interesting and accurate fun facts about \(collegeName).
-        Each fact should have:
-        1. A short title (2-4 words)
-        2. A brief description (one sentence)
-        3. An appropriate SF Symbol icon name
-        
-        Focus on: academic achievements, notable alumni, campus features, historical significance, and unique traditions.
-        """
+        // Future prompt template:
+        // "Generate 5 interesting and accurate fun facts about \(collegeName).
+        //  Each fact should have: title (2-4 words), description (one sentence), SF Symbol icon.
+        //  Focus on: academic achievements, notable alumni, campus features, historical significance."
         
         // For now, return generated facts based on patterns
-        // In production, replace with actual AI API call
         return try await generateFactsLocally(for: collegeName)
     }
     

@@ -1,4 +1,6 @@
+#if canImport(AppKit)
 import AppKit
+#endif
 import Core
 import Notes
 import SwiftUI
@@ -116,7 +118,11 @@ public struct NoteEditorView: View {
             }
             .formStyle(.grouped)
             .scrollContentBackground(.hidden)
+            #if os(macOS)
             .background(Color(NSColor.windowBackgroundColor))
+            #else
+            .background(Color(.systemGroupedBackground))
+            #endif
         }
         .onChange(of: focusedField) { newFocus in
             print("🎯 Focus changed to: \(newFocus?.description ?? "none")")
@@ -138,10 +144,12 @@ public struct NoteEditorView: View {
             }
         }
         .onDisappear {
+            #if os(macOS)
             if let monitor = keyMonitor {
                 NSEvent.removeMonitor(monitor)
                 print("🛑 Removed keyboard monitor")
             }
+            #endif
         }
     }
 
@@ -155,6 +163,7 @@ public struct NoteEditorView: View {
     }
 
     private func setupKeyboardMonitor() {
+        #if os(macOS)
         print("⌨️  Installing GLOBAL keyboard event monitor...")
 
         keyMonitor = NSEvent.addLocalMonitorForEvents(matching: [.keyDown, .keyUp]) { event in
@@ -171,9 +180,13 @@ public struct NoteEditorView: View {
         }
 
         print("✅ Keyboard monitor installed!")
+        #else
+        print("⌨️  Keyboard monitoring not available on iOS")
+        #endif
     }
 
     private func checkAppState() {
+        #if os(macOS)
         guard let app = NSApp else { return }
 
         print("\n📊 APP STATE CHECK:")
@@ -193,6 +206,9 @@ public struct NoteEditorView: View {
         app.activate(ignoringOtherApps: true)
         print("   └─ Attempted app activation")
         print("")
+        #else
+        print("\n📊 APP STATE CHECK (iOS - limited info)")
+        #endif
     }
 }
 
@@ -206,7 +222,11 @@ extension NoteEditorView.Field {
 }
 
 func isNotesAppRunning() -> Bool {
-    NSWorkspace.shared.runningApplications.contains { $0.bundleIdentifier == "com.apple.Notes" }
+    #if os(macOS)
+    return NSWorkspace.shared.runningApplications.contains { $0.bundleIdentifier == "com.apple.Notes" }
+    #else
+    return false
+    #endif
 }
 
 @MainActor
