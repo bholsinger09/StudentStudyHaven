@@ -98,7 +98,7 @@ public struct FlashcardListView: View {
                     showingCreateFlashcard = false
                 }
             )
-            .frame(width: 500, height: 400)
+            .presentationDetents([.large])
         }
         .task {
             await viewModel.loadFlashcards()

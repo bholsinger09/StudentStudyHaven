@@ -17,14 +17,15 @@ struct FlashcardEditorView: View {
     var body: some View {
         VStack(spacing: 0) {
             // Header with Cancel and Save buttons
-            HStack(spacing: 16) {
+            HStack(spacing: 12) {
                 Button(action: {
                     dismiss()
                 }) {
                     Text("Cancel")
-                        .font(.system(size: 16, weight: .medium))
+                        .font(.system(size: 15, weight: .medium))
                         .foregroundColor(.white)
-                        .frame(minWidth: 100, minHeight: 40)
+                        .padding(.horizontal, 20)
+                        .padding(.vertical, 10)
                         .background(Color(red: 0.9, green: 0.4, blue: 0.5))
                         .cornerRadius(8)
                 }
@@ -37,9 +38,10 @@ struct FlashcardEditorView: View {
                     dismiss()
                 }) {
                     Text("Save Flashcard")
-                        .font(.system(size: 16, weight: .semibold))
+                        .font(.system(size: 15, weight: .semibold))
                         .foregroundColor(.white)
-                        .frame(minWidth: 140, minHeight: 40)
+                        .padding(.horizontal, 20)
+                        .padding(.vertical, 10)
                         .background(Color(red: 0.73, green: 0.33, blue: 0.83))
                         .cornerRadius(8)
                 }
@@ -53,7 +55,8 @@ struct FlashcardEditorView: View {
                         || back.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty) ? 0.5 : 1.0
                 )
             }
-            .padding()
+            .padding(.horizontal, 16)
+            .padding(.vertical, 12)
             .background(Color.black)
 
             Divider()
@@ -61,17 +64,23 @@ struct FlashcardEditorView: View {
             // Form
             Form {
                 Section("Front (Question)") {
-                    TextEditor(text: $front)
-                        .frame(minHeight: 100)
-                        .font(.body)
-                        .scrollContentBackground(.hidden)
+                    GeometryReader { geometry in
+                        TextEditor(text: $front)
+                            .frame(height: max(100, geometry.size.height * 0.35))
+                            .font(.body)
+                            .scrollContentBackground(.hidden)
+                    }
+                    .frame(minHeight: 100)
                 }
 
                 Section("Back (Answer)") {
-                    TextEditor(text: $back)
-                        .frame(minHeight: 100)
-                        .font(.body)
-                        .scrollContentBackground(.hidden)
+                    GeometryReader { geometry in
+                        TextEditor(text: $back)
+                            .frame(height: max(100, geometry.size.height * 0.35))
+                            .font(.body)
+                            .scrollContentBackground(.hidden)
+                    }
+                    .frame(minHeight: 100)
                 }
             }
             .formStyle(.grouped)
