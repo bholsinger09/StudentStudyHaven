@@ -1,9 +1,13 @@
 import Core
 import Foundation
+import Combine
 
 /// Mock implementation of NoteRepository for development and testing
 public final class MockNoteRepositoryImpl: NoteRepositoryProtocol {
     private var notes: [String: Note] = [:]
+    private let notesSubject = CurrentValueSubject<[Note], Never>([])
+    private let changesSubject = PassthroughSubject<DataChange<Note>, Never>()
+    private var isObserving = false
 
     public init() {}
 
@@ -41,6 +45,12 @@ public final class MockNoteRepositoryImpl: NoteRepositoryProtocol {
         try await Task.sleep(nanoseconds: 300_000_000)
 
         notes[note.id] = note
+        
+        if isObserving {
+            changesSubject.send(DataChange(type: .added, item: note))
+            updateNotesSubject()
+        }
+        
         return note
     }
 
@@ -55,6 +65,12 @@ public final class MockNoteRepositoryImpl: NoteRepositoryProtocol {
         var updatedNote = note
         updatedNote.updatedAt = Date()
         notes[note.id] = updatedNote
+        
+        if isObserving {
+            changesSubject.send(DataChange(type: .modified, item: updatedNote))
+            updateNotesSubject()
+        }
+        
         return updatedNote
     }
 
@@ -62,11 +78,16 @@ public final class MockNoteRepositoryImpl: NoteRepositoryProtocol {
         // Simulate network delay
         try await Task.sleep(nanoseconds: 300_000_000)
 
-        guard notes[id] != nil else {
+        guard let deletedNote = notes[id] else {
             throw AppError.notFound("Note not found")
         }
 
         notes.removeValue(forKey: id)
+        
+        if isObserving {
+            changesSubject.send(DataChange(type: .removed, item: deletedNote))
+            updateNotesSubject()
+        }
     }
 
     public func searchNotes(query: String, classId: String?) async throws -> [Note] {
@@ -85,5 +106,39 @@ public final class MockNoteRepositoryImpl: NoteRepositoryProtocol {
                 || $0.content.lowercased().contains(lowercasedQuery)
                 || $0.tags.contains { $0.lowercased().contains(lowercasedQuery) }
         }
+    }
+    
+    // MARK: - Real-time listeners
+    
+    public func observeNotes(for classId: String) -> AnyPublisher<[Note], Never> {
+        isObserving = true
+        // Initial load
+        Task {
+            do {
+                let initialNotes = try await getNotes(for: classId)
+                notesSubject.send(initialNotes)
+            } catch {
+                notesSubject.send([])
+            }
+        }
+        return notesSubject.eraseToAnyPublisher()
+    }
+    
+    public func observeNoteChanges(for classId: String) -> AnyPublisher<DataChange<Note>, Never> {
+        isObserving = true
+        return changesSubject
+            .filter { $0.item.classId == classId }
+            .eraseToAnyPublisher()
+    }
+    
+    public func stopObserving() {
+        isObserving = false
+    }
+    
+    // MARK: - Private helpers
+    
+    private func updateNotesSubject() {
+        let allNotes = Array(notes.values)
+        notesSubject.send(allNotes)
     }
 }

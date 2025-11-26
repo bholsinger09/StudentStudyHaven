@@ -9,6 +9,7 @@ public struct Flashcard: Identifiable, Codable, Equatable {
     public var back: String
     public var noteIds: [String]
     public var lastReviewedAt: Date?
+    public var reviewData: ReviewData?
     public var createdAt: Date
     public var updatedAt: Date
 
@@ -20,6 +21,7 @@ public struct Flashcard: Identifiable, Codable, Equatable {
         back: String,
         noteIds: [String] = [],
         lastReviewedAt: Date? = nil,
+        reviewData: ReviewData? = nil,
         createdAt: Date = Date(),
         updatedAt: Date = Date()
     ) {
@@ -30,7 +32,31 @@ public struct Flashcard: Identifiable, Codable, Equatable {
         self.back = back
         self.noteIds = noteIds
         self.lastReviewedAt = lastReviewedAt
+        self.reviewData = reviewData
         self.createdAt = createdAt
         self.updatedAt = updatedAt
+    }
+}
+
+/// Review data for spaced repetition
+public struct ReviewData: Codable, Equatable {
+    public var repetitions: Int
+    public var easeFactor: Double
+    public var interval: Int
+    public var nextReviewDate: Date
+    public var lastReviewDate: Date?
+    
+    public init(
+        repetitions: Int = 0,
+        easeFactor: Double = 2.5,
+        interval: Int = 0,
+        nextReviewDate: Date = Date(),
+        lastReviewDate: Date? = nil
+    ) {
+        self.repetitions = repetitions
+        self.easeFactor = easeFactor
+        self.interval = interval
+        self.nextReviewDate = nextReviewDate
+        self.lastReviewDate = lastReviewDate
     }
 }

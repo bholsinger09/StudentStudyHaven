@@ -1,4 +1,5 @@
 import Foundation
+import Combine
 
 /// Protocol for User Repository
 public protocol UserRepositoryProtocol {
@@ -22,6 +23,11 @@ public protocol ClassRepositoryProtocol {
     func createClass(_ classItem: Class) async throws -> Class
     func updateClass(_ classItem: Class) async throws -> Class
     func deleteClass(id: String) async throws
+    
+    // Real-time listeners
+    func observeClasses(for userId: String) -> AnyPublisher<[Class], Never>
+    func observeClassChanges(for userId: String) -> AnyPublisher<DataChange<Class>, Never>
+    func stopObserving()
 }
 
 /// Protocol for Flashcard Repository
@@ -32,6 +38,11 @@ public protocol FlashcardRepositoryProtocol {
     func createFlashcards(_ flashcards: [Flashcard]) async throws -> [Flashcard]
     func updateFlashcard(_ flashcard: Flashcard) async throws -> Flashcard
     func deleteFlashcard(id: String) async throws
+    
+    // Real-time listeners
+    func observeFlashcards(for classId: String) -> AnyPublisher<[Flashcard], Never>
+    func observeFlashcardChanges(for classId: String) -> AnyPublisher<DataChange<Flashcard>, Never>
+    func stopObserving()
 }
 
 /// Protocol for Note Repository
@@ -43,4 +54,9 @@ public protocol NoteRepositoryProtocol {
     func updateNote(_ note: Note) async throws -> Note
     func deleteNote(id: String) async throws
     func searchNotes(query: String, classId: String?) async throws -> [Note]
+    
+    // Real-time listeners
+    func observeNotes(for classId: String) -> AnyPublisher<[Note], Never>
+    func observeNoteChanges(for classId: String) -> AnyPublisher<DataChange<Note>, Never>
+    func stopObserving()
 }

@@ -1,9 +1,13 @@
 import Core
 import Foundation
+import Combine
 
 /// Mock implementation of FlashcardRepository for development and testing
 public final class MockFlashcardRepositoryImpl: FlashcardRepositoryProtocol {
     private var flashcards: [String: Flashcard] = [:]
+    private let flashcardsSubject = CurrentValueSubject<[Flashcard], Never>([])
+    private let changesSubject = PassthroughSubject<DataChange<Flashcard>, Never>()
+    private var isObserving = false
 
     public init() {}
 
@@ -30,6 +34,12 @@ public final class MockFlashcardRepositoryImpl: FlashcardRepositoryProtocol {
         try await Task.sleep(nanoseconds: 300_000_000)
 
         flashcards[flashcard.id] = flashcard
+        
+        if isObserving {
+            changesSubject.send(DataChange(type: .added, item: flashcard))
+            updateFlashcardsSubject()
+        }
+        
         return flashcard
     }
 
@@ -39,6 +49,14 @@ public final class MockFlashcardRepositoryImpl: FlashcardRepositoryProtocol {
 
         for flashcard in flashcardList {
             flashcards[flashcard.id] = flashcard
+            
+            if isObserving {
+                changesSubject.send(DataChange(type: .added, item: flashcard))
+            }
+        }
+        
+        if isObserving {
+            updateFlashcardsSubject()
         }
 
         return flashcardList
@@ -55,6 +73,12 @@ public final class MockFlashcardRepositoryImpl: FlashcardRepositoryProtocol {
         var updatedFlashcard = flashcard
         updatedFlashcard.updatedAt = Date()
         flashcards[flashcard.id] = updatedFlashcard
+        
+        if isObserving {
+            changesSubject.send(DataChange(type: .modified, item: updatedFlashcard))
+            updateFlashcardsSubject()
+        }
+        
         return updatedFlashcard
     }
 
@@ -62,10 +86,49 @@ public final class MockFlashcardRepositoryImpl: FlashcardRepositoryProtocol {
         // Simulate network delay
         try await Task.sleep(nanoseconds: 300_000_000)
 
-        guard flashcards[id] != nil else {
+        guard let deletedFlashcard = flashcards[id] else {
             throw AppError.notFound("Flashcard not found")
         }
 
         flashcards.removeValue(forKey: id)
+        
+        if isObserving {
+            changesSubject.send(DataChange(type: .removed, item: deletedFlashcard))
+            updateFlashcardsSubject()
+        }
+    }
+    
+    // MARK: - Real-time listeners
+    
+    public func observeFlashcards(for classId: String) -> AnyPublisher<[Flashcard], Never> {
+        isObserving = true
+        // Initial load
+        Task {
+            do {
+                let initialFlashcards = try await getFlashcards(for: classId)
+                flashcardsSubject.send(initialFlashcards)
+            } catch {
+                flashcardsSubject.send([])
+            }
+        }
+        return flashcardsSubject.eraseToAnyPublisher()
+    }
+    
+    public func observeFlashcardChanges(for classId: String) -> AnyPublisher<DataChange<Flashcard>, Never> {
+        isObserving = true
+        return changesSubject
+            .filter { $0.item.classId == classId }
+            .eraseToAnyPublisher()
+    }
+    
+    public func stopObserving() {
+        isObserving = false
+    }
+    
+    // MARK: - Private helpers
+    
+    private func updateFlashcardsSubject() {
+        let allFlashcards = Array(flashcards.values)
+        flashcardsSubject.send(allFlashcards)
     }
 }
