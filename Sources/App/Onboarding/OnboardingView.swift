@@ -12,24 +12,38 @@ struct OnboardingPage: Identifiable {
 /// Onboarding data
 let onboardingPages: [OnboardingPage] = [
     OnboardingPage(
+        icon: "graduationcap.fill",
+        title: "Welcome to StudentStudyHaven!",
+        description:
+            "Your all-in-one study companion. Organize classes, take notes, create flashcards, and track your academic progress all in one place.",
+        color: Color(red: 0.73, green: 0.33, blue: 0.83)
+    ),
+    OnboardingPage(
         icon: "book.fill",
         title: "Organize Your Classes",
         description:
-            "Keep track of all your classes, schedules, and course materials in one place.",
+            "Keep track of all your classes, schedules, and course materials. Add class times, locations, professors, and important deadlines in one organized view.",
         color: Color.blue
     ),
     OnboardingPage(
         icon: "note.text",
         title: "Take Smart Notes",
-        description: "Create, organize, and link notes together to build your knowledge graph.",
+        description: "Create rich notes with formatting, tags, and links. Connect related notes together to build your personal knowledge base and never lose important information.",
         color: Color.green
     ),
     OnboardingPage(
         icon: "rectangle.stack.fill",
         title: "Study with Flashcards",
         description:
-            "Auto-generate flashcards from your notes and use spaced repetition for better retention.",
+            "Generate flashcards from your notes automatically. Practice with spaced repetition to retain information longer and ace your exams.",
         color: Color.orange
+    ),
+    OnboardingPage(
+        icon: "building.columns.fill",
+        title: "Your College Dashboard",
+        description:
+            "Choose your college to see fun facts, student statistics, and acceptance rates. Stay connected to your campus community.",
+        color: Color(red: 0.73, green: 0.33, blue: 0.83)
     ),
 ]
 
