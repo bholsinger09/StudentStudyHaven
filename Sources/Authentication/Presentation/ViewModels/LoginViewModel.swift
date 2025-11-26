@@ -12,9 +12,11 @@ public final class LoginViewModel: ObservableObject {
     @Published public var isLoggedIn: Bool = false
 
     private let loginUseCase: LoginUseCase
+    public let authRepository: AuthRepositoryProtocol
 
     public init(loginUseCase: LoginUseCase) {
         self.loginUseCase = loginUseCase
+        self.authRepository = loginUseCase.authRepository
     }
 
     public func login() async {

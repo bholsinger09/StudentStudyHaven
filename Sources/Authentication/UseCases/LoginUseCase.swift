@@ -3,7 +3,7 @@ import Foundation
 
 /// Use case for user login
 public final class LoginUseCase {
-    private let authRepository: AuthRepositoryProtocol
+    public let authRepository: AuthRepositoryProtocol
 
     public init(authRepository: AuthRepositoryProtocol) {
         self.authRepository = authRepository

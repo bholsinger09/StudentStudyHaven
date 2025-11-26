@@ -366,50 +366,7 @@ struct ProfileTab: View {
     @EnvironmentObject var appState: AppState
 
     var body: some View {
-        NavigationStack {
-            List {
-                if let user = appState.currentUser {
-                    Section("Account") {
-                        HStack {
-                            Text("Name")
-                                .foregroundColor(.white)
-                            Spacer()
-                            Text(user.name)
-                                .foregroundColor(Color(red: 0.73, green: 0.33, blue: 0.83))
-                        }
-
-                        HStack {
-                            Text("Email")
-                                .foregroundColor(.white)
-                            Spacer()
-                            Text(user.email)
-                                .foregroundColor(Color(red: 0.73, green: 0.33, blue: 0.83))
-                        }
-                    }
-                }
-
-                Section {
-                    Button(
-                        role: .destructive,
-                        action: {
-                            Task {
-                                await appState.logout()
-                            }
-                        }
-                    ) {
-                        HStack {
-                            Spacer()
-                            Text("Logout")
-                                .fontWeight(.semibold)
-                            Spacer()
-                        }
-                    }
-                }
-            }
-            .scrollContentBackground(.hidden)
-            .background(Color.black)
-            .navigationTitle("Profile")
-        }
+        ProfileView(viewModel: ProfileViewModel(appState: appState))
     }
 }
 

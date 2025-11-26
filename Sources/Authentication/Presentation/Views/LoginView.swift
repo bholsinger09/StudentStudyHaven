@@ -105,6 +105,16 @@ public struct LoginView: View {
                                 .multilineTextAlignment(.center)
                                 .padding(.top, 4)
                         }
+                        
+                        // Forgot Password Link
+                        HStack {
+                            Spacer()
+                            NavigationLink("Forgot Password?") {
+                                ForgotPasswordView(authRepository: viewModel.authRepository)
+                            }
+                            .font(.caption)
+                            .foregroundColor(Color(red: 0.73, green: 0.33, blue: 0.83))
+                        }
 
                         // Login button with dark blue background
                         Button(action: {
