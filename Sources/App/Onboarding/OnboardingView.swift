@@ -28,12 +28,6 @@ let onboardingPages: [OnboardingPage] = [
         title: "Study with Flashcards",
         description: "Auto-generate flashcards from your notes and use spaced repetition for better retention.",
         color: Color.orange
-    ),
-    OnboardingPage(
-        icon: "building.columns.fill",
-        title: "Choose Your College",
-        description: "Select your university and get personalized fun facts and statistics.",
-        color: Color(red: 0.73, green: 0.33, blue: 0.83)
     )
 ]
 
@@ -66,11 +60,15 @@ public struct OnboardingView: View {
                         OnboardingPageView(page: page)
                             .tag(index)
                     }
+                    
+                    // College selection page
+                    CollegeSelectionView()
+                        .tag(onboardingPages.count)
                 }
                 
                 // Custom page indicator
                 HStack(spacing: 8) {
-                    ForEach(0..<onboardingPages.count, id: \.self) { index in
+                    ForEach(0...onboardingPages.count, id: \.self) { index in
                         Circle()
                             .fill(currentPage == index ? Color(red: 0.73, green: 0.33, blue: 0.83) : Color.gray.opacity(0.3))
                             .frame(width: 8, height: 8)
@@ -98,7 +96,7 @@ public struct OnboardingView: View {
                     }
                     
                     Button {
-                        if currentPage < onboardingPages.count - 1 {
+                        if currentPage < onboardingPages.count {
                             withAnimation {
                                 currentPage += 1
                             }
@@ -106,7 +104,7 @@ public struct OnboardingView: View {
                             completeOnboarding()
                         }
                     } label: {
-                        Text(currentPage < onboardingPages.count - 1 ? "Next" : "Get Started")
+                        Text(currentPage < onboardingPages.count ? "Next" : "Get Started")
                             .fontWeight(.semibold)
                             .foregroundColor(.white)
                             .frame(maxWidth: .infinity)

@@ -4,6 +4,7 @@ import SwiftUI
 /// Home tab with college selection and dashboard
 struct HomeView: View {
     @EnvironmentObject var appState: AppState
+    @AppStorage("selectedCollegeName") private var storedCollegeName: String = ""
     @State private var selectedCollege: String?
     @State private var showingCollegeSelector = false
 
@@ -14,6 +15,7 @@ struct HomeView: View {
 
                 if let collegeName = selectedCollege {
                     CollegeDashboardView(collegeName: collegeName)
+                        .id(collegeName) // Force view recreation when college changes
                 } else {
                     EmptyHomeView(onSelectCollege: { showingCollegeSelector = true })
                 }
@@ -41,11 +43,28 @@ struct HomeView: View {
                 CollegeSelectorView(selectedCollege: $selectedCollege)
             }
             .onAppear {
-                // Load saved college from user's collegeId if available
-                if let collegeId = appState.currentUser?.collegeId, selectedCollege == nil {
-                    // For now, just use a placeholder. In production, fetch from repository
+                NSLog("🏠 HomeView.onAppear - storedCollegeName: '%@', selectedCollege: '%@'", 
+                      storedCollegeName, selectedCollege ?? "nil")
+                // Load from @AppStorage first (from onboarding selection)
+                if !storedCollegeName.isEmpty && selectedCollege == nil {
+                    NSLog("🏠 Setting selectedCollege from storage: '%@'", storedCollegeName)
+                    selectedCollege = storedCollegeName
+                }
+                // Fallback to user's collegeId if available
+                else if let collegeId = appState.currentUser?.collegeId, selectedCollege == nil {
+                    NSLog("🏠 Setting selectedCollege from user collegeId: '%@'", collegeId)
                     selectedCollege = collegeId
                 }
+            }
+            .onChange(of: storedCollegeName) { newValue in
+                NSLog("🏠 HomeView storedCollegeName changed to: '%@'", newValue)
+                if !newValue.isEmpty {
+                    NSLog("🏠 Updating selectedCollege to: '%@'", newValue)
+                    selectedCollege = newValue
+                }
+            }
+            .onChange(of: selectedCollege) { newValue in
+                NSLog("🏠 HomeView selectedCollege changed to: '%@'", newValue ?? "nil")
             }
         }
     }
@@ -93,6 +112,8 @@ struct EmptyHomeView: View {
 /// College dashboard with fun facts
 struct CollegeDashboardView: View {
     let collegeName: String
+    @State private var funFacts: [CollegeFact] = []
+    @State private var isLoadingFacts = true
 
     var body: some View {
         ScrollView {
@@ -131,14 +152,31 @@ struct CollegeDashboardView: View {
 
                 // Fun Facts Section
                 VStack(alignment: .leading, spacing: 16) {
-                    Text("Fun Facts")
-                        .font(.title2)
-                        .fontWeight(.bold)
-                        .foregroundColor(.white)
-                        .padding(.horizontal)
+                    HStack {
+                        Text("Fun Facts (\(funFacts.count))")
+                            .font(.title2)
+                            .fontWeight(.bold)
+                            .foregroundColor(.white)
+                        
+                        if isLoadingFacts {
+                            ProgressView()
+                                .scaleEffect(0.8)
+                        }
+                        
+                        Text("DEBUG: \(collegeName)")
+                            .font(.caption)
+                            .foregroundColor(.red)
+                    }
+                    .padding(.horizontal)
 
-                    ForEach(collegeFacts(for: collegeName), id: \.title) { fact in
-                        FunFactCard(fact: fact)
+                    if funFacts.isEmpty && !isLoadingFacts {
+                        Text("No fun facts available")
+                            .foregroundColor(.gray)
+                            .padding()
+                    } else {
+                        ForEach(funFacts, id: \.title) { fact in
+                            FunFactCard(fact: fact)
+                        }
                     }
                 }
 
@@ -161,94 +199,75 @@ struct CollegeDashboardView: View {
             }
             .padding()
         }
+        .task(id: collegeName) {
+            NSLog("🔄 .task triggered for college: '%@'", collegeName)
+            await loadFunFacts()
+        }
+        .onChange(of: collegeName) { newValue in
+            NSLog("🔄 .onChange triggered - College changed to: '%@'", newValue)
+            // Clear facts immediately when college changes
+            funFacts = []
+            isLoadingFacts = true
+        }
+    }
+    
+    private func loadFunFacts() async {
+        let separator = String(repeating: "=", count: 60)
+        NSLog("\n%@", separator)
+        NSLog("🎓 LOADING FUN FACTS")
+        NSLog("🎓 College Name: '%@'", collegeName)
+        NSLog("🎓 Available colleges in model:")
+        for (index, college) in College.sampleColleges.enumerated() {
+            NSLog("   %d. '%@' - %d facts", index + 1, college.name, college.funFacts.count)
+        }
+        NSLog("%@", separator)
+        
+        isLoadingFacts = true
+        
+        do {
+            // Try to get from College model first
+            if let college = College.sampleColleges.first(where: { $0.name == collegeName }),
+               !college.funFacts.isEmpty {
+                NSLog("✅ FOUND college '%@' with %d facts:", college.name, college.funFacts.count)
+                for (index, fact) in college.funFacts.enumerated() {
+                    NSLog("   %d. %@ %@: %@", index + 1, fact.icon, fact.title, fact.description)
+                }
+                funFacts = college.funFacts.map { funFact in
+                    CollegeFact(icon: funFact.icon, title: funFact.title, description: funFact.description)
+                }
+                NSLog("✅ Mapped to %d CollegeFact objects", funFacts.count)
+            } else {
+                NSLog("⚠️ College '%@' NOT found in model, using AI generation", collegeName)
+                // Fallback to AI-generated facts
+                let aiFacts = try await AIFunFactService.shared.getFunFacts(for: collegeName)
+                NSLog("🤖 AI generated %d facts", aiFacts.count)
+                funFacts = aiFacts.map { funFact in
+                    CollegeFact(icon: funFact.icon, title: funFact.title, description: funFact.description)
+                }
+            }
+        } catch {
+            NSLog("❌ ERROR loading fun facts: %@", error.localizedDescription)
+            // Use fallback facts
+            funFacts = [
+                CollegeFact(icon: "graduationcap.fill", title: "Academic Excellence", description: "A renowned institution with a rich history"),
+                CollegeFact(icon: "person.3.fill", title: "Diverse Community", description: "Students from all backgrounds and countries"),
+                CollegeFact(icon: "building.2.fill", title: "Modern Campus", description: "State-of-the-art facilities and resources")
+            ]
+            NSLog("📦 Using %d fallback facts", funFacts.count)
+        }
+        
+        NSLog("📊 FINAL: %d fun facts loaded", funFacts.count)
+        NSLog("📊 Facts: %@", funFacts.map { $0.title }.joined(separator: ", "))
+        NSLog("%@\n", String(repeating: "=", count: 60))
+        isLoadingFacts = false
     }
 
     private func collegeLocation(for name: String) -> String {
-        let locations: [String: String] = [
-            "Harvard University": "Cambridge, MA",
-            "Stanford University": "Stanford, CA",
-            "MIT": "Cambridge, MA",
-            "Yale University": "New Haven, CT",
-            "Princeton University": "Princeton, NJ",
-            "Columbia University": "New York, NY",
-            "University of California, Berkeley": "Berkeley, CA",
-            "UCLA": "Los Angeles, CA"
-        ]
-        return locations[name] ?? "United States"
-    }
-
-    private func collegeFacts(for name: String) -> [CollegeFact] {
-        let facts: [String: [CollegeFact]] = [
-            "Harvard University": [
-                CollegeFact(
-                    icon: "calendar",
-                    title: "Founded in 1636",
-                    description: "Oldest institution of higher learning in the United States"
-                ),
-                CollegeFact(
-                    icon: "books.vertical.fill",
-                    title: "Largest Academic Library",
-                    description: "Over 20 million volumes across 70+ libraries"
-                ),
-                CollegeFact(
-                    icon: "star.fill",
-                    title: "Notable Alumni",
-                    description: "8 U.S. Presidents and 160 Nobel Laureates"
-                ),
-            ],
-            "Stanford University": [
-                CollegeFact(
-                    icon: "tree.fill",
-                    title: "Massive Campus",
-                    description: "8,180 acres - one of the largest in the United States"
-                ),
-                CollegeFact(
-                    icon: "lightbulb.fill",
-                    title: "Innovation Hub",
-                    description: "Alumni founded Google, Netflix, Instagram, and more"
-                ),
-                CollegeFact(
-                    icon: "sportscourt.fill",
-                    title: "Olympic Champions",
-                    description: "Students have won 296 Olympic medals"
-                ),
-            ],
-            "MIT": [
-                CollegeFact(
-                    icon: "atom",
-                    title: "Research Powerhouse",
-                    description: "$4 billion in research expenditures annually"
-                ),
-                CollegeFact(
-                    icon: "cpu",
-                    title: "Tech Innovation",
-                    description: "Created the first computer network and email"
-                ),
-                CollegeFact(
-                    icon: "trophy.fill",
-                    title: "Nobel Prizes",
-                    description: "97 Nobel Laureates affiliated with MIT"
-                ),
-            ],
-        ]
-
-        return facts[name] ?? [
-            CollegeFact(
-                icon: "graduationcap.fill",
-                title: "Academic Excellence",
-                description: "A renowned institution with a rich history"
-            ),
-            CollegeFact(
-                icon: "person.3.fill",
-                title: "Diverse Community",
-                description: "Students from all backgrounds and countries"
-            ),
-            CollegeFact(
-                icon: "building.2.fill",
-                title: "Beautiful Campus",
-                description: "State-of-the-art facilities and resources"
-            ),
-        ]
+        // Get location from College model
+        if let college = College.sampleColleges.first(where: { $0.name == name }) {
+            return college.location
+        }
+        return "United States"
     }
 
     private func collegeStats(for name: String) -> [CollegeStat] {
@@ -326,6 +345,7 @@ struct StatCard: View {
 /// College selector sheet with step-by-step selection
 struct CollegeSelectorView: View {
     @Binding var selectedCollege: String?
+    @AppStorage("selectedCollegeName") private var storedCollegeName: String = ""
     @Environment(\.dismiss) private var dismiss
     @State private var selectedState: String = ""
     @State private var selectedUniversity: String = ""
@@ -496,7 +516,13 @@ struct CollegeSelectorView: View {
 
                         Button(action: {
                             if !selectedUniversity.isEmpty {
+                                NSLog("💾 CollegeSelectorView - Saving college: '%@'", selectedUniversity)
+                                NSLog("💾 Before: selectedCollege='%@', storedCollegeName='%@'", 
+                                      selectedCollege ?? "nil", storedCollegeName)
                                 selectedCollege = selectedUniversity
+                                storedCollegeName = selectedUniversity
+                                NSLog("💾 After: selectedCollege='%@', storedCollegeName='%@'", 
+                                      selectedCollege ?? "nil", storedCollegeName)
                                 dismiss()
                             }
                         }) {
