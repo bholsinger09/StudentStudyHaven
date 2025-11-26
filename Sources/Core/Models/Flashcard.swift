@@ -45,7 +45,7 @@ public struct ReviewData: Codable, Equatable {
     public var interval: Int
     public var nextReviewDate: Date
     public var lastReviewDate: Date?
-    
+
     public init(
         repetitions: Int = 0,
         easeFactor: Double = 2.5,

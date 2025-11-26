@@ -1,5 +1,5 @@
-import Foundation
 import Combine
+import Foundation
 
 /// Protocol for real-time data listeners
 public protocol RealtimeListener {
@@ -15,12 +15,12 @@ public enum ConnectionState: Equatable {
     case connecting
     case connected
     case error(String)
-    
+
     public static func == (lhs: ConnectionState, rhs: ConnectionState) -> Bool {
         switch (lhs, rhs) {
         case (.disconnected, .disconnected),
-             (.connecting, .connecting),
-             (.connected, .connected):
+            (.connecting, .connecting),
+            (.connected, .connected):
             return true
         case let (.error(lhsMsg), .error(rhsMsg)):
             return lhsMsg == rhsMsg
@@ -42,7 +42,7 @@ public struct DataChange<T> {
     public let type: ChangeType
     public let item: T
     public let timestamp: Date
-    
+
     public init(type: ChangeType, item: T, timestamp: Date = Date()) {
         self.type = type
         self.item = item

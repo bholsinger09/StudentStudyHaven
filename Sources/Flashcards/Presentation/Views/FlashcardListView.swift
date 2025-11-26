@@ -1,5 +1,4 @@
 import Core
-import Flashcards
 import SwiftUI
 
 /// Flashcard list view

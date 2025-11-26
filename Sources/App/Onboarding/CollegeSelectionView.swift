@@ -1,5 +1,5 @@
-import SwiftUI
 import Core
+import SwiftUI
 
 /// College selection view for onboarding
 public struct CollegeSelectionView: View {
@@ -7,9 +7,9 @@ public struct CollegeSelectionView: View {
     @AppStorage("selectedCollegeName") private var selectedCollegeName: String = ""
     @State private var selectedCollege: College?
     @State private var showingCollegeList = false
-    
+
     public init() {}
-    
+
     public var body: some View {
         VStack(spacing: 30) {
             // Icon
@@ -17,19 +17,19 @@ public struct CollegeSelectionView: View {
                 Circle()
                     .fill(Color(red: 0.73, green: 0.33, blue: 0.83).opacity(0.2))
                     .frame(width: 140, height: 140)
-                
+
                 Image(systemName: "building.columns.fill")
                     .font(.system(size: 60))
                     .foregroundColor(Color(red: 0.73, green: 0.33, blue: 0.83))
             }
-            
+
             // Title
             Text("Choose Your College")
                 .font(.system(size: 32, weight: .bold))
                 .foregroundColor(.white)
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, 40)
-            
+
             // Selected college or prompt
             if let college = selectedCollege {
                 collegeCard(college)
@@ -40,7 +40,7 @@ public struct CollegeSelectionView: View {
                     .foregroundColor(.gray)
                     .multilineTextAlignment(.center)
                     .padding(.horizontal, 40)
-                
+
                 Button {
                     showingCollegeList = true
                 } label: {
@@ -73,7 +73,7 @@ public struct CollegeSelectionView: View {
             }
         }
     }
-    
+
     private func collegeCard(_ college: College) -> some View {
         VStack(alignment: .leading, spacing: 16) {
             // College name and location
@@ -82,13 +82,13 @@ public struct CollegeSelectionView: View {
                     .font(.title2)
                     .fontWeight(.bold)
                     .foregroundColor(Color(red: 0.73, green: 0.33, blue: 0.83))
-                
+
                 Text(college.location)
                     .font(.subheadline)
                     .foregroundColor(.gray)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
-            
+
             Button {
                 showingCollegeList = true
             } label: {
@@ -100,14 +100,14 @@ public struct CollegeSelectionView: View {
                     .background(Color(red: 0.73, green: 0.33, blue: 0.83).opacity(0.2))
                     .cornerRadius(8)
             }
-            
+
             // Fun Facts
             if !college.funFacts.isEmpty {
                 VStack(alignment: .leading, spacing: 8) {
                     Text("Fun Facts")
                         .font(.headline)
                         .foregroundColor(.white)
-                    
+
                     ScrollView {
                         VStack(spacing: 12) {
                             ForEach(college.funFacts.prefix(3)) { fact in
@@ -124,31 +124,31 @@ public struct CollegeSelectionView: View {
         .cornerRadius(16)
         .padding(.horizontal, 24)
     }
-    
+
     private func funFactRow(_ fact: FunFact) -> some View {
         HStack(alignment: .top, spacing: 12) {
             ZStack {
                 Circle()
                     .fill(Color(red: 0.73, green: 0.33, blue: 0.83).opacity(0.2))
                     .frame(width: 40, height: 40)
-                
+
                 Image(systemName: fact.icon)
                     .font(.system(size: 16))
                     .foregroundColor(Color(red: 0.73, green: 0.33, blue: 0.83))
             }
-            
+
             VStack(alignment: .leading, spacing: 4) {
                 Text(fact.title)
                     .font(.subheadline)
                     .fontWeight(.semibold)
                     .foregroundColor(.white)
-                
+
                 Text(fact.description)
                     .font(.caption)
                     .foregroundColor(.gray)
                     .fixedSize(horizontal: false, vertical: true)
             }
-            
+
             Spacer()
         }
         .padding(12)
@@ -162,23 +162,23 @@ struct CollegeListSheet: View {
     @Binding var selectedCollege: College?
     @Environment(\.dismiss) private var dismiss
     @State private var searchText = ""
-    
+
     private var filteredColleges: [College] {
         if searchText.isEmpty {
             return College.sampleColleges
         } else {
             return College.sampleColleges.filter { college in
-                college.name.localizedCaseInsensitiveContains(searchText) ||
-                college.location.localizedCaseInsensitiveContains(searchText)
+                college.name.localizedCaseInsensitiveContains(searchText)
+                    || college.location.localizedCaseInsensitiveContains(searchText)
             }
         }
     }
-    
+
     var body: some View {
         NavigationStack {
             ZStack {
                 Color.black.ignoresSafeArea()
-                
+
                 ScrollView {
                     VStack(spacing: 12) {
                         ForEach(filteredColleges) { college in
@@ -206,37 +206,37 @@ struct CollegeListSheet: View {
         }
         .preferredColorScheme(.dark)
     }
-    
+
     private func collegeListItem(_ college: College) -> some View {
         HStack(spacing: 16) {
             ZStack {
                 Circle()
                     .fill(Color(red: 0.73, green: 0.33, blue: 0.83).opacity(0.2))
                     .frame(width: 50, height: 50)
-                
+
                 Image(systemName: "building.columns.fill")
                     .font(.system(size: 20))
                     .foregroundColor(Color(red: 0.73, green: 0.33, blue: 0.83))
             }
-            
+
             VStack(alignment: .leading, spacing: 4) {
                 Text(college.name)
                     .font(.headline)
                     .foregroundColor(.white)
-                
+
                 Text(college.location)
                     .font(.subheadline)
                     .foregroundColor(.gray)
-                
+
                 if !college.funFacts.isEmpty {
                     Text("\(college.funFacts.count) fun facts")
                         .font(.caption)
                         .foregroundColor(Color(red: 0.73, green: 0.33, blue: 0.83))
                 }
             }
-            
+
             Spacer()
-            
+
             Image(systemName: "chevron.right")
                 .font(.system(size: 14))
                 .foregroundColor(.gray)

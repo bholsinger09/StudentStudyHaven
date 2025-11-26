@@ -1,6 +1,6 @@
+import Combine
 import Core
 import Foundation
-import Combine
 
 /// Mock implementation of FlashcardRepository for development and testing
 public final class MockFlashcardRepositoryImpl: FlashcardRepositoryProtocol {
@@ -34,12 +34,12 @@ public final class MockFlashcardRepositoryImpl: FlashcardRepositoryProtocol {
         try await Task.sleep(nanoseconds: 300_000_000)
 
         flashcards[flashcard.id] = flashcard
-        
+
         if isObserving {
             changesSubject.send(DataChange(type: .added, item: flashcard))
             updateFlashcardsSubject()
         }
-        
+
         return flashcard
     }
 
@@ -49,12 +49,12 @@ public final class MockFlashcardRepositoryImpl: FlashcardRepositoryProtocol {
 
         for flashcard in flashcardList {
             flashcards[flashcard.id] = flashcard
-            
+
             if isObserving {
                 changesSubject.send(DataChange(type: .added, item: flashcard))
             }
         }
-        
+
         if isObserving {
             updateFlashcardsSubject()
         }
@@ -73,12 +73,12 @@ public final class MockFlashcardRepositoryImpl: FlashcardRepositoryProtocol {
         var updatedFlashcard = flashcard
         updatedFlashcard.updatedAt = Date()
         flashcards[flashcard.id] = updatedFlashcard
-        
+
         if isObserving {
             changesSubject.send(DataChange(type: .modified, item: updatedFlashcard))
             updateFlashcardsSubject()
         }
-        
+
         return updatedFlashcard
     }
 
@@ -91,15 +91,15 @@ public final class MockFlashcardRepositoryImpl: FlashcardRepositoryProtocol {
         }
 
         flashcards.removeValue(forKey: id)
-        
+
         if isObserving {
             changesSubject.send(DataChange(type: .removed, item: deletedFlashcard))
             updateFlashcardsSubject()
         }
     }
-    
+
     // MARK: - Real-time listeners
-    
+
     public func observeFlashcards(for classId: String) -> AnyPublisher<[Flashcard], Never> {
         isObserving = true
         // Initial load
@@ -113,20 +113,23 @@ public final class MockFlashcardRepositoryImpl: FlashcardRepositoryProtocol {
         }
         return flashcardsSubject.eraseToAnyPublisher()
     }
-    
-    public func observeFlashcardChanges(for classId: String) -> AnyPublisher<DataChange<Flashcard>, Never> {
+
+    public func observeFlashcardChanges(for classId: String) -> AnyPublisher<
+        DataChange<Flashcard>, Never
+    > {
         isObserving = true
-        return changesSubject
+        return
+            changesSubject
             .filter { $0.item.classId == classId }
             .eraseToAnyPublisher()
     }
-    
+
     public func stopObserving() {
         isObserving = false
     }
-    
+
     // MARK: - Private helpers
-    
+
     private func updateFlashcardsSubject() {
         let allFlashcards = Array(flashcards.values)
         flashcardsSubject.send(allFlashcards)

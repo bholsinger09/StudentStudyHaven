@@ -9,7 +9,7 @@ public struct Activity: Identifiable, Codable, Equatable {
     public var description: String
     public var metadata: [String: String]
     public var timestamp: Date
-    
+
     public init(
         id: String = UUID().uuidString,
         userId: String,
@@ -27,7 +27,7 @@ public struct Activity: Identifiable, Codable, Equatable {
         self.metadata = metadata
         self.timestamp = timestamp
     }
-    
+
     /// Create activity for class creation
     public static func classCreated(
         userId: String,
@@ -42,7 +42,7 @@ public struct Activity: Identifiable, Codable, Equatable {
             metadata: ["classId": classId, "className": className]
         )
     }
-    
+
     /// Create activity for note creation
     public static func noteCreated(
         userId: String,
@@ -58,7 +58,7 @@ public struct Activity: Identifiable, Codable, Equatable {
             metadata: ["noteId": noteId, "classId": classId, "noteTitle": noteTitle]
         )
     }
-    
+
     /// Create activity for flashcard review
     public static func flashcardReviewed(
         userId: String,
@@ -74,7 +74,7 @@ public struct Activity: Identifiable, Codable, Equatable {
             metadata: ["count": "\(count)", "classId": classId, "className": className]
         )
     }
-    
+
     /// Create activity for study session completion
     public static func studySessionCompleted(
         userId: String,
@@ -90,7 +90,7 @@ public struct Activity: Identifiable, Codable, Equatable {
             metadata: ["duration": "\(duration)", "sessionType": sessionType]
         )
     }
-    
+
     /// Create activity for achievement
     public static func achievementUnlocked(
         userId: String,
@@ -121,7 +121,7 @@ public enum ActivityType: String, Codable {
     case achievementUnlocked = "achievement_unlocked"
     case goalCompleted = "goal_completed"
     case streakMilestone = "streak_milestone"
-    
+
     public var icon: String {
         switch self {
         case .classCreated, .classUpdated:
@@ -146,7 +146,7 @@ public enum ActivityType: String, Codable {
             return "flame.fill"
         }
     }
-    
+
     public var color: String {
         switch self {
         case .classCreated, .classUpdated:
@@ -182,59 +182,61 @@ public protocol ActivityRepositoryProtocol {
 /// Mock implementation of Activity Repository
 public final class MockActivityRepositoryImpl: ActivityRepositoryProtocol {
     private var activities: [String: Activity] = [:]
-    
+
     public init() {}
-    
+
     public func getActivities(for userId: String, limit: Int) async throws -> [Activity] {
         try await Task.sleep(nanoseconds: 100_000_000)
-        
+
         return activities.values
             .filter { $0.userId == userId }
             .sorted { $0.timestamp > $1.timestamp }
             .prefix(limit)
             .map { $0 }
     }
-    
-    public func getActivitiesByType(for userId: String, type: ActivityType) async throws -> [Activity] {
+
+    public func getActivitiesByType(for userId: String, type: ActivityType) async throws
+        -> [Activity]
+    {
         try await Task.sleep(nanoseconds: 100_000_000)
-        
+
         return activities.values
             .filter { $0.userId == userId && $0.type == type }
             .sorted { $0.timestamp > $1.timestamp }
     }
-    
+
     public func getActivitiesForClass(classId: String) async throws -> [Activity] {
         try await Task.sleep(nanoseconds: 100_000_000)
-        
+
         return activities.values
             .filter { $0.metadata["classId"] == classId }
             .sorted { $0.timestamp > $1.timestamp }
     }
-    
+
     public func createActivity(_ activity: Activity) async throws -> Activity {
         try await Task.sleep(nanoseconds: 100_000_000)
-        
+
         activities[activity.id] = activity
         return activity
     }
-    
+
     public func deleteActivity(id: String) async throws {
         try await Task.sleep(nanoseconds: 100_000_000)
-        
+
         guard activities[id] != nil else {
             throw AppError.notFound("Activity not found")
         }
-        
+
         activities.removeValue(forKey: id)
     }
-    
+
     public func deleteActivitiesForUser(userId: String) async throws {
         try await Task.sleep(nanoseconds: 100_000_000)
-        
+
         let userActivityIds = activities.values
             .filter { $0.userId == userId }
             .map { $0.id }
-        
+
         for id in userActivityIds {
             activities.removeValue(forKey: id)
         }

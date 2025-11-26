@@ -15,7 +15,7 @@ struct HomeView: View {
 
                 if let collegeName = selectedCollege {
                     CollegeDashboardView(collegeName: collegeName)
-                        .id(collegeName) // Force view recreation when college changes
+                        .id(collegeName)  // Force view recreation when college changes
                 } else {
                     EmptyHomeView(onSelectCollege: { showingCollegeSelector = true })
                 }
@@ -29,7 +29,7 @@ struct HomeView: View {
                                 Image(systemName: "building.columns.fill")
                                     .font(.system(size: 32))
                                     .foregroundColor(Color(red: 0.73, green: 0.33, blue: 0.83))
-                                
+
                                 Text("Your College Choice")
                                     .font(.system(size: 10, weight: .semibold))
                                     .foregroundColor(Color(red: 0.73, green: 0.33, blue: 0.83))
@@ -116,7 +116,7 @@ struct CollegeDashboardView: View {
                         Image(systemName: "building.columns.fill")
                             .font(.system(size: 50))
                             .foregroundColor(Color(red: 0.73, green: 0.33, blue: 0.83))
-                        
+
                         Text("My College Choice")
                             .font(.system(size: 8, weight: .semibold))
                             .foregroundColor(Color(red: 0.73, green: 0.33, blue: 0.83))
@@ -126,11 +126,11 @@ struct CollegeDashboardView: View {
                         Text(collegeName)
                             .font(.system(size: 32, weight: .bold))
                             .foregroundColor(Color(red: 0.73, green: 0.33, blue: 0.83))
-                        
+
                         Text(collegeLocation(for: collegeName))
                             .font(.system(size: 16))
                             .foregroundColor(Color(red: 0.73, green: 0.33, blue: 0.83))
-                        
+
                         Text("My College Choice")
                             .font(.system(size: 12, weight: .semibold))
                             .foregroundColor(Color(red: 0.73, green: 0.33, blue: 0.83))
@@ -149,7 +149,7 @@ struct CollegeDashboardView: View {
                             .font(.title2)
                             .fontWeight(.bold)
                             .foregroundColor(.white)
-                        
+
                         if isLoadingFacts {
                             ProgressView()
                                 .scaleEffect(0.8)
@@ -176,7 +176,8 @@ struct CollegeDashboardView: View {
                         .foregroundColor(.white)
                         .padding(.horizontal)
 
-                    LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
+                    LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12)
+                    {
                         ForEach(collegeStats, id: \.label) { stat in
                             StatCard(stat: stat)
                         }
@@ -200,33 +201,42 @@ struct CollegeDashboardView: View {
             isLoadingFacts = true
         }
     }
-    
+
     private func loadFunFacts() async {
         isLoadingFacts = true
-        
+
         do {
             // Try to get from College model first
             if let college = College.sampleColleges.first(where: { $0.name == collegeName }),
-               !college.funFacts.isEmpty {
+                !college.funFacts.isEmpty
+            {
                 funFacts = college.funFacts.map { funFact in
-                    CollegeFact(icon: funFact.icon, title: funFact.title, description: funFact.description)
+                    CollegeFact(
+                        icon: funFact.icon, title: funFact.title, description: funFact.description)
                 }
             } else {
                 // Fallback to AI-generated facts
                 let aiFacts = try await AIFunFactService.shared.getFunFacts(for: collegeName)
                 funFacts = aiFacts.map { funFact in
-                    CollegeFact(icon: funFact.icon, title: funFact.title, description: funFact.description)
+                    CollegeFact(
+                        icon: funFact.icon, title: funFact.title, description: funFact.description)
                 }
             }
         } catch {
             // Use fallback facts
             funFacts = [
-                CollegeFact(icon: "graduationcap.fill", title: "Academic Excellence", description: "A renowned institution with a rich history"),
-                CollegeFact(icon: "person.3.fill", title: "Diverse Community", description: "Students from all backgrounds and countries"),
-                CollegeFact(icon: "building.2.fill", title: "Modern Campus", description: "State-of-the-art facilities and resources")
+                CollegeFact(
+                    icon: "graduationcap.fill", title: "Academic Excellence",
+                    description: "A renowned institution with a rich history"),
+                CollegeFact(
+                    icon: "person.3.fill", title: "Diverse Community",
+                    description: "Students from all backgrounds and countries"),
+                CollegeFact(
+                    icon: "building.2.fill", title: "Modern Campus",
+                    description: "State-of-the-art facilities and resources"),
             ]
         }
-        
+
         isLoadingFacts = false
     }
 
@@ -243,7 +253,8 @@ struct CollegeDashboardView: View {
             let stats = try await AICollegeStatsService.shared.getStats(for: collegeName)
             collegeStats = [
                 CollegeStat(icon: "person.3.fill", label: "Students", value: stats.students),
-                CollegeStat(icon: "chart.line.uptrend.xyaxis", label: "Acceptance", value: stats.acceptance),
+                CollegeStat(
+                    icon: "chart.line.uptrend.xyaxis", label: "Acceptance", value: stats.acceptance),
             ]
         } catch {
             // Fallback stats
@@ -326,55 +337,130 @@ struct CollegeSelectorView: View {
     @State private var selectedUniversity: String = ""
 
     let collegesByState: [String: [String]] = [
-        "Alabama": ["University of Alabama", "Auburn University", "University of Alabama at Birmingham"],
+        "Alabama": [
+            "University of Alabama", "Auburn University", "University of Alabama at Birmingham",
+        ],
         "Alaska": ["University of Alaska Fairbanks", "University of Alaska Anchorage"],
-        "Arizona": ["Arizona State University", "University of Arizona", "Northern Arizona University"],
+        "Arizona": [
+            "Arizona State University", "University of Arizona", "Northern Arizona University",
+        ],
         "Arkansas": ["University of Arkansas", "Arkansas State University"],
-        "California": ["Stanford University", "University of California, Berkeley", "UCLA", "USC", "Caltech", "UC San Diego", "UC Davis", "UC Irvine", "UC Santa Barbara", "Pepperdine University"],
-        "Colorado": ["University of Colorado Boulder", "Colorado State University", "University of Denver"],
-        "Connecticut": ["Yale University", "University of Connecticut", "Wesleyan University", "Trinity College"],
+        "California": [
+            "Stanford University", "University of California, Berkeley", "UCLA", "USC", "Caltech",
+            "UC San Diego", "UC Davis", "UC Irvine", "UC Santa Barbara", "Pepperdine University",
+        ],
+        "Colorado": [
+            "University of Colorado Boulder", "Colorado State University", "University of Denver",
+        ],
+        "Connecticut": [
+            "Yale University", "University of Connecticut", "Wesleyan University",
+            "Trinity College",
+        ],
         "Delaware": ["University of Delaware", "Delaware State University"],
-        "Florida": ["University of Florida", "Florida State University", "University of Miami", "University of Central Florida", "University of South Florida"],
-        "Georgia": ["Georgia Institute of Technology", "University of Georgia", "Emory University", "Georgia State University"],
+        "Florida": [
+            "University of Florida", "Florida State University", "University of Miami",
+            "University of Central Florida", "University of South Florida",
+        ],
+        "Georgia": [
+            "Georgia Institute of Technology", "University of Georgia", "Emory University",
+            "Georgia State University",
+        ],
         "Hawaii": ["University of Hawaii at Manoa", "Hawaii Pacific University"],
         "Idaho": ["Boise State University", "University of Idaho", "Idaho State University"],
-        "Illinois": ["University of Chicago", "Northwestern University", "University of Illinois Urbana-Champaign", "University of Illinois Chicago", "DePaul University"],
-        "Indiana": ["Purdue University", "Indiana University Bloomington", "University of Notre Dame", "Ball State University"],
+        "Illinois": [
+            "University of Chicago", "Northwestern University",
+            "University of Illinois Urbana-Champaign", "University of Illinois Chicago",
+            "DePaul University",
+        ],
+        "Indiana": [
+            "Purdue University", "Indiana University Bloomington", "University of Notre Dame",
+            "Ball State University",
+        ],
         "Iowa": ["University of Iowa", "Iowa State University", "Drake University"],
         "Kansas": ["University of Kansas", "Kansas State University", "Wichita State University"],
-        "Kentucky": ["University of Kentucky", "University of Louisville", "Western Kentucky University"],
-        "Louisiana": ["Louisiana State University", "Tulane University", "University of New Orleans"],
+        "Kentucky": [
+            "University of Kentucky", "University of Louisville", "Western Kentucky University",
+        ],
+        "Louisiana": [
+            "Louisiana State University", "Tulane University", "University of New Orleans",
+        ],
         "Maine": ["University of Maine", "Bowdoin College", "Colby College"],
-        "Maryland": ["Johns Hopkins University", "University of Maryland College Park", "University of Maryland Baltimore County"],
-        "Massachusetts": ["Harvard University", "MIT", "Boston University", "Tufts University", "Northeastern University", "Boston College", "UMass Amherst", "Williams College"],
-        "Michigan": ["University of Michigan", "Michigan State University", "Wayne State University", "Western Michigan University"],
-        "Minnesota": ["University of Minnesota Twin Cities", "Carleton College", "Macalester College"],
-        "Mississippi": ["University of Mississippi", "Mississippi State University", "University of Southern Mississippi"],
-        "Missouri": ["Washington University in St. Louis", "University of Missouri", "Saint Louis University", "Missouri State University"],
+        "Maryland": [
+            "Johns Hopkins University", "University of Maryland College Park",
+            "University of Maryland Baltimore County",
+        ],
+        "Massachusetts": [
+            "Harvard University", "MIT", "Boston University", "Tufts University",
+            "Northeastern University", "Boston College", "UMass Amherst", "Williams College",
+        ],
+        "Michigan": [
+            "University of Michigan", "Michigan State University", "Wayne State University",
+            "Western Michigan University",
+        ],
+        "Minnesota": [
+            "University of Minnesota Twin Cities", "Carleton College", "Macalester College",
+        ],
+        "Mississippi": [
+            "University of Mississippi", "Mississippi State University",
+            "University of Southern Mississippi",
+        ],
+        "Missouri": [
+            "Washington University in St. Louis", "University of Missouri",
+            "Saint Louis University", "Missouri State University",
+        ],
         "Montana": ["University of Montana", "Montana State University"],
         "Nebraska": ["University of Nebraska Lincoln", "Creighton University"],
         "Nevada": ["University of Nevada Las Vegas", "University of Nevada Reno"],
         "New Hampshire": ["Dartmouth College", "University of New Hampshire"],
-        "New Jersey": ["Princeton University", "Rutgers University", "Stevens Institute of Technology", "Seton Hall University"],
+        "New Jersey": [
+            "Princeton University", "Rutgers University", "Stevens Institute of Technology",
+            "Seton Hall University",
+        ],
         "New Mexico": ["University of New Mexico", "New Mexico State University"],
-        "New York": ["Columbia University", "Cornell University", "NYU", "University of Rochester", "Syracuse University", "RPI", "Fordham University", "Stony Brook University"],
-        "North Carolina": ["Duke University", "University of North Carolina Chapel Hill", "North Carolina State University", "Wake Forest University"],
+        "New York": [
+            "Columbia University", "Cornell University", "NYU", "University of Rochester",
+            "Syracuse University", "RPI", "Fordham University", "Stony Brook University",
+        ],
+        "North Carolina": [
+            "Duke University", "University of North Carolina Chapel Hill",
+            "North Carolina State University", "Wake Forest University",
+        ],
         "North Dakota": ["University of North Dakota", "North Dakota State University"],
-        "Ohio": ["Ohio State University", "Case Western Reserve University", "University of Cincinnati", "Ohio University"],
+        "Ohio": [
+            "Ohio State University", "Case Western Reserve University", "University of Cincinnati",
+            "Ohio University",
+        ],
         "Oklahoma": ["University of Oklahoma", "Oklahoma State University"],
         "Oregon": ["University of Oregon", "Oregon State University", "Portland State University"],
-        "Pennsylvania": ["University of Pennsylvania", "Carnegie Mellon University", "Penn State University", "Drexel University", "Temple University", "University of Pittsburgh"],
+        "Pennsylvania": [
+            "University of Pennsylvania", "Carnegie Mellon University", "Penn State University",
+            "Drexel University", "Temple University", "University of Pittsburgh",
+        ],
         "Rhode Island": ["Brown University", "University of Rhode Island", "Providence College"],
-        "South Carolina": ["University of South Carolina", "Clemson University", "College of Charleston"],
+        "South Carolina": [
+            "University of South Carolina", "Clemson University", "College of Charleston",
+        ],
         "South Dakota": ["University of South Dakota", "South Dakota State University"],
-        "Tennessee": ["Vanderbilt University", "University of Tennessee Knoxville", "University of Memphis"],
-        "Texas": ["University of Texas at Austin", "Rice University", "Texas A&M University", "University of Houston", "Texas Tech University", "Southern Methodist University"],
+        "Tennessee": [
+            "Vanderbilt University", "University of Tennessee Knoxville", "University of Memphis",
+        ],
+        "Texas": [
+            "University of Texas at Austin", "Rice University", "Texas A&M University",
+            "University of Houston", "Texas Tech University", "Southern Methodist University",
+        ],
         "Utah": ["University of Utah", "Brigham Young University", "Utah State University"],
         "Vermont": ["University of Vermont", "Middlebury College"],
-        "Virginia": ["University of Virginia", "Virginia Tech", "William & Mary", "George Mason University"],
-        "Washington": ["University of Washington", "Washington State University", "Seattle University"],
+        "Virginia": [
+            "University of Virginia", "Virginia Tech", "William & Mary", "George Mason University",
+        ],
+        "Washington": [
+            "University of Washington", "Washington State University", "Seattle University",
+        ],
         "West Virginia": ["West Virginia University", "Marshall University"],
-        "Wisconsin": ["University of Wisconsin Madison", "Marquette University", "University of Wisconsin Milwaukee"],
+        "Wisconsin": [
+            "University of Wisconsin Madison", "Marquette University",
+            "University of Wisconsin Milwaukee",
+        ],
         "Wyoming": ["University of Wyoming"],
     ]
 
@@ -423,7 +509,7 @@ struct CollegeSelectorView: View {
                             ForEach(sortedStates, id: \.self) { state in
                                 Button(state) {
                                     selectedState = state
-                                    selectedUniversity = "" // Reset university when state changes
+                                    selectedUniversity = ""  // Reset university when state changes
                                 }
                             }
                         } label: {
@@ -457,8 +543,11 @@ struct CollegeSelectorView: View {
                                 }
                             } label: {
                                 HStack {
-                                    Text(selectedUniversity.isEmpty ? "Choose a University" : selectedUniversity)
-                                        .foregroundColor(selectedUniversity.isEmpty ? .gray : .white)
+                                    Text(
+                                        selectedUniversity.isEmpty
+                                            ? "Choose a University" : selectedUniversity
+                                    )
+                                    .foregroundColor(selectedUniversity.isEmpty ? .gray : .white)
                                     Spacer()
                                     Image(systemName: "chevron.down")
                                         .foregroundColor(.gray)

@@ -26,16 +26,16 @@ struct StudentStudyHavenApp: App {
                 .environmentObject(appState)
                 .onAppear {
                     #if os(macOS)
-                    // Prevent system from intercepting text input on macOS
-                    NSApp?.activate(ignoringOtherApps: true)
+                        // Prevent system from intercepting text input on macOS
+                        NSApp?.activate(ignoringOtherApps: true)
                     #endif
                 }
         }
         #if os(macOS)
-        .commands {
-            // Remove conflicting commands that might interfere with text input
-            CommandGroup(replacing: .newItem) {}
-        }
+            .commands {
+                // Remove conflicting commands that might interfere with text input
+                CommandGroup(replacing: .newItem) {}
+            }
         #endif
     }
 }

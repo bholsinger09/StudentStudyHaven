@@ -1,6 +1,6 @@
+import Combine
 import Core
 import Foundation
-import Combine
 
 /// Mock implementation of NoteRepository for development and testing
 public final class MockNoteRepositoryImpl: NoteRepositoryProtocol {
@@ -45,12 +45,12 @@ public final class MockNoteRepositoryImpl: NoteRepositoryProtocol {
         try await Task.sleep(nanoseconds: 300_000_000)
 
         notes[note.id] = note
-        
+
         if isObserving {
             changesSubject.send(DataChange(type: .added, item: note))
             updateNotesSubject()
         }
-        
+
         return note
     }
 
@@ -65,12 +65,12 @@ public final class MockNoteRepositoryImpl: NoteRepositoryProtocol {
         var updatedNote = note
         updatedNote.updatedAt = Date()
         notes[note.id] = updatedNote
-        
+
         if isObserving {
             changesSubject.send(DataChange(type: .modified, item: updatedNote))
             updateNotesSubject()
         }
-        
+
         return updatedNote
     }
 
@@ -83,7 +83,7 @@ public final class MockNoteRepositoryImpl: NoteRepositoryProtocol {
         }
 
         notes.removeValue(forKey: id)
-        
+
         if isObserving {
             changesSubject.send(DataChange(type: .removed, item: deletedNote))
             updateNotesSubject()
@@ -107,9 +107,9 @@ public final class MockNoteRepositoryImpl: NoteRepositoryProtocol {
                 || $0.tags.contains { $0.lowercased().contains(lowercasedQuery) }
         }
     }
-    
+
     // MARK: - Real-time listeners
-    
+
     public func observeNotes(for classId: String) -> AnyPublisher<[Note], Never> {
         isObserving = true
         // Initial load
@@ -123,20 +123,21 @@ public final class MockNoteRepositoryImpl: NoteRepositoryProtocol {
         }
         return notesSubject.eraseToAnyPublisher()
     }
-    
+
     public func observeNoteChanges(for classId: String) -> AnyPublisher<DataChange<Note>, Never> {
         isObserving = true
-        return changesSubject
+        return
+            changesSubject
             .filter { $0.item.classId == classId }
             .eraseToAnyPublisher()
     }
-    
+
     public func stopObserving() {
         isObserving = false
     }
-    
+
     // MARK: - Private helpers
-    
+
     private func updateNotesSubject() {
         let allNotes = Array(notes.values)
         notesSubject.send(allNotes)

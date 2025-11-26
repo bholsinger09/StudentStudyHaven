@@ -198,7 +198,7 @@ struct FlashcardView: View {
                     colors: [.blue.opacity(0.8), .blue]
                 )
             }
-            
+
             // Back of card
             if isShowingAnswer {
                 cardSide(
@@ -210,7 +210,7 @@ struct FlashcardView: View {
         }
         .frame(maxWidth: 350, maxHeight: 500)
     }
-    
+
     private func cardSide(label: String, text: String, colors: [Color]) -> some View {
         ZStack {
             RoundedRectangle(cornerRadius: 20)

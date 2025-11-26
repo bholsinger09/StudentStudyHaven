@@ -1,9 +1,10 @@
-#if canImport(AppKit)
-import AppKit
-#endif
 import Core
 import Notes
 import SwiftUI
+
+#if canImport(AppKit)
+    import AppKit
+#endif
 
 /// Simple note editor for classroom documents
 public struct NoteEditorView: View {
@@ -119,9 +120,9 @@ public struct NoteEditorView: View {
             .formStyle(.grouped)
             .scrollContentBackground(.hidden)
             #if os(macOS)
-            .background(Color(NSColor.windowBackgroundColor))
+                .background(Color(NSColor.windowBackgroundColor))
             #else
-            .background(Color(.systemGroupedBackground))
+                .background(Color(.systemGroupedBackground))
             #endif
         }
         .onChange(of: focusedField) { newFocus in
@@ -145,10 +146,10 @@ public struct NoteEditorView: View {
         }
         .onDisappear {
             #if os(macOS)
-            if let monitor = keyMonitor {
-                NSEvent.removeMonitor(monitor)
-                print("🛑 Removed keyboard monitor")
-            }
+                if let monitor = keyMonitor {
+                    NSEvent.removeMonitor(monitor)
+                    print("🛑 Removed keyboard monitor")
+                }
             #endif
         }
     }
@@ -164,50 +165,52 @@ public struct NoteEditorView: View {
 
     private func setupKeyboardMonitor() {
         #if os(macOS)
-        print("⌨️  Installing GLOBAL keyboard event monitor...")
+            print("⌨️  Installing GLOBAL keyboard event monitor...")
 
-        keyMonitor = NSEvent.addLocalMonitorForEvents(matching: [.keyDown, .keyUp]) { event in
-            let char = event.characters ?? ""
-            let keyCode = event.keyCode
-            print("⌨️  KEYBOARD EVENT DETECTED:")
-            print("   ├─ Type: \(event.type == .keyDown ? "KEY DOWN" : "KEY UP")")
-            print("   ├─ Character: '\(char)'")
-            print("   ├─ Key Code: \(keyCode)")
-            print("   ├─ Modifiers: \(event.modifierFlags)")
-            print("   ├─ Window: \(NSApp?.keyWindow?.title ?? "none")")
-            print("   └─ First Responder: \(NSApp?.keyWindow?.firstResponder?.className ?? "none")")
-            return event
-        }
+            keyMonitor = NSEvent.addLocalMonitorForEvents(matching: [.keyDown, .keyUp]) { event in
+                let char = event.characters ?? ""
+                let keyCode = event.keyCode
+                print("⌨️  KEYBOARD EVENT DETECTED:")
+                print("   ├─ Type: \(event.type == .keyDown ? "KEY DOWN" : "KEY UP")")
+                print("   ├─ Character: '\(char)'")
+                print("   ├─ Key Code: \(keyCode)")
+                print("   ├─ Modifiers: \(event.modifierFlags)")
+                print("   ├─ Window: \(NSApp?.keyWindow?.title ?? "none")")
+                print(
+                    "   └─ First Responder: \(NSApp?.keyWindow?.firstResponder?.className ?? "none")"
+                )
+                return event
+            }
 
-        print("✅ Keyboard monitor installed!")
+            print("✅ Keyboard monitor installed!")
         #else
-        print("⌨️  Keyboard monitoring not available on iOS")
+            print("⌨️  Keyboard monitoring not available on iOS")
         #endif
     }
 
     private func checkAppState() {
         #if os(macOS)
-        guard let app = NSApp else { return }
+            guard let app = NSApp else { return }
 
-        print("\n📊 APP STATE CHECK:")
-        print("   ├─ App is active: \(app.isActive)")
-        print("   ├─ App is hidden: \(app.isHidden)")
-        print("   ├─ Main window key: \(app.mainWindow?.isKeyWindow ?? false)")
-        print("   ├─ First responder: \(app.keyWindow?.firstResponder?.className ?? "none")")
+            print("\n📊 APP STATE CHECK:")
+            print("   ├─ App is active: \(app.isActive)")
+            print("   ├─ App is hidden: \(app.isHidden)")
+            print("   ├─ Main window key: \(app.mainWindow?.isKeyWindow ?? false)")
+            print("   ├─ First responder: \(app.keyWindow?.firstResponder?.className ?? "none")")
 
-        // Check for Notes app
-        let notesRunning = isNotesAppRunning()
-        let notesActive =
-            NSWorkspace.shared.frontmostApplication?.bundleIdentifier == "com.apple.Notes"
-        print("   ├─ Notes.app running: \(notesRunning ? "⚠️ YES" : "✅ NO")")
-        print("   └─ Notes.app frontmost: \(notesActive ? "⚠️ YES" : "✅ NO")")
+            // Check for Notes app
+            let notesRunning = isNotesAppRunning()
+            let notesActive =
+                NSWorkspace.shared.frontmostApplication?.bundleIdentifier == "com.apple.Notes"
+            print("   ├─ Notes.app running: \(notesRunning ? "⚠️ YES" : "✅ NO")")
+            print("   └─ Notes.app frontmost: \(notesActive ? "⚠️ YES" : "✅ NO")")
 
-        // Try to activate
-        app.activate(ignoringOtherApps: true)
-        print("   └─ Attempted app activation")
-        print("")
+            // Try to activate
+            app.activate(ignoringOtherApps: true)
+            print("   └─ Attempted app activation")
+            print("")
         #else
-        print("\n📊 APP STATE CHECK (iOS - limited info)")
+            print("\n📊 APP STATE CHECK (iOS - limited info)")
         #endif
     }
 }
@@ -223,9 +226,11 @@ extension NoteEditorView.Field {
 
 func isNotesAppRunning() -> Bool {
     #if os(macOS)
-    return NSWorkspace.shared.runningApplications.contains { $0.bundleIdentifier == "com.apple.Notes" }
+        return NSWorkspace.shared.runningApplications.contains {
+            $0.bundleIdentifier == "com.apple.Notes"
+        }
     #else
-    return false
+        return false
     #endif
 }
 

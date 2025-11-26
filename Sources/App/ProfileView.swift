@@ -9,27 +9,27 @@ struct ProfileView: View {
     @State private var showingImagePicker = false
     @State private var showingEditSheet = false
     @State private var showingChangePasswordSheet = false
-    
+
     init(viewModel: ProfileViewModel) {
         _viewModel = StateObject(wrappedValue: viewModel)
     }
-    
+
     var body: some View {
         NavigationStack {
             ZStack {
                 Color.black.ignoresSafeArea()
-                
+
                 ScrollView {
                     VStack(spacing: 24) {
                         // Profile Header
                         profileHeader
-                        
+
                         // Account Statistics
                         statisticsSection
-                        
+
                         // Account Actions
                         actionsSection
-                        
+
                         // Danger Zone
                         dangerZoneSection
                     }
@@ -58,9 +58,9 @@ struct ProfileView: View {
             }
         }
     }
-    
+
     // MARK: - Profile Header
-    
+
     private var profileHeader: some View {
         VStack(spacing: 16) {
             // Profile Photo
@@ -85,7 +85,7 @@ struct ProfileView: View {
                                 .foregroundColor(.white)
                         }
                 }
-                
+
                 // Camera button overlay
                 Button {
                     showingImagePicker = true
@@ -101,18 +101,18 @@ struct ProfileView: View {
                 }
                 .offset(x: 35, y: 35)
             }
-            
+
             // User Info
             VStack(spacing: 8) {
                 Text(viewModel.userName)
                     .font(.title2)
                     .fontWeight(.bold)
                     .foregroundColor(.white)
-                
+
                 Text(viewModel.userEmail)
                     .font(.subheadline)
                     .foregroundColor(.gray)
-                
+
                 if let college = viewModel.userCollege {
                     HStack(spacing: 4) {
                         Image(systemName: "building.columns.fill")
@@ -130,15 +130,15 @@ struct ProfileView: View {
         }
         .padding(.vertical, 24)
     }
-    
+
     // MARK: - Statistics Section
-    
+
     private var statisticsSection: some View {
         VStack(alignment: .leading, spacing: 16) {
             Text("Your Statistics")
                 .font(.headline)
                 .foregroundColor(.white)
-            
+
             HStack(spacing: 16) {
                 ProfileStatCard(
                     icon: "book.fill",
@@ -146,14 +146,14 @@ struct ProfileView: View {
                     value: "\(viewModel.classCount)",
                     color: .blue
                 )
-                
+
                 ProfileStatCard(
                     icon: "note.text",
                     title: "Notes",
                     value: "\(viewModel.noteCount)",
                     color: .green
                 )
-                
+
                 ProfileStatCard(
                     icon: "rectangle.stack.fill",
                     title: "Flashcards",
@@ -166,15 +166,15 @@ struct ProfileView: View {
         .background(Color.white.opacity(0.05))
         .cornerRadius(16)
     }
-    
+
     // MARK: - Actions Section
-    
+
     private var actionsSection: some View {
         VStack(alignment: .leading, spacing: 16) {
             Text("Account")
                 .font(.headline)
                 .foregroundColor(.white)
-            
+
             VStack(spacing: 0) {
                 ActionRow(
                     icon: "person.fill",
@@ -183,10 +183,10 @@ struct ProfileView: View {
                 ) {
                     showingEditSheet = true
                 }
-                
+
                 Divider()
                     .background(Color.white.opacity(0.1))
-                
+
                 ActionRow(
                     icon: "lock.fill",
                     title: "Change Password",
@@ -194,10 +194,10 @@ struct ProfileView: View {
                 ) {
                     showingChangePasswordSheet = true
                 }
-                
+
                 Divider()
                     .background(Color.white.opacity(0.1))
-                
+
                 NavigationLink {
                     SettingsView()
                 } label: {
@@ -205,12 +205,12 @@ struct ProfileView: View {
                         Image(systemName: "gear")
                             .foregroundColor(.gray)
                             .frame(width: 24)
-                        
+
                         Text("Settings")
                             .foregroundColor(.white)
-                        
+
                         Spacer()
-                        
+
                         Image(systemName: "chevron.right")
                             .foregroundColor(.gray)
                             .font(.caption)
@@ -222,15 +222,15 @@ struct ProfileView: View {
             .cornerRadius(16)
         }
     }
-    
+
     // MARK: - Danger Zone
-    
+
     private var dangerZoneSection: some View {
         VStack(alignment: .leading, spacing: 16) {
             Text("Danger Zone")
                 .font(.headline)
                 .foregroundColor(.red)
-            
+
             Button {
                 Task {
                     await viewModel.logout()
@@ -258,18 +258,18 @@ struct ProfileStatCard: View {
     let title: String
     let value: String
     let color: Color
-    
+
     var body: some View {
         VStack(spacing: 8) {
             Image(systemName: icon)
                 .font(.system(size: 24))
                 .foregroundColor(color)
-            
+
             Text(value)
                 .font(.title2)
                 .fontWeight(.bold)
                 .foregroundColor(.white)
-            
+
             Text(title)
                 .font(.caption)
                 .foregroundColor(.gray)
@@ -288,19 +288,19 @@ struct ActionRow: View {
     let title: String
     let color: Color
     let action: () -> Void
-    
+
     var body: some View {
         Button(action: action) {
             HStack(spacing: 12) {
                 Image(systemName: icon)
                     .foregroundColor(color)
                     .frame(width: 24)
-                
+
                 Text(title)
                     .foregroundColor(.white)
-                
+
                 Spacer()
-                
+
                 Image(systemName: "chevron.right")
                     .foregroundColor(.gray)
                     .font(.caption)
@@ -317,12 +317,12 @@ struct EditProfileView: View {
     @ObservedObject var viewModel: ProfileViewModel
     @State private var name: String = ""
     @State private var email: String = ""
-    
+
     var body: some View {
         NavigationStack {
             ZStack {
                 Color.black.ignoresSafeArea()
-                
+
                 VStack(spacing: 20) {
                     VStack(alignment: .leading, spacing: 8) {
                         Text("Name")
@@ -331,7 +331,7 @@ struct EditProfileView: View {
                             .textFieldStyle(.roundedBorder)
                     }
                     .padding(.horizontal)
-                    
+
                     VStack(alignment: .leading, spacing: 8) {
                         Text("Email")
                             .foregroundColor(.gray)
@@ -339,7 +339,7 @@ struct EditProfileView: View {
                             .textFieldStyle(.roundedBorder)
                     }
                     .padding(.horizontal)
-                    
+
                     Spacer()
                 }
                 .padding(.top, 40)
@@ -349,7 +349,7 @@ struct EditProfileView: View {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel") { dismiss() }
                 }
-                
+
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Save") {
                         Task {
@@ -376,12 +376,12 @@ struct ChangePasswordView: View {
     @State private var currentPassword: String = ""
     @State private var newPassword: String = ""
     @State private var confirmPassword: String = ""
-    
+
     var body: some View {
         NavigationStack {
             ZStack {
                 Color.black.ignoresSafeArea()
-                
+
                 VStack(spacing: 20) {
                     VStack(alignment: .leading, spacing: 8) {
                         Text("Current Password")
@@ -390,7 +390,7 @@ struct ChangePasswordView: View {
                             .textFieldStyle(.roundedBorder)
                     }
                     .padding(.horizontal)
-                    
+
                     VStack(alignment: .leading, spacing: 8) {
                         Text("New Password")
                             .foregroundColor(.gray)
@@ -398,7 +398,7 @@ struct ChangePasswordView: View {
                             .textFieldStyle(.roundedBorder)
                     }
                     .padding(.horizontal)
-                    
+
                     VStack(alignment: .leading, spacing: 8) {
                         Text("Confirm Password")
                             .foregroundColor(.gray)
@@ -406,12 +406,12 @@ struct ChangePasswordView: View {
                             .textFieldStyle(.roundedBorder)
                     }
                     .padding(.horizontal)
-                    
+
                     Text("Password must be at least 6 characters")
                         .font(.caption)
                         .foregroundColor(.gray)
                         .padding(.horizontal)
-                    
+
                     Spacer()
                 }
                 .padding(.top, 40)
@@ -421,7 +421,7 @@ struct ChangePasswordView: View {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel") { dismiss() }
                 }
-                
+
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Save") {
                         Task {
@@ -434,7 +434,9 @@ struct ChangePasswordView: View {
                             }
                         }
                     }
-                    .disabled(viewModel.isLoading || newPassword.count < 6 || newPassword != confirmPassword)
+                    .disabled(
+                        viewModel.isLoading || newPassword.count < 6
+                            || newPassword != confirmPassword)
                 }
             }
         }

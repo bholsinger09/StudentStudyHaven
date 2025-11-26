@@ -1,6 +1,6 @@
+import Combine
 import Core
 import Foundation
-import Combine
 
 /// Mock implementation of ClassRepository for development and testing
 public final class MockClassRepositoryImpl: ClassRepositoryProtocol {
@@ -34,12 +34,12 @@ public final class MockClassRepositoryImpl: ClassRepositoryProtocol {
         try await Task.sleep(nanoseconds: 300_000_000)
 
         classes[classItem.id] = classItem
-        
+
         if isObserving {
             changesSubject.send(DataChange(type: .added, item: classItem))
             updateClassesSubject()
         }
-        
+
         return classItem
     }
 
@@ -54,12 +54,12 @@ public final class MockClassRepositoryImpl: ClassRepositoryProtocol {
         var updatedClass = classItem
         updatedClass.updatedAt = Date()
         classes[classItem.id] = updatedClass
-        
+
         if isObserving {
             changesSubject.send(DataChange(type: .modified, item: updatedClass))
             updateClassesSubject()
         }
-        
+
         return updatedClass
     }
 
@@ -72,15 +72,15 @@ public final class MockClassRepositoryImpl: ClassRepositoryProtocol {
         }
 
         classes.removeValue(forKey: id)
-        
+
         if isObserving {
             changesSubject.send(DataChange(type: .removed, item: deletedClass))
             updateClassesSubject()
         }
     }
-    
+
     // MARK: - Real-time listeners
-    
+
     public func observeClasses(for userId: String) -> AnyPublisher<[Class], Never> {
         isObserving = true
         // Initial load
@@ -94,20 +94,21 @@ public final class MockClassRepositoryImpl: ClassRepositoryProtocol {
         }
         return classesSubject.eraseToAnyPublisher()
     }
-    
+
     public func observeClassChanges(for userId: String) -> AnyPublisher<DataChange<Class>, Never> {
         isObserving = true
-        return changesSubject
+        return
+            changesSubject
             .filter { $0.item.userId == userId }
             .eraseToAnyPublisher()
     }
-    
+
     public func stopObserving() {
         isObserving = false
     }
-    
+
     // MARK: - Private helpers
-    
+
     private func updateClassesSubject() {
         let allClasses = Array(classes.values)
         classesSubject.send(allClasses)

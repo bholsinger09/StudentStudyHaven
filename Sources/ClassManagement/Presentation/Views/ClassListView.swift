@@ -1,4 +1,3 @@
-import ClassManagement
 import Core
 import SwiftUI
 
@@ -46,7 +45,9 @@ public struct ClassListView: View {
             .task {
                 await viewModel.loadClasses()
             }
-            .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("ClassDidSave"))) { _ in
+            .onReceive(
+                NotificationCenter.default.publisher(for: NSNotification.Name("ClassDidSave"))
+            ) { _ in
                 Task {
                     await viewModel.loadClasses()
                 }

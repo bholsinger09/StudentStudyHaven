@@ -6,48 +6,51 @@ import SwiftUI
 public struct ForgotPasswordView: View {
     @Environment(\.dismiss) private var dismiss
     @StateObject private var viewModel: ForgotPasswordViewModel
-    
+
     public init(authRepository: AuthRepositoryProtocol) {
-        _viewModel = StateObject(wrappedValue: ForgotPasswordViewModel(authRepository: authRepository))
+        _viewModel = StateObject(
+            wrappedValue: ForgotPasswordViewModel(authRepository: authRepository))
     }
-    
+
     public var body: some View {
         NavigationStack {
             ZStack {
                 Color.black.ignoresSafeArea()
-                
+
                 VStack(spacing: 24) {
                     // Header
                     VStack(spacing: 12) {
                         Image(systemName: "lock.rotation")
                             .font(.system(size: 60))
                             .foregroundColor(Color(red: 0.73, green: 0.33, blue: 0.83))
-                        
+
                         Text("Reset Password")
                             .font(.title)
                             .fontWeight(.bold)
                             .foregroundColor(.white)
-                        
-                        Text("Enter your email address and we'll send you instructions to reset your password")
-                            .font(.subheadline)
-                            .foregroundColor(.gray)
-                            .multilineTextAlignment(.center)
-                            .padding(.horizontal)
+
+                        Text(
+                            "Enter your email address and we'll send you instructions to reset your password"
+                        )
+                        .font(.subheadline)
+                        .foregroundColor(.gray)
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal)
                     }
                     .padding(.top, 40)
-                    
+
                     // Email Field
                     VStack(alignment: .leading, spacing: 8) {
                         Text("Email")
                             .font(.subheadline)
                             .foregroundColor(.gray)
-                        
+
                         TextField("Enter your email", text: $viewModel.email)
                             .textFieldStyle(.roundedBorder)
                             .disabled(viewModel.isLoading)
                     }
                     .padding(.horizontal)
-                    
+
                     // Send Button
                     Button {
                         Task {
@@ -72,7 +75,7 @@ public struct ForgotPasswordView: View {
                     }
                     .disabled(viewModel.isLoading || viewModel.email.isEmpty)
                     .padding(.horizontal)
-                    
+
                     Spacer()
                 }
             }
@@ -111,17 +114,17 @@ class ForgotPasswordViewModel: ObservableObject {
     @Published var showError = false
     @Published var showSuccess = false
     @Published var errorMessage = ""
-    
+
     private let resetPasswordUseCase: ResetPasswordUseCase
-    
+
     init(authRepository: AuthRepositoryProtocol) {
         self.resetPasswordUseCase = ResetPasswordUseCase(authRepository: authRepository)
     }
-    
+
     func sendResetEmail() async {
         isLoading = true
         defer { isLoading = false }
-        
+
         do {
             try await resetPasswordUseCase.execute(email: email)
             showSuccess = true
@@ -133,7 +136,7 @@ class ForgotPasswordViewModel: ObservableObject {
             showError = true
         }
     }
-    
+
     func clearError() {
         showError = false
         errorMessage = ""

@@ -105,7 +105,7 @@ public struct LoginView: View {
                                 .multilineTextAlignment(.center)
                                 .padding(.top, 4)
                         }
-                        
+
                         // Forgot Password Link
                         HStack {
                             Spacer()

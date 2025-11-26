@@ -5,29 +5,29 @@ import SwiftUI
 public struct ErrorView: View {
     let error: Error
     let retryAction: (() -> Void)?
-    
+
     public init(error: Error, retryAction: (() -> Void)? = nil) {
         self.error = error
         self.retryAction = retryAction
     }
-    
+
     public var body: some View {
         VStack(spacing: 20) {
             Image(systemName: "exclamationmark.triangle.fill")
                 .font(.system(size: 50))
                 .foregroundColor(.orange)
-            
+
             Text("Oops!")
                 .font(.title2)
                 .fontWeight(.bold)
                 .foregroundColor(.white)
-            
+
             Text(ErrorHandler.userFriendlyMessage(for: error))
                 .font(.body)
                 .foregroundColor(.gray)
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, 40)
-            
+
             if let retryAction = retryAction, ErrorHandler.isRetryable(error) {
                 Button {
                     retryAction()
@@ -53,24 +53,24 @@ public struct ErrorView: View {
 public struct ErrorBanner: View {
     let message: String
     let dismissAction: () -> Void
-    
+
     public init(message: String, dismissAction: @escaping () -> Void) {
         self.message = message
         self.dismissAction = dismissAction
     }
-    
+
     public var body: some View {
         HStack(spacing: 12) {
             Image(systemName: "exclamationmark.circle.fill")
                 .foregroundColor(.white)
-            
+
             Text(message)
                 .font(.subheadline)
                 .foregroundColor(.white)
                 .lineLimit(2)
-            
+
             Spacer()
-            
+
             Button {
                 dismissAction()
             } label: {
@@ -94,7 +94,7 @@ public struct EmptyStateView: View {
     let message: String
     let actionTitle: String?
     let action: (() -> Void)?
-    
+
     public init(
         icon: String,
         title: String,
@@ -108,24 +108,24 @@ public struct EmptyStateView: View {
         self.actionTitle = actionTitle
         self.action = action
     }
-    
+
     public var body: some View {
         VStack(spacing: 20) {
             Image(systemName: icon)
                 .font(.system(size: 60))
                 .foregroundColor(Color(red: 0.73, green: 0.33, blue: 0.83))
-            
+
             Text(title)
                 .font(.title2)
                 .fontWeight(.bold)
                 .foregroundColor(.white)
-            
+
             Text(message)
                 .font(.body)
                 .foregroundColor(.gray)
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, 40)
-            
+
             if let actionTitle = actionTitle, let action = action {
                 Button {
                     action()

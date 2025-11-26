@@ -1,5 +1,4 @@
 import Core
-import Notes
 import SwiftUI
 
 /// View for linking notes together
