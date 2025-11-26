@@ -89,4 +89,16 @@ public final class MockAuthRepositoryImpl: AuthRepositoryProtocol {
         currentSession = newSession
         return newSession
     }
+    
+    public func deleteAccount() async throws {
+        guard let session = currentSession else {
+            throw AppError.unauthorized
+        }
+        
+        // Remove user from storage
+        users.removeValue(forKey: session.user.email)
+        
+        // Clear session
+        currentSession = nil
+    }
 }

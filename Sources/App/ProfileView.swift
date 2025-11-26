@@ -9,6 +9,8 @@ struct ProfileView: View {
     @State private var showingImagePicker = false
     @State private var showingEditSheet = false
     @State private var showingChangePasswordSheet = false
+    @State private var showingDeleteAccountAlert = false
+    @State private var deleteAccountEmail = ""
 
     init(viewModel: ProfileViewModel) {
         _viewModel = StateObject(wrappedValue: viewModel)
@@ -55,6 +57,20 @@ struct ProfileView: View {
                 Button("OK") { viewModel.clearError() }
             } message: {
                 Text(viewModel.errorMessage)
+            }
+            .alert("Delete Account", isPresented: $showingDeleteAccountAlert) {
+                TextField("Enter your email to confirm", text: $deleteAccountEmail)
+                Button("Cancel", role: .cancel) {
+                    deleteAccountEmail = ""
+                }
+                Button("Delete Account", role: .destructive) {
+                    Task {
+                        await viewModel.deleteAccount(confirmEmail: deleteAccountEmail)
+                        deleteAccountEmail = ""
+                    }
+                }
+            } message: {
+                Text("This action is permanent and cannot be undone. All your classes, notes, flashcards, and study data will be permanently deleted.\n\nEnter your email to confirm: \(viewModel.userEmail)")
             }
         }
     }
@@ -231,21 +247,55 @@ struct ProfileView: View {
                 .font(.headline)
                 .foregroundColor(.red)
 
-            Button {
-                Task {
-                    await viewModel.logout()
+            VStack(spacing: 12) {
+                Button {
+                    Task {
+                        await viewModel.logout()
+                    }
+                } label: {
+                    HStack {
+                        Image(systemName: "rectangle.portrait.and.arrow.right")
+                        Text("Log Out")
+                            .fontWeight(.semibold)
+                        Spacer()
+                    }
+                    .foregroundColor(.red)
+                    .padding()
+                    .background(Color.red.opacity(0.1))
+                    .cornerRadius(12)
                 }
-            } label: {
-                HStack {
-                    Image(systemName: "rectangle.portrait.and.arrow.right")
-                    Text("Log Out")
-                        .fontWeight(.semibold)
-                    Spacer()
+
+                Button {
+                    showingDeleteAccountAlert = true
+                } label: {
+                    HStack {
+                        Image(systemName: "trash.fill")
+                        Text("Delete Account")
+                            .fontWeight(.semibold)
+                        Spacer()
+                    }
+                    .foregroundColor(.white)
+                    .padding()
+                    .background(Color.red)
+                    .cornerRadius(12)
                 }
-                .foregroundColor(.red)
-                .padding()
-                .background(Color.red.opacity(0.1))
-                .cornerRadius(12)
+
+                // Support link for account deletion help
+                Link(destination: URL(string: "https://bholsinger09.github.io/StudentStudyHaven/support.html#delete-account")!) {
+                    HStack {
+                        Image(systemName: "questionmark.circle.fill")
+                        Text("Need help deleting your account?")
+                            .font(.caption)
+                        Spacer()
+                        Image(systemName: "arrow.up.right")
+                            .font(.caption2)
+                    }
+                    .foregroundColor(.gray)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 8)
+                    .background(Color.white.opacity(0.05))
+                    .cornerRadius(8)
+                }
             }
         }
     }

@@ -129,4 +129,8 @@ class MockAuthRepository: AuthRepositoryProtocol {
     func refreshToken() async throws -> AuthSession {
         throw AppError.unknown("Not implemented")
     }
+    
+    func deleteAccount() async throws {
+        // Mock implementation
+    }
 }

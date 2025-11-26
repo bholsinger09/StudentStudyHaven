@@ -153,6 +153,41 @@ class ProfileViewModel: ObservableObject {
         await appState.logout()
     }
 
+    func deleteAccount(confirmEmail: String) async {
+        guard let user = appState.currentUser else { return }
+        
+        // Verify email matches
+        guard confirmEmail.lowercased() == user.email.lowercased() else {
+            errorMessage = "Email does not match. Account deletion cancelled."
+            showError = true
+            return
+        }
+        
+        isLoading = true
+        defer { isLoading = false }
+        
+        do {
+            // Delete user data from Firestore
+            // TODO: Implement DeleteAccountUseCase
+            // This should:
+            // 1. Delete all user's classes
+            // 2. Delete all user's notes
+            // 3. Delete all user's flashcards
+            // 4. Delete user's profile data
+            // 5. Delete Firebase Auth account
+            
+            // For now, just delete the Firebase Auth account
+            try await authRepository.deleteAccount()
+            
+            // Log out and reset app state
+            await appState.logout()
+            
+        } catch {
+            errorMessage = "Failed to delete account: \(error.localizedDescription). Please contact support at support@studentstudyhaven.com for assistance."
+            showError = true
+        }
+    }
+
     func clearError() {
         showError = false
         errorMessage = ""

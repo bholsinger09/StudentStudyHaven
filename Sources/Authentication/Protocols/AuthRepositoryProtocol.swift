@@ -8,4 +8,5 @@ public protocol AuthRepositoryProtocol {
     func logout() async throws
     func getCurrentSession() async -> AuthSession?
     func refreshToken() async throws -> AuthSession
+    func deleteAccount() async throws
 }
