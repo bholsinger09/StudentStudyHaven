@@ -25,14 +25,15 @@ public struct NoteEditorView: View {
     public var body: some View {
         VStack(spacing: 0) {
             // Header with Cancel and Save
-            HStack(spacing: 16) {
+            HStack(spacing: 12) {
                 Button(action: {
                     dismiss()
                 }) {
                     Text("Cancel")
-                        .font(.system(size: 16, weight: .medium))
+                        .font(.system(size: 15, weight: .medium))
                         .foregroundColor(.white)
-                        .frame(minWidth: 100, minHeight: 40)
+                        .padding(.horizontal, 20)
+                        .padding(.vertical, 10)
                         .background(Color(red: 0.9, green: 0.4, blue: 0.5))
                         .cornerRadius(8)
                 }
@@ -47,9 +48,10 @@ public struct NoteEditorView: View {
                     }
                 }) {
                     Text("Save Note")
-                        .font(.system(size: 16, weight: .semibold))
+                        .font(.system(size: 15, weight: .semibold))
                         .foregroundColor(.white)
-                        .frame(minWidth: 120, minHeight: 40)
+                        .padding(.horizontal, 20)
+                        .padding(.vertical, 10)
                         .background(Color(red: 0.73, green: 0.33, blue: 0.83))
                         .cornerRadius(8)
                 }
@@ -57,7 +59,8 @@ public struct NoteEditorView: View {
                 .disabled(!viewModel.isValid)
                 .opacity(viewModel.isValid ? 1.0 : 0.5)
             }
-            .padding()
+            .padding(.horizontal, 16)
+            .padding(.vertical, 12)
             .background(Color.black)
 
             Divider()
@@ -90,11 +93,14 @@ public struct NoteEditorView: View {
 
                 Section("Notes") {
                     ZStack(alignment: .topLeading) {
-                        TextEditor(text: $viewModel.content)
-                            .frame(minHeight: 250)
-                            .font(.body)
-                            .scrollContentBackground(.hidden)
-                            .focused($focusedField, equals: .notes)
+                        GeometryReader { geometry in
+                            TextEditor(text: $viewModel.content)
+                                .frame(height: max(200, geometry.size.height * 0.4))
+                                .font(.body)
+                                .scrollContentBackground(.hidden)
+                                .focused($focusedField, equals: .notes)
+                        }
+                        .frame(minHeight: 200)
                             .onChange(of: viewModel.content) { newValue in
                                 print(
                                     "📝 [\(Date().formatted(date: .omitted, time: .standard))] Content changed: \(newValue.count) chars"

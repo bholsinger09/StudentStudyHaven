@@ -91,7 +91,7 @@ public struct NotesListView: View {
                     updateNoteUseCase: updateNoteUseCase
                 )
             )
-            .frame(width: 600, height: 550)
+            .presentationDetents([.large])
         }
         .task {
             await viewModel.loadNotes()
