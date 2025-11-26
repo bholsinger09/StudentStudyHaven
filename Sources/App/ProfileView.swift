@@ -198,12 +198,24 @@ struct ProfileView: View {
                 Divider()
                     .background(Color.white.opacity(0.1))
                 
-                ActionRow(
-                    icon: "gear",
-                    title: "Settings",
-                    color: .gray
-                ) {
-                    // Navigate to settings (will implement later)
+                NavigationLink {
+                    SettingsView()
+                } label: {
+                    HStack(spacing: 12) {
+                        Image(systemName: "gear")
+                            .foregroundColor(.gray)
+                            .frame(width: 24)
+                        
+                        Text("Settings")
+                            .foregroundColor(.white)
+                        
+                        Spacer()
+                        
+                        Image(systemName: "chevron.right")
+                            .foregroundColor(.gray)
+                            .font(.caption)
+                    }
+                    .padding()
                 }
             }
             .background(Color.white.opacity(0.05))

@@ -8,10 +8,20 @@ import SwiftUI
 /// Root view that handles authentication state
 struct RootView: View {
     @EnvironmentObject var appState: AppState
+    @AppStorage("hasCompletedOnboarding") private var hasCompletedOnboarding = false
+    @State private var showOnboarding = false
 
     var body: some View {
         if appState.isAuthenticated {
             MainTabView()
+                .sheet(isPresented: $showOnboarding) {
+                    OnboardingView()
+                }
+                .onAppear {
+                    if !hasCompletedOnboarding {
+                        showOnboarding = true
+                    }
+                }
         } else {
             AuthenticationCoordinator()
         }
