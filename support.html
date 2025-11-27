@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Study Haven - Support</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 40px 30px;
+        }
+        
+        .section {
+            margin-bottom: 40px;
+        }
+        
+        .section h2 {
+            color: #667eea;
+            font-size: 1.8em;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        
+        .section h3 {
+            color: #764ba2;
+            font-size: 1.3em;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+        
+        .section p, .section ul {
+            margin-bottom: 15px;
+            color: #555;
+        }
+        
+        .section ul {
+            padding-left: 20px;
+        }
+        
+        .section li {
+            margin-bottom: 8px;
+        }
+        
+        .contact-box {
+            background: #f8f9ff;
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        
+        .contact-box strong {
+            color: #667eea;
+        }
+        
+        .contact-box a {
+            color: #764ba2;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .contact-box a:hover {
+            text-decoration: underline;
+        }
+        
+        .feature-list {
+            background: #f8f9ff;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        
+        .footer {
+            background: #f8f9fa;
+            padding: 30px;
+            text-align: center;
+            color: #666;
+            border-top: 1px solid #e0e0e0;
+        }
+        
+        .footer a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .footer a:hover {
+            text-decoration: underline;
+        }
+        
+        @media (max-width: 600px) {
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .content {
+                padding: 30px 20px;
+            }
+            
+            .section h2 {
+                font-size: 1.5em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📚 Student Study Haven</h1>
+            <p>Your Personal Academic Success Platform</p>
+        </div>
+        
+        <div class="content">
+            <!-- Contact Section -->
+            <div class="section">
+                <h2>📧 Contact Support</h2>
+                <div class="contact-box">
+                    <p><strong>Email:</strong> <a href="mailto:support@studentstudyhaven.com">support@studentstudyhaven.com</a></p>
+                    <p><strong>Response Time:</strong> Within 24-48 hours</p>
+                    <p><strong>Website:</strong> <a href="https://studentstudyhaven.com" target="_blank">studentstudyhaven.com</a></p>
+                </div>
+                <p>We're here to help! Contact us anytime with questions, feedback, or technical issues.</p>
+            </div>
+            
+            <!-- About Section -->
+            <div class="section">
+                <h2>🎓 About Student Study Haven</h2>
+                <p>Student Study Haven is a comprehensive study management app designed to help students organize their academic life, enhance learning, and achieve their educational goals.</p>
+                
+                <div class="feature-list">
+                    <h3>Key Features:</h3>
+                    <ul>
+                        <li><strong>Class Management:</strong> Organize all your courses in one place</li>
+                        <li><strong>Smart Notes:</strong> Create, organize, and link notes with AI-powered insights</li>
+                        <li><strong>Flashcards:</strong> Build custom flashcard decks for effective studying</li>
+                        <li><strong>College Dashboard:</strong> Explore universities, view statistics, and discover fun facts</li>
+                        <li><strong>Study Sessions:</strong> Track your study time and progress</li>
+                        <li><strong>Profile & Stats:</strong> Monitor your academic achievements</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- FAQ Section -->
+            <div class="section">
+                <h2>❓ Frequently Asked Questions</h2>
+                
+                <h3>How do I create an account?</h3>
+                <p>Tap "Sign Up" on the welcome screen, enter your email and password, and you're ready to go! You can also sign in with your existing account credentials.</p>
+                
+                <h3>How do I add a new class?</h3>
+                <p>Navigate to the Classes tab, tap the "+" button, and enter your course details including name, instructor, schedule, and location.</p>
+                
+                <h3>Can I organize my notes by class?</h3>
+                <p>Yes! When creating a note, you can assign it to a specific class. You can also link related notes together for better organization.</p>
+                
+                <h3>How do flashcards work?</h3>
+                <p>Create flashcard decks by tapping the "+" button in the Flashcards tab. Add front (question) and back (answer) content, then practice by flipping through your cards.</p>
+                
+                <h3>Is my data secure?</h3>
+                <p>Absolutely! We use Firebase Authentication and secure cloud storage to protect your data. All information is encrypted and stored safely.</p>
+                
+                <h3>Can I access my data on multiple devices?</h3>
+                <p>Yes! Your data syncs across all devices where you're signed in with the same account.</p>
+                
+                <h3>What if I forgot my password?</h3>
+                <p>Tap "Forgot Password" on the login screen and follow the instructions to reset your password via email.</p>
+                
+                <h3 id="delete-account">How do I delete my account?</h3>
+                <p><strong>To permanently delete your account:</strong></p>
+                <ol>
+                    <li>Open the Student Study Haven app</li>
+                    <li>Navigate to the <strong>Profile</strong> tab</li>
+                    <li>Scroll down to the <strong>"Danger Zone"</strong> section</li>
+                    <li>Tap <strong>"Delete Account"</strong></li>
+                    <li>Enter your email address to confirm</li>
+                    <li>Tap <strong>"Delete Account"</strong> to permanently delete</li>
+                </ol>
+                <p><strong>⚠️ Important:</strong> This action is permanent and cannot be undone. All your classes, notes, flashcards, and study data will be permanently deleted from our servers.</p>
+                <p>If you need assistance with account deletion, please contact us at <a href="mailto:support@studentstudyhaven.com">support@studentstudyhaven.com</a></p>
+            </div>
+            
+            <!-- Troubleshooting Section -->
+            <div class="section">
+                <h2>🔧 Troubleshooting</h2>
+                
+                <h3>App is crashing or freezing</h3>
+                <ul>
+                    <li>Force quit the app and restart it</li>
+                    <li>Ensure you have the latest version from the App Store</li>
+                    <li>Restart your iPhone</li>
+                    <li>Check for iOS updates</li>
+                    <li>If the problem persists, contact support</li>
+                </ul>
+                
+                <h3>Data not syncing</h3>
+                <ul>
+                    <li>Check your internet connection</li>
+                    <li>Sign out and sign back in</li>
+                    <li>Ensure you're using the same account on all devices</li>
+                    <li>Wait a few moments for sync to complete</li>
+                </ul>
+                
+                <h3>Can't log in</h3>
+                <ul>
+                    <li>Double-check your email and password</li>
+                    <li>Use "Forgot Password" to reset if needed</li>
+                    <li>Ensure you have a stable internet connection</li>
+                    <li>Try closing and reopening the app</li>
+                </ul>
+                
+                <h3>Features not working correctly</h3>
+                <ul>
+                    <li>Update to the latest app version</li>
+                    <li>Clear the app cache by signing out and back in</li>
+                    <li>Contact support with specific details about the issue</li>
+                </ul>
+            </div>
+            
+            <!-- System Requirements -->
+            <div class="section">
+                <h2>📱 System Requirements</h2>
+                <ul>
+                    <li><strong>Platform:</strong> iOS 15.0 or later</li>
+                    <li><strong>Devices:</strong> iPhone 11 and newer models recommended</li>
+                    <li><strong>Internet:</strong> Required for sync and cloud features</li>
+                    <li><strong>Storage:</strong> Minimum 50MB available space</li>
+                </ul>
+            </div>
+            
+            <!-- Privacy Section -->
+            <div class="section">
+                <h2>🔒 Privacy & Data</h2>
+                <p>We take your privacy seriously. Student Study Haven:</p>
+                <ul>
+                    <li>Only collects data necessary for app functionality</li>
+                    <li>Never sells your personal information</li>
+                    <li>Uses industry-standard encryption</li>
+                    <li>Complies with GDPR and data protection regulations</li>
+                    <li>Allows you to delete your account and data at any time</li>
+                </ul>
+                <p>For complete details, read our <a href="https://studentstudyhaven.com/privacy" target="_blank">Privacy Policy</a>.</p>
+            </div>
+            
+            <!-- Delete Account -->
+            <div class="section">
+                <h2>🗑️ Delete Your Account</h2>
+                <p>If you wish to permanently delete your account and all associated data:</p>
+                <ol>
+                    <li>Open the app and go to your Profile tab</li>
+                    <li>Tap "Settings"</li>
+                    <li>Scroll to "Delete Account"</li>
+                    <li>Confirm your decision</li>
+                </ol>
+                <p><strong>Note:</strong> This action is permanent and cannot be undone. All your classes, notes, flashcards, and study data will be permanently deleted.</p>
+            </div>
+            
+            <!-- Feedback Section -->
+            <div class="section">
+                <h2>💬 Feedback & Feature Requests</h2>
+                <p>We love hearing from our users! Have a suggestion for a new feature or improvement? Email us at <a href="mailto:feedback@studentstudyhaven.com">feedback@studentstudyhaven.com</a></p>
+                <p>Your input helps us make Student Study Haven better for everyone.</p>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>&copy; 2025 Student Study Haven. All rights reserved.</p>
+            <p>
+                <a href="https://studentstudyhaven.com/privacy" target="_blank">Privacy Policy</a> | 
+                <a href="https://studentstudyhaven.com/terms" target="_blank">Terms of Service</a>
+            </p>
+            <p style="margin-top: 15px;">Made with ❤️ for students</p>
+        </div>
+    </div>
+</body>
+</html>
