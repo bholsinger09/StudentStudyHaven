@@ -3,6 +3,7 @@ import ClassManagement
 import Core
 import Flashcards
 import Notes
+import StudyGroups
 import SwiftUI
 
 /// Root view that handles authentication state
@@ -51,33 +52,45 @@ struct AuthenticationCoordinator: View {
 /// Main tab view after authentication
 struct MainTabView: View {
     @EnvironmentObject var appState: AppState
+    @State private var selectedTab: Int = 0
 
     var body: some View {
-        TabView {
+        TabView(selection: $selectedTab) {
             HomeView()
                 .tabItem {
                     Label("Home", systemImage: "house.fill")
                 }
+                .tag(0)
 
             ClassesTab()
                 .tabItem {
                     Label("Classes", systemImage: "book.fill")
                 }
+                .tag(1)
 
             NotesTab()
                 .tabItem {
                     Label("Classroom Notetaking", systemImage: "pencil.and.list.clipboard")
                 }
+                .tag(2)
 
             FlashcardsTab()
                 .tabItem {
                     Label("Flashcards", systemImage: "rectangle.stack.fill")
                 }
+                .tag(3)
+            
+            StudyGroupsTab()
+                .tabItem {
+                    Label("Study Groups", systemImage: "person.3.fill")
+                }
+                .tag(4)
 
             ProfileTab()
                 .tabItem {
                     Label("Profile", systemImage: "person.fill")
                 }
+                .tag(5)
         }
     }
 }
@@ -371,12 +384,60 @@ struct EmptyFlashcardsView: View {
     }
 }
 
+/// Study Groups tab
+struct StudyGroupsTab: View {
+    @EnvironmentObject var appState: AppState
+
+    var body: some View {
+        NavigationStack {
+            if let userId = appState.currentUser?.id,
+               let collegeId = appState.currentUser?.collegeId {
+                StudyGroupsView(
+                    viewModel: StudyGroupListViewModel(
+                        getStudyGroupsUseCase: GetStudyGroupsUseCase(
+                            studyGroupRepository: appState.studyGroupRepository),
+                        joinStudyGroupUseCase: JoinStudyGroupUseCase(
+                            studyGroupRepository: appState.studyGroupRepository),
+                        userId: userId,
+                        collegeId: collegeId
+                    ),
+                    createStudyGroupUseCase: CreateStudyGroupUseCase(
+                        studyGroupRepository: appState.studyGroupRepository),
+                    searchUsersUseCase: SearchUsersUseCase(
+                        userRepository: appState.userRepository),
+                    inviteUserToGroupUseCase: InviteUserToGroupUseCase(
+                        studyGroupRepository: appState.studyGroupRepository,
+                        userRepository: appState.userRepository),
+                    userId: userId,
+                    collegeId: collegeId
+                )
+            } else {
+                ZStack {
+                    Color.black.ignoresSafeArea()
+                    Text("Please log in to view study groups")
+                        .foregroundColor(.white)
+                }
+            }
+        }
+    }
+}
+
 /// Profile tab
 struct ProfileTab: View {
     @EnvironmentObject var appState: AppState
 
     var body: some View {
-        ProfileView(viewModel: ProfileViewModel(appState: appState))
+        Group {
+            if appState.isAuthenticated {
+                ProfileView(viewModel: ProfileViewModel(appState: appState))
+            } else {
+                ZStack {
+                    Color.black.ignoresSafeArea()
+                    Text("Please log in to view profile")
+                        .foregroundColor(.white)
+                }
+            }
+        }
     }
 }
 

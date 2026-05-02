@@ -2,12 +2,9 @@
 <Workspace
    version = "1.0">
    <FileRef
-      location = "group:StudentStudyHaven-iOS/StudentStudyHaven-iOS.xcodeproj">
+      location = "group:StudentStudyHaven.xcodeproj">
    </FileRef>
    <FileRef
-      location = "group:StudentStudyHaven-macOS/StudentStudyHaven-macOS.xcodeproj">
-   </FileRef>
-   <FileRef
-      location = "group:Package.swift">
+      location = "group:">
    </FileRef>
 </Workspace>

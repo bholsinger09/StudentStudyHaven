@@ -10,6 +10,7 @@ import ClassManagement
 import Core
 import Flashcards
 import Notes
+import StudyGroups
 import SwiftUI
 
 /// Application state management
@@ -20,16 +21,25 @@ class AppState: ObservableObject {
 
     // Dependencies
     let authRepository: AuthRepositoryProtocol
+    let userRepository: UserRepositoryProtocol
     let classRepository: ClassRepositoryProtocol
     let flashcardRepository: FlashcardRepositoryProtocol
     let noteRepository: NoteRepositoryProtocol
+    let studyGroupRepository: StudyGroupRepositoryProtocol
+    let studySessionRepository: GroupStudySessionRepositoryProtocol
+    let groupMessageRepository: GroupMessageRepositoryProtocol
 
     init() {
-        // Initialize with mock repositories (replace with real implementations)
-        self.authRepository = MockAuthRepositoryImpl()
-        self.classRepository = MockClassRepositoryImpl()
-        self.flashcardRepository = MockFlashcardRepositoryImpl()
-        self.noteRepository = MockNoteRepositoryImpl()
+        // Initialize with Firebase repositories for Study Groups, mocks for others
+        let container = DependencyContainer.shared
+        self.authRepository = container.authRepository
+        self.userRepository = container.userRepository
+        self.classRepository = container.classRepository
+        self.flashcardRepository = container.flashcardRepository
+        self.noteRepository = container.noteRepository
+        self.studyGroupRepository = container.studyGroupRepository
+        self.studySessionRepository = container.studySessionRepository
+        self.groupMessageRepository = container.groupMessageRepository
 
         Task {
             await checkAuthStatus()

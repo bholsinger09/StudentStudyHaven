@@ -28,10 +28,12 @@ let package = Package(
         .library(
             name: "Notes",
             targets: ["Notes"]),
+        .library(
+            name: "StudyGroups",
+            targets: ["StudyGroups"]),
     ],
     dependencies: [
-        // Firebase temporarily disabled - uncomment when ready to use real backend
-        // .package(url: "https://github.com/firebase/firebase-ios-sdk.git", from: "10.19.0"),
+        .package(url: "https://github.com/firebase/firebase-ios-sdk.git", from: "10.19.0"),
     ],
     targets: [
         // MARK: - App Target
@@ -43,10 +45,10 @@ let package = Package(
                 "ClassManagement",
                 "Flashcards",
                 "Notes",
-                // Firebase temporarily disabled
-                // .product(name: "FirebaseAuth", package: "firebase-ios-sdk"),
-                // .product(name: "FirebaseFirestore", package: "firebase-ios-sdk"),
-                // .product(name: "FirebaseFirestoreSwift", package: "firebase-ios-sdk"),
+                "StudyGroups",
+                .product(name: "FirebaseAuth", package: "firebase-ios-sdk"),
+                .product(name: "FirebaseFirestore", package: "firebase-ios-sdk"),
+                .product(name: "FirebaseFirestoreSwift", package: "firebase-ios-sdk"),
             ],
             path: "Sources/App"),
 
@@ -54,10 +56,9 @@ let package = Package(
         .target(
             name: "Core",
             dependencies: [
-                // Firebase temporarily disabled
-                // .product(name: "FirebaseAuth", package: "firebase-ios-sdk"),
-                // .product(name: "FirebaseFirestore", package: "firebase-ios-sdk"),
-                // .product(name: "FirebaseFirestoreSwift", package: "firebase-ios-sdk"),
+                .product(name: "FirebaseAuth", package: "firebase-ios-sdk"),
+                .product(name: "FirebaseFirestore", package: "firebase-ios-sdk"),
+                .product(name: "FirebaseFirestoreSwift", package: "firebase-ios-sdk"),
             ],
             path: "Sources/Core"),
         .testTarget(
@@ -69,11 +70,10 @@ let package = Package(
         .target(
             name: "Authentication",
             dependencies: [
-                "Core"
-                // Firebase temporarily disabled
-                // .product(name: "FirebaseAuth", package: "firebase-ios-sdk"),
-                // .product(name: "FirebaseFirestore", package: "firebase-ios-sdk"),
-                // .product(name: "FirebaseFirestoreSwift", package: "firebase-ios-sdk"),
+                "Core",
+                .product(name: "FirebaseAuth", package: "firebase-ios-sdk"),
+                .product(name: "FirebaseFirestore", package: "firebase-ios-sdk"),
+                .product(name: "FirebaseFirestoreSwift", package: "firebase-ios-sdk"),
             ],
             path: "Sources/Authentication"),
         .testTarget(
@@ -85,10 +85,9 @@ let package = Package(
         .target(
             name: "ClassManagement",
             dependencies: [
-                "Core"
-                // Firebase temporarily disabled
-                // .product(name: "FirebaseFirestore", package: "firebase-ios-sdk"),
-                // .product(name: "FirebaseFirestoreSwift", package: "firebase-ios-sdk"),
+                "Core",
+                .product(name: "FirebaseFirestore", package: "firebase-ios-sdk"),
+                .product(name: "FirebaseFirestoreSwift", package: "firebase-ios-sdk"),
             ],
             path: "Sources/ClassManagement"),
         .testTarget(
@@ -100,10 +99,9 @@ let package = Package(
         .target(
             name: "Flashcards",
             dependencies: [
-                "Core"
-                // Firebase temporarily disabled
-                // .product(name: "FirebaseFirestore", package: "firebase-ios-sdk"),
-                // .product(name: "FirebaseFirestoreSwift", package: "firebase-ios-sdk"),
+                "Core",
+                .product(name: "FirebaseFirestore", package: "firebase-ios-sdk"),
+                .product(name: "FirebaseFirestoreSwift", package: "firebase-ios-sdk"),
             ],
             path: "Sources/Flashcards"),
         .testTarget(
@@ -115,15 +113,28 @@ let package = Package(
         .target(
             name: "Notes",
             dependencies: [
-                "Core"
-                // Firebase temporarily disabled
-                // .product(name: "FirebaseFirestore", package: "firebase-ios-sdk"),
-                // .product(name: "FirebaseFirestoreSwift", package: "firebase-ios-sdk"),
+                "Core",
+                .product(name: "FirebaseFirestore", package: "firebase-ios-sdk"),
+                .product(name: "FirebaseFirestoreSwift", package: "firebase-ios-sdk"),
             ],
             path: "Sources/Notes"),
         .testTarget(
             name: "NotesTests",
             dependencies: ["Notes", "Core"],
             path: "Tests/NotesTests"),
+
+        // MARK: - Study Groups Module
+        .target(
+            name: "StudyGroups",
+            dependencies: [
+                "Core",
+                .product(name: "FirebaseFirestore", package: "firebase-ios-sdk"),
+                .product(name: "FirebaseFirestoreSwift", package: "firebase-ios-sdk"),
+            ],
+            path: "Sources/StudyGroups"),
+        .testTarget(
+            name: "StudyGroupsTests",
+            dependencies: ["StudyGroups", "Core"],
+            path: "Tests/StudyGroupsTests"),
     ]
 )

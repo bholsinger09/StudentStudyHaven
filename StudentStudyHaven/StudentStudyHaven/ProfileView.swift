@@ -9,27 +9,30 @@ struct ProfileView: View {
     @State private var showingImagePicker = false
     @State private var showingEditSheet = false
     @State private var showingChangePasswordSheet = false
-    
+    @State private var showingDeleteAccountAlert = false
+    @State private var showingDeleteConfirmation = false
+    @State private var deleteConfirmationText = ""
+
     init(viewModel: ProfileViewModel) {
         _viewModel = StateObject(wrappedValue: viewModel)
     }
-    
+
     var body: some View {
         NavigationStack {
             ZStack {
                 Color.black.ignoresSafeArea()
-                
+
                 ScrollView {
                     VStack(spacing: 24) {
                         // Profile Header
                         profileHeader
-                        
+
                         // Account Statistics
                         statisticsSection
-                        
+
                         // Account Actions
                         actionsSection
-                        
+
                         // Danger Zone
                         dangerZoneSection
                     }
@@ -56,11 +59,34 @@ struct ProfileView: View {
             } message: {
                 Text(viewModel.errorMessage)
             }
+            .alert("Delete Account", isPresented: $showingDeleteAccountAlert) {
+                Button("Cancel", role: .cancel) { }
+                Button("Continue", role: .destructive) {
+                    showingDeleteConfirmation = true
+                }
+            } message: {
+                Text("Are you sure you want to delete your account? This action cannot be undone.\n\n• All your data will be permanently deleted\n• Your classes, notes, and flashcards will be removed\n• Any active subscriptions should be cancelled separately in App Store settings")
+            }
+            .sheet(isPresented: $showingDeleteConfirmation) {
+                DeleteAccountConfirmationView(
+                    confirmationText: $deleteConfirmationText,
+                    userEmail: viewModel.userEmail,
+                    onConfirm: {
+                        Task {
+                            await viewModel.deleteAccount()
+                        }
+                    },
+                    onCancel: {
+                        showingDeleteConfirmation = false
+                        deleteConfirmationText = ""
+                    }
+                )
+            }
         }
     }
-    
+
     // MARK: - Profile Header
-    
+
     private var profileHeader: some View {
         VStack(spacing: 16) {
             // Profile Photo
@@ -85,7 +111,7 @@ struct ProfileView: View {
                                 .foregroundColor(.white)
                         }
                 }
-                
+
                 // Camera button overlay
                 Button {
                     showingImagePicker = true
@@ -101,18 +127,18 @@ struct ProfileView: View {
                 }
                 .offset(x: 35, y: 35)
             }
-            
+
             // User Info
             VStack(spacing: 8) {
                 Text(viewModel.userName)
                     .font(.title2)
                     .fontWeight(.bold)
                     .foregroundColor(.white)
-                
+
                 Text(viewModel.userEmail)
                     .font(.subheadline)
                     .foregroundColor(.gray)
-                
+
                 if let college = viewModel.userCollege {
                     HStack(spacing: 4) {
                         Image(systemName: "building.columns.fill")
@@ -130,15 +156,15 @@ struct ProfileView: View {
         }
         .padding(.vertical, 24)
     }
-    
+
     // MARK: - Statistics Section
-    
+
     private var statisticsSection: some View {
         VStack(alignment: .leading, spacing: 16) {
             Text("Your Statistics")
                 .font(.headline)
                 .foregroundColor(.white)
-            
+
             HStack(spacing: 16) {
                 ProfileStatCard(
                     icon: "book.fill",
@@ -146,14 +172,14 @@ struct ProfileView: View {
                     value: "\(viewModel.classCount)",
                     color: .blue
                 )
-                
+
                 ProfileStatCard(
                     icon: "note.text",
                     title: "Notes",
                     value: "\(viewModel.noteCount)",
                     color: .green
                 )
-                
+
                 ProfileStatCard(
                     icon: "rectangle.stack.fill",
                     title: "Flashcards",
@@ -166,15 +192,15 @@ struct ProfileView: View {
         .background(Color.white.opacity(0.05))
         .cornerRadius(16)
     }
-    
+
     // MARK: - Actions Section
-    
+
     private var actionsSection: some View {
         VStack(alignment: .leading, spacing: 16) {
             Text("Account")
                 .font(.headline)
                 .foregroundColor(.white)
-            
+
             VStack(spacing: 0) {
                 ActionRow(
                     icon: "person.fill",
@@ -183,10 +209,10 @@ struct ProfileView: View {
                 ) {
                     showingEditSheet = true
                 }
-                
+
                 Divider()
                     .background(Color.white.opacity(0.1))
-                
+
                 ActionRow(
                     icon: "lock.fill",
                     title: "Change Password",
@@ -194,10 +220,10 @@ struct ProfileView: View {
                 ) {
                     showingChangePasswordSheet = true
                 }
-                
+
                 Divider()
                     .background(Color.white.opacity(0.1))
-                
+
                 NavigationLink {
                     SettingsView()
                 } label: {
@@ -205,12 +231,12 @@ struct ProfileView: View {
                         Image(systemName: "gear")
                             .foregroundColor(.gray)
                             .frame(width: 24)
-                        
+
                         Text("Settings")
                             .foregroundColor(.white)
-                        
+
                         Spacer()
-                        
+
                         Image(systemName: "chevron.right")
                             .foregroundColor(.gray)
                             .font(.caption)
@@ -222,31 +248,49 @@ struct ProfileView: View {
             .cornerRadius(16)
         }
     }
-    
+
     // MARK: - Danger Zone
-    
+
     private var dangerZoneSection: some View {
         VStack(alignment: .leading, spacing: 16) {
             Text("Danger Zone")
                 .font(.headline)
                 .foregroundColor(.red)
-            
-            Button {
-                Task {
-                    await viewModel.logout()
+
+            VStack(spacing: 0) {
+                Button {
+                    Task {
+                        await viewModel.logout()
+                    }
+                } label: {
+                    HStack {
+                        Image(systemName: "rectangle.portrait.and.arrow.right")
+                        Text("Log Out")
+                            .fontWeight(.semibold)
+                        Spacer()
+                    }
+                    .foregroundColor(.red)
+                    .padding()
                 }
-            } label: {
-                HStack {
-                    Image(systemName: "rectangle.portrait.and.arrow.right")
-                    Text("Log Out")
-                        .fontWeight(.semibold)
-                    Spacer()
+
+                Divider()
+                    .background(Color.red.opacity(0.3))
+
+                Button {
+                    showingDeleteAccountAlert = true
+                } label: {
+                    HStack {
+                        Image(systemName: "trash.fill")
+                        Text("Delete Account")
+                            .fontWeight(.semibold)
+                        Spacer()
+                    }
+                    .foregroundColor(.red)
+                    .padding()
                 }
-                .foregroundColor(.red)
-                .padding()
-                .background(Color.red.opacity(0.1))
-                .cornerRadius(12)
             }
+            .background(Color.red.opacity(0.1))
+            .cornerRadius(12)
         }
     }
 }
@@ -258,18 +302,18 @@ struct ProfileStatCard: View {
     let title: String
     let value: String
     let color: Color
-    
+
     var body: some View {
         VStack(spacing: 8) {
             Image(systemName: icon)
                 .font(.system(size: 24))
                 .foregroundColor(color)
-            
+
             Text(value)
                 .font(.title2)
                 .fontWeight(.bold)
                 .foregroundColor(.white)
-            
+
             Text(title)
                 .font(.caption)
                 .foregroundColor(.gray)
@@ -288,19 +332,19 @@ struct ActionRow: View {
     let title: String
     let color: Color
     let action: () -> Void
-    
+
     var body: some View {
         Button(action: action) {
             HStack(spacing: 12) {
                 Image(systemName: icon)
                     .foregroundColor(color)
                     .frame(width: 24)
-                
+
                 Text(title)
                     .foregroundColor(.white)
-                
+
                 Spacer()
-                
+
                 Image(systemName: "chevron.right")
                     .foregroundColor(.gray)
                     .font(.caption)
@@ -317,12 +361,12 @@ struct EditProfileView: View {
     @ObservedObject var viewModel: ProfileViewModel
     @State private var name: String = ""
     @State private var email: String = ""
-    
+
     var body: some View {
         NavigationStack {
             ZStack {
                 Color.black.ignoresSafeArea()
-                
+
                 VStack(spacing: 20) {
                     VStack(alignment: .leading, spacing: 8) {
                         Text("Name")
@@ -331,7 +375,7 @@ struct EditProfileView: View {
                             .textFieldStyle(.roundedBorder)
                     }
                     .padding(.horizontal)
-                    
+
                     VStack(alignment: .leading, spacing: 8) {
                         Text("Email")
                             .foregroundColor(.gray)
@@ -339,7 +383,7 @@ struct EditProfileView: View {
                             .textFieldStyle(.roundedBorder)
                     }
                     .padding(.horizontal)
-                    
+
                     Spacer()
                 }
                 .padding(.top, 40)
@@ -349,7 +393,7 @@ struct EditProfileView: View {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel") { dismiss() }
                 }
-                
+
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Save") {
                         Task {
@@ -376,12 +420,12 @@ struct ChangePasswordView: View {
     @State private var currentPassword: String = ""
     @State private var newPassword: String = ""
     @State private var confirmPassword: String = ""
-    
+
     var body: some View {
         NavigationStack {
             ZStack {
                 Color.black.ignoresSafeArea()
-                
+
                 VStack(spacing: 20) {
                     VStack(alignment: .leading, spacing: 8) {
                         Text("Current Password")
@@ -390,7 +434,7 @@ struct ChangePasswordView: View {
                             .textFieldStyle(.roundedBorder)
                     }
                     .padding(.horizontal)
-                    
+
                     VStack(alignment: .leading, spacing: 8) {
                         Text("New Password")
                             .foregroundColor(.gray)
@@ -398,7 +442,7 @@ struct ChangePasswordView: View {
                             .textFieldStyle(.roundedBorder)
                     }
                     .padding(.horizontal)
-                    
+
                     VStack(alignment: .leading, spacing: 8) {
                         Text("Confirm Password")
                             .foregroundColor(.gray)
@@ -406,12 +450,12 @@ struct ChangePasswordView: View {
                             .textFieldStyle(.roundedBorder)
                     }
                     .padding(.horizontal)
-                    
+
                     Text("Password must be at least 6 characters")
                         .font(.caption)
                         .foregroundColor(.gray)
                         .padding(.horizontal)
-                    
+
                     Spacer()
                 }
                 .padding(.top, 40)
@@ -421,7 +465,7 @@ struct ChangePasswordView: View {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel") { dismiss() }
                 }
-                
+
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Save") {
                         Task {
@@ -434,9 +478,207 @@ struct ChangePasswordView: View {
                             }
                         }
                     }
-                    .disabled(viewModel.isLoading || newPassword.count < 6 || newPassword != confirmPassword)
+                    .disabled(
+                        viewModel.isLoading || newPassword.count < 6
+                            || newPassword != confirmPassword)
                 }
             }
+        }
+    }
+}
+
+// MARK: - Delete Account Confirmation View
+
+struct DeleteAccountConfirmationView: View {
+    @Environment(\.dismiss) private var dismiss
+    @Environment(\.openURL) private var openURL
+    @Binding var confirmationText: String
+    let userEmail: String
+    let onConfirm: () -> Void
+    let onCancel: () -> Void
+    
+    private var isConfirmationValid: Bool {
+        confirmationText.lowercased() == "delete"
+    }
+    
+    var body: some View {
+        NavigationStack {
+            ZStack {
+                Color.black.ignoresSafeArea()
+                
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 24) {
+                        // Warning Icon
+                        HStack {
+                            Spacer()
+                            ZStack {
+                                Circle()
+                                    .fill(Color.red.opacity(0.2))
+                                    .frame(width: 80, height: 80)
+                                
+                                Image(systemName: "exclamationmark.triangle.fill")
+                                    .font(.system(size: 40))
+                                    .foregroundColor(.red)
+                            }
+                            Spacer()
+                        }
+                        .padding(.top, 20)
+                        
+                        // Warning Title
+                        VStack(spacing: 8) {
+                            Text("Delete Your Account?")
+                                .font(.title2)
+                                .fontWeight(.bold)
+                                .foregroundColor(.white)
+                            
+                            Text("This action is permanent and cannot be undone")
+                                .font(.subheadline)
+                                .foregroundColor(.gray)
+                                .multilineTextAlignment(.center)
+                        }
+                        .frame(maxWidth: .infinity)
+                        
+                        // What will be deleted
+                        VStack(alignment: .leading, spacing: 16) {
+                            Text("What will be deleted:")
+                                .font(.headline)
+                                .foregroundColor(.white)
+                            
+                            VStack(alignment: .leading, spacing: 12) {
+                                DeleteWarningRow(
+                                    icon: "person.fill.xmark",
+                                    text: "Your account and profile information"
+                                )
+                                DeleteWarningRow(
+                                    icon: "book.fill",
+                                    text: "All your classes and course data"
+                                )
+                                DeleteWarningRow(
+                                    icon: "note.text",
+                                    text: "All your notes and study materials"
+                                )
+                                DeleteWarningRow(
+                                    icon: "rectangle.stack.fill",
+                                    text: "All your flashcards and study progress"
+                                )
+                                DeleteWarningRow(
+                                    icon: "chart.bar.fill",
+                                    text: "All your statistics and learning data"
+                                )
+                            }
+                            .padding()
+                            .background(Color.red.opacity(0.1))
+                            .cornerRadius(12)
+                        }
+                        
+                        // Billing Information
+                        VStack(alignment: .leading, spacing: 12) {
+                            HStack(spacing: 8) {
+                                Image(systemName: "info.circle.fill")
+                                    .foregroundColor(.blue)
+                                Text("Important: Billing & Subscriptions")
+                                    .font(.headline)
+                                    .foregroundColor(.white)
+                            }
+                            
+                            Text("If you have any active subscriptions, please cancel them separately through the App Store before deleting your account. Deleting your account does not automatically cancel subscriptions.")
+                                .font(.subheadline)
+                                .foregroundColor(.gray)
+                                .fixedSize(horizontal: false, vertical: true)
+                            
+                            Button {
+                                if let url = URL(string: "https://apps.apple.com/account/subscriptions") {
+                                    openURL(url)
+                                }
+                            } label: {
+                                HStack {
+                                    Image(systemName: "arrow.up.right.square")
+                                    Text("Manage Subscriptions in App Store")
+                                        .font(.subheadline)
+                                }
+                                .foregroundColor(.blue)
+                            }
+                        }
+                        .padding()
+                        .background(Color.blue.opacity(0.1))
+                        .cornerRadius(12)
+                        
+                        // Account Email
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("Account to be deleted:")
+                                .font(.subheadline)
+                                .foregroundColor(.gray)
+                            
+                            Text(userEmail)
+                                .font(.body)
+                                .fontWeight(.semibold)
+                                .foregroundColor(.white)
+                                .padding()
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .background(Color.white.opacity(0.1))
+                                .cornerRadius(8)
+                        }
+                        
+                        // Confirmation Input
+                        VStack(alignment: .leading, spacing: 12) {
+                            Text("Type DELETE to confirm")
+                                .font(.headline)
+                                .foregroundColor(.white)
+                            
+                            Text("To verify this action, type the word DELETE below:")
+                                .font(.subheadline)
+                                .foregroundColor(.gray)
+                            
+                            TextField("Type DELETE", text: $confirmationText)
+                                .textFieldStyle(.roundedBorder)
+                        }
+                        
+                        Spacer(minLength: 40)
+                    }
+                    .padding()
+                }
+            }
+            .navigationTitle("Delete Account")
+            #if os(iOS)
+            .navigationBarTitleDisplayMode(.inline)
+            #endif
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel") {
+                        onCancel()
+                    }
+                }
+                
+                ToolbarItem(placement: .destructiveAction) {
+                    Button("Delete Account") {
+                        onConfirm()
+                        dismiss()
+                    }
+                    .foregroundColor(.red)
+                    .disabled(!isConfirmationValid)
+                }
+            }
+        }
+    }
+}
+
+// MARK: - Delete Warning Row
+
+struct DeleteWarningRow: View {
+    let icon: String
+    let text: String
+    
+    var body: some View {
+        HStack(spacing: 12) {
+            Image(systemName: icon)
+                .foregroundColor(.red)
+                .frame(width: 24)
+            
+            Text(text)
+                .font(.subheadline)
+                .foregroundColor(.white)
+            
+            Spacer()
         }
     }
 }

@@ -153,6 +153,41 @@ class ProfileViewModel: ObservableObject {
         await appState.logout()
     }
 
+    func deleteAccount() async {
+        guard appState.currentUser != nil else { return }
+
+        isLoading = true
+        defer { isLoading = false }
+
+        // TODO: Implement DeleteAccountUseCase with Firebase Auth
+        // This should:
+        // 1. Delete all user data from Firestore (classes, notes, flashcards)
+        // 2. Delete user profile photos from Storage
+        // 3. Delete the Firebase Auth account
+        // try await deleteAccountUseCase.execute(userId: user.id)
+        
+        // For now, just log out
+        // In production, wrap this in do-catch when implementing actual deletion:
+        // do {
+        //     try await deleteAccountUseCase.execute(userId: user.id)
+        //     await appState.logout()
+        // } catch {
+        //     errorMessage = "Failed to delete account: \(error.localizedDescription)"
+        //     showError = true
+        //     return
+        // }
+        
+        await appState.logout()
+        
+        // In production, implement:
+        // - Delete all user's classes
+        // - Delete all user's notes
+        // - Delete all user's flashcards
+        // - Delete user document from Firestore
+        // - Delete profile photo from Storage
+        // - Delete Firebase Auth account: try await Auth.auth().currentUser?.delete()
+    }
+
     func clearError() {
         showError = false
         errorMessage = ""
