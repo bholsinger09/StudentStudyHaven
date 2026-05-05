@@ -33,7 +33,7 @@ let package = Package(
             targets: ["StudyGroups"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/firebase/firebase-ios-sdk.git", from: "10.19.0"),
+        // No external dependencies - using Firebase REST API
     ],
     targets: [
         // MARK: - App Target
@@ -46,20 +46,13 @@ let package = Package(
                 "Flashcards",
                 "Notes",
                 "StudyGroups",
-                .product(name: "FirebaseAuth", package: "firebase-ios-sdk"),
-                .product(name: "FirebaseFirestore", package: "firebase-ios-sdk"),
-                .product(name: "FirebaseFirestoreSwift", package: "firebase-ios-sdk"),
             ],
             path: "Sources/App"),
 
         // MARK: - Core Module
         .target(
             name: "Core",
-            dependencies: [
-                .product(name: "FirebaseAuth", package: "firebase-ios-sdk"),
-                .product(name: "FirebaseFirestore", package: "firebase-ios-sdk"),
-                .product(name: "FirebaseFirestoreSwift", package: "firebase-ios-sdk"),
-            ],
+            dependencies: [],
             path: "Sources/Core"),
         .testTarget(
             name: "CoreTests",
@@ -71,9 +64,6 @@ let package = Package(
             name: "Authentication",
             dependencies: [
                 "Core",
-                .product(name: "FirebaseAuth", package: "firebase-ios-sdk"),
-                .product(name: "FirebaseFirestore", package: "firebase-ios-sdk"),
-                .product(name: "FirebaseFirestoreSwift", package: "firebase-ios-sdk"),
             ],
             path: "Sources/Authentication"),
         .testTarget(
@@ -86,8 +76,6 @@ let package = Package(
             name: "ClassManagement",
             dependencies: [
                 "Core",
-                .product(name: "FirebaseFirestore", package: "firebase-ios-sdk"),
-                .product(name: "FirebaseFirestoreSwift", package: "firebase-ios-sdk"),
             ],
             path: "Sources/ClassManagement"),
         .testTarget(
@@ -100,8 +88,6 @@ let package = Package(
             name: "Flashcards",
             dependencies: [
                 "Core",
-                .product(name: "FirebaseFirestore", package: "firebase-ios-sdk"),
-                .product(name: "FirebaseFirestoreSwift", package: "firebase-ios-sdk"),
             ],
             path: "Sources/Flashcards"),
         .testTarget(
@@ -114,8 +100,6 @@ let package = Package(
             name: "Notes",
             dependencies: [
                 "Core",
-                .product(name: "FirebaseFirestore", package: "firebase-ios-sdk"),
-                .product(name: "FirebaseFirestoreSwift", package: "firebase-ios-sdk"),
             ],
             path: "Sources/Notes"),
         .testTarget(
@@ -128,8 +112,6 @@ let package = Package(
             name: "StudyGroups",
             dependencies: [
                 "Core",
-                .product(name: "FirebaseFirestore", package: "firebase-ios-sdk"),
-                .product(name: "FirebaseFirestoreSwift", package: "firebase-ios-sdk"),
             ],
             path: "Sources/StudyGroups"),
         .testTarget(

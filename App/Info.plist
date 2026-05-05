@@ -17,9 +17,9 @@
 	<key>CFBundlePackageType</key>
 	<string>$(PRODUCT_BUNDLE_PACKAGE_TYPE)</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.0</string>
+	<string>1.7</string>
 	<key>CFBundleVersion</key>
-	<string>1</string>
+	<string>7</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>UIApplicationSceneManifest</key>
@@ -48,5 +48,13 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<key>FIREBASE_ANALYTICS_COLLECTION_ENABLED</key>
+	<false/>
+	<key>FirebaseAutomaticScreenReportingEnabled</key>
+	<false/>
+	<key>GOOGLE_ANALYTICS_ENABLED</key>
+	<false/>
+	<key>FIREBASE_ANALYTICS_COLLECTION_DEACTIVATED</key>
+	<true/>
 </dict>
 </plist>
