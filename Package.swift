@@ -65,7 +65,11 @@ let package = Package(
             dependencies: [
                 "Core",
             ],
-            path: "Sources/Authentication"),
+            path: "Sources/Authentication",
+            linkerSettings: [
+                .linkedFramework("AuthenticationServices"),
+                .linkedFramework("UIKit"),
+            ]),
         .testTarget(
             name: "AuthenticationTests",
             dependencies: ["Authentication", "Core"],
