@@ -1,3 +1,4 @@
+#if os(iOS)
 import AuthenticationServices
 import Core
 import Foundation
@@ -102,3 +103,4 @@ public final class SignInWithAppleCoordinator: NSObject, ASAuthorizationControll
         return window
     }
 }
+#endif
