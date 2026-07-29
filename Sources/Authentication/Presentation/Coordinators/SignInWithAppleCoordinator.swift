@@ -1,12 +1,13 @@
-#if os(iOS)
-import AuthenticationServices
 import Core
 import Foundation
+
+#if os(iOS)
+import AuthenticationServices
 import UIKit
 
 /// Coordinates Sign in with Apple authentication flow
 @MainActor
-public final class SignInWithAppleCoordinator: NSObject, ASAuthorizationControllerDelegate, ASAuthorizationControllerPresentationContextProvider {
+public final class SignInWithAppleCoordinator: NSObject {
     private let authRepository: AuthRepositoryProtocol
     private var continuation: CheckedContinuation<AuthSession, Error>?
 
@@ -31,9 +32,10 @@ public final class SignInWithAppleCoordinator: NSObject, ASAuthorizationControll
         controller.presentationContextProvider = self
         controller.performRequests()
     }
+}
 
-    // MARK: - ASAuthorizationControllerDelegate
-
+// MARK: - iOS Protocol Conformances
+extension SignInWithAppleCoordinator: ASAuthorizationControllerDelegate, ASAuthorizationControllerPresentationContextProvider {
     public func authorizationController(
         controller: ASAuthorizationController,
         didCompleteWithAuthorization authorization: ASAuthorization
@@ -88,8 +90,6 @@ public final class SignInWithAppleCoordinator: NSObject, ASAuthorizationControll
         continuation?.resume(throwing: appError)
     }
 
-    // MARK: - ASAuthorizationControllerPresentationContextProvider
-
     @objc
     public func presentationAnchor(for controller: ASAuthorizationController) -> ASPresentationAnchor {
         guard let window = UIApplication.shared.connectedScenes
@@ -103,6 +103,7 @@ public final class SignInWithAppleCoordinator: NSObject, ASAuthorizationControll
         return window
     }
 }
+
 #else
 // Stub for non-iOS platforms
 @MainActor
