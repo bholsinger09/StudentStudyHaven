@@ -1,7 +1,7 @@
 import Core
 import Foundation
 
-#if os(iOS)
+#if canImport(UIKit)
 import AuthenticationServices
 import UIKit
 

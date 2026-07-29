@@ -13,14 +13,14 @@ public final class LoginViewModel: ObservableObject {
 
     private let loginUseCase: LoginUseCase
     public let authRepository: AuthRepositoryProtocol
-    #if os(iOS)
+    #if canImport(UIKit)
     private let appleSignInCoordinator: AppleSignInCoordinator
     #endif
 
     public init(loginUseCase: LoginUseCase) {
         self.loginUseCase = loginUseCase
         self.authRepository = loginUseCase.authRepository
-        #if os(iOS)
+        #if canImport(UIKit)
         self.appleSignInCoordinator = AppleSignInCoordinator(authRepository: authRepository)
         #endif
     }
@@ -48,7 +48,7 @@ public final class LoginViewModel: ObservableObject {
         isLoading = false
     }
 
-    #if os(iOS)
+    #if canImport(UIKit)
     public func signInWithApple() async {
         isLoading = true
         errorMessage = nil

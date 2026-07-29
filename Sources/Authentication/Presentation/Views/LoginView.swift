@@ -147,7 +147,7 @@ public struct LoginView: View {
                         .disabled(viewModel.isLoading)
                         .padding(.top, 8)
 
-                        #if os(iOS)
+                        #if canImport(UIKit)
                         // Sign in with Apple button
                         Button(action: {
                             Task {
