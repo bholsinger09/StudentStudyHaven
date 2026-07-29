@@ -103,4 +103,18 @@ public final class SignInWithAppleCoordinator: NSObject, ASAuthorizationControll
         return window
     }
 }
+#else
+// Stub for non-iOS platforms
+@MainActor
+public final class SignInWithAppleCoordinator {
+    private let authRepository: AuthRepositoryProtocol
+
+    public init(authRepository: AuthRepositoryProtocol) {
+        self.authRepository = authRepository
+    }
+
+    public func signIn() async throws -> AuthSession {
+        throw AppError.authenticationFailed("Sign in with Apple is only available on iOS")
+    }
+}
 #endif
