@@ -146,6 +146,34 @@ public struct LoginView: View {
                         .buttonStyle(.plain)
                         .disabled(viewModel.isLoading)
                         .padding(.top, 8)
+
+                        #if os(iOS)
+                        // Sign in with Apple button
+                        Button(action: {
+                            Task {
+                                await viewModel.signInWithApple()
+                            }
+                        }) {
+                            HStack {
+                                Image(systemName: "apple.logo")
+                                    .font(.system(size: 16, weight: .bold))
+                                Text("Sign in with Apple")
+                                    .fontWeight(.semibold)
+                                    .font(.headline)
+                            }
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(Color.black)
+                            .foregroundColor(.white)
+                            .cornerRadius(12)
+                            .shadow(
+                                color: Color.black.opacity(0.3),
+                                radius: 8, x: 0, y: 4)
+                        }
+                        .buttonStyle(.plain)
+                        .disabled(viewModel.isLoading)
+                        .padding(.top, 12)
+                        #endif
                     }
                     .padding(.horizontal, 40)
                     .padding(.vertical, 30)

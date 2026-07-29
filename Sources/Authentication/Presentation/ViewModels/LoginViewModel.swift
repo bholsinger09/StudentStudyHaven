@@ -13,10 +13,16 @@ public final class LoginViewModel: ObservableObject {
 
     private let loginUseCase: LoginUseCase
     public let authRepository: AuthRepositoryProtocol
+    #if os(iOS)
+    private let signInWithAppleCoordinator: SignInWithAppleCoordinator
+    #endif
 
     public init(loginUseCase: LoginUseCase) {
         self.loginUseCase = loginUseCase
         self.authRepository = loginUseCase.authRepository
+        #if os(iOS)
+        self.signInWithAppleCoordinator = SignInWithAppleCoordinator(authRepository: authRepository)
+        #endif
     }
 
     public func login() async {
@@ -41,6 +47,23 @@ public final class LoginViewModel: ObservableObject {
 
         isLoading = false
     }
+
+    #if os(iOS)
+    public func signInWithApple() async {
+        isLoading = true
+        errorMessage = nil
+        do {
+            let session = try await signInWithAppleCoordinator.signIn()
+            isLoggedIn = true
+            NotificationCenter.default.post(name: .userDidLogin, object: session.user)
+        } catch let error as AppError {
+            errorMessage = error.localizedDescription
+        } catch {
+            errorMessage = "An unexpected error occurred"
+        }
+        isLoading = false
+    }
+    #endif
 
     public func clearError() {
         errorMessage = nil
