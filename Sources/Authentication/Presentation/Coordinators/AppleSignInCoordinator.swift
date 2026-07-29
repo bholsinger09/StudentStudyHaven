@@ -7,7 +7,7 @@ import UIKit
 
 /// Coordinates Sign in with Apple authentication flow
 @MainActor
-public final class SignInWithAppleCoordinator: NSObject {
+public final class AppleSignInCoordinator: NSObject {
     private let authRepository: AuthRepositoryProtocol
     private var continuation: CheckedContinuation<AuthSession, Error>?
 
@@ -15,7 +15,6 @@ public final class SignInWithAppleCoordinator: NSObject {
         self.authRepository = authRepository
     }
 
-    /// Initiates Sign in with Apple flow
     public func signIn() async throws -> AuthSession {
         return try await withCheckedThrowingContinuation { continuation in
             self.continuation = continuation
@@ -34,8 +33,7 @@ public final class SignInWithAppleCoordinator: NSObject {
     }
 }
 
-// MARK: - iOS Protocol Conformances
-extension SignInWithAppleCoordinator: ASAuthorizationControllerDelegate, ASAuthorizationControllerPresentationContextProvider {
+extension AppleSignInCoordinator: ASAuthorizationControllerDelegate, ASAuthorizationControllerPresentationContextProvider {
     public func authorizationController(
         controller: ASAuthorizationController,
         didCompleteWithAuthorization authorization: ASAuthorization
@@ -47,15 +45,10 @@ extension SignInWithAppleCoordinator: ASAuthorizationControllerDelegate, ASAutho
 
         Task {
             do {
-                // Extract email and user ID from Apple credential
                 let email = appleIDCredential.email ?? ""
                 let userID = appleIDCredential.user
-
-                // Create login credentials using Apple user ID as email if email not available
                 let emailToUse = !email.isEmpty ? email : "\(userID)@appleid.local"
                 let credentials = LoginCredentials(email: emailToUse, password: userID)
-
-                // Attempt to authenticate with backend using Apple credentials
                 let session = try await authRepository.login(credentials: credentials)
                 continuation?.resume(returning: session)
             } catch {
@@ -105,9 +98,8 @@ extension SignInWithAppleCoordinator: ASAuthorizationControllerDelegate, ASAutho
 }
 
 #else
-// Stub for non-iOS platforms
 @MainActor
-public final class SignInWithAppleCoordinator {
+public final class AppleSignInCoordinator {
     private let authRepository: AuthRepositoryProtocol
 
     public init(authRepository: AuthRepositoryProtocol) {

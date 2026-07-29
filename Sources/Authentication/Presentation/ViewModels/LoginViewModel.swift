@@ -14,14 +14,14 @@ public final class LoginViewModel: ObservableObject {
     private let loginUseCase: LoginUseCase
     public let authRepository: AuthRepositoryProtocol
     #if os(iOS)
-    private let signInWithAppleCoordinator: SignInWithAppleCoordinator
+    private let appleSignInCoordinator: AppleSignInCoordinator
     #endif
 
     public init(loginUseCase: LoginUseCase) {
         self.loginUseCase = loginUseCase
         self.authRepository = loginUseCase.authRepository
         #if os(iOS)
-        self.signInWithAppleCoordinator = SignInWithAppleCoordinator(authRepository: authRepository)
+        self.appleSignInCoordinator = AppleSignInCoordinator(authRepository: authRepository)
         #endif
     }
 
@@ -53,7 +53,7 @@ public final class LoginViewModel: ObservableObject {
         isLoading = true
         errorMessage = nil
         do {
-            let session = try await signInWithAppleCoordinator.signIn()
+            let session = try await appleSignInCoordinator.signIn()
             isLoggedIn = true
             NotificationCenter.default.post(name: .userDidLogin, object: session.user)
         } catch let error as AppError {
