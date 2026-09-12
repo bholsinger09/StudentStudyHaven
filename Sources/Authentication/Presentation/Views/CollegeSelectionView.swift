@@ -6,9 +6,14 @@ import SwiftUI
 public struct CollegeSelectionView: View {
     @StateObject private var viewModel: CollegeSelectionViewModel
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.horizontalSizeClass) var horizontalSizeClass
 
     public init(viewModel: CollegeSelectionViewModel) {
         _viewModel = StateObject(wrappedValue: viewModel)
+    }
+
+    private var isCompact: Bool {
+        horizontalSizeClass == .compact
     }
 
     public var body: some View {
@@ -30,6 +35,7 @@ public struct CollegeSelectionView: View {
                     }
                 }
                 .padding()
+                .frame(minHeight: 44)
                 .background(Color.gray.opacity(0.1))
                 .cornerRadius(10)
                 .padding()
@@ -41,14 +47,15 @@ public struct CollegeSelectionView: View {
                     ProgressView()
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                 } else if viewModel.filteredColleges.isEmpty {
-                    EmptyCollegeState(hasSearch: !viewModel.searchQuery.isEmpty)
+                    EmptyCollegeState(hasSearch: !viewModel.searchQuery.isEmpty, isCompact: isCompact)
                 } else {
                     ScrollView {
                         LazyVStack(spacing: 0) {
                             ForEach(viewModel.filteredColleges) { college in
                                 CollegeRow(
                                     college: college,
-                                    isSelected: viewModel.selectedCollege?.id == college.id
+                                    isSelected: viewModel.selectedCollege?.id == college.id,
+                                    isCompact: isCompact
                                 )
                                 .contentShape(Rectangle())
                                 .onTapGesture {
@@ -138,32 +145,35 @@ public class CollegeSelectionViewModel: ObservableObject {
 struct CollegeRow: View {
     let college: College
     let isSelected: Bool
+    let isCompact: Bool
 
     var body: some View {
-        HStack(spacing: 16) {
+        HStack(spacing: isCompact ? 12 : 16) {
             // College Icon
             ZStack {
                 Circle()
                     .fill(isSelected ? Color.blue : Color.blue.opacity(0.1))
-                    .frame(width: 50, height: 50)
+                    .frame(width: isCompact ? 40 : 50, height: isCompact ? 40 : 50)
 
                 Image(systemName: "building.columns.fill")
                     .foregroundColor(isSelected ? .white : .blue)
-                    .font(.title3)
+                    .font(isCompact ? .body : .title3)
             }
 
             // College Info
             VStack(alignment: .leading, spacing: 4) {
                 Text(college.name)
-                    .font(.headline)
+                    .font(isCompact ? .subheadline : .headline)
+                    .lineLimit(1)
 
                 HStack(spacing: 4) {
                     Image(systemName: "location.fill")
                         .font(.caption)
                     Text(college.location)
-                        .font(.subheadline)
+                        .font(.caption)
                 }
                 .foregroundColor(.secondary)
+                .lineLimit(1)
             }
 
             Spacer()
@@ -172,10 +182,10 @@ struct CollegeRow: View {
             if isSelected {
                 Image(systemName: "checkmark.circle.fill")
                     .foregroundColor(.blue)
-                    .font(.title3)
+                    .font(isCompact ? .body : .title3)
             }
         }
-        .padding()
+        .padding(isCompact ? 12 : 16)
         .background(isSelected ? Color.blue.opacity(0.05) : Color.clear)
     }
 }
@@ -183,21 +193,22 @@ struct CollegeRow: View {
 /// Empty state for college search
 struct EmptyCollegeState: View {
     let hasSearch: Bool
+    let isCompact: Bool
 
     var body: some View {
         VStack(spacing: 20) {
             Image(systemName: "building.columns")
-                .font(.system(size: 60))
+                .font(.system(size: isCompact ? 40 : 60))
                 .foregroundColor(.secondary)
 
             Text(hasSearch ? "No Colleges Found" : "Loading Colleges")
-                .font(.headline)
+                .font(isCompact ? .subheadline : .headline)
 
             Text(hasSearch ? "Try a different search term" : "Please wait while we load colleges")
-                .font(.subheadline)
+                .font(.caption)
                 .foregroundColor(.secondary)
                 .multilineTextAlignment(.center)
-                .padding(.horizontal, 40)
+                .padding(.horizontal, isCompact ? 16 : 40)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }

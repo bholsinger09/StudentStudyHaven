@@ -5,38 +5,55 @@ import SwiftUI
 public struct RegisterView: View {
     @StateObject private var viewModel: RegisterViewModel
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.horizontalSizeClass) var horizontalSizeClass
 
     public init(viewModel: RegisterViewModel) {
         _viewModel = StateObject(wrappedValue: viewModel)
     }
 
+    private var isCompact: Bool {
+        horizontalSizeClass == .compact
+    }
+
+    private var horizontalPadding: CGFloat {
+        isCompact ? 16 : 40
+    }
+
+    private var fieldSpacing: CGFloat {
+        isCompact ? 12 : 16
+    }
+
     public var body: some View {
         ScrollView {
-            VStack(spacing: 20) {
+            VStack(spacing: isCompact ? 16 : 20) {
                 // Header
                 VStack(spacing: 8) {
                     Image(systemName: "person.badge.plus")
-                        .font(.system(size: 50))
+                        .font(.system(size: isCompact ? 40 : 50))
                         .foregroundColor(.blue)
                     Text("Create Account")
-                        .font(.title2)
+                        .font(isCompact ? .headline : .title2)
                         .fontWeight(.bold)
                 }
-                .padding(.top, 40)
+                .padding(.top, isCompact ? 20 : 40)
 
                 // Registration Form
-                VStack(spacing: 16) {
+                VStack(spacing: fieldSpacing) {
                     TextField("Full Name", text: $viewModel.name)
                         .textFieldStyle(.roundedBorder)
+                        .frame(minHeight: 44)
 
                     TextField("Email", text: $viewModel.email)
                         .textFieldStyle(.roundedBorder)
+                        .frame(minHeight: 44)
 
                     SecureField("Password", text: $viewModel.password)
                         .textFieldStyle(.roundedBorder)
+                        .frame(minHeight: 44)
 
                     SecureField("Confirm Password", text: $viewModel.confirmPassword)
                         .textFieldStyle(.roundedBorder)
+                        .frame(minHeight: 44)
 
                     // College Selection Button
                     Button(action: {
@@ -51,6 +68,7 @@ public struct RegisterView: View {
                                 .foregroundColor(.secondary)
                         }
                         .padding()
+                        .frame(minHeight: 44)
                         .background(Color.gray.opacity(0.1))
                         .cornerRadius(8)
                     }
@@ -79,13 +97,14 @@ public struct RegisterView: View {
                     }
                     .frame(maxWidth: .infinity)
                     .padding()
+                    .frame(minHeight: 48)
                     .background(Color.blue)
                     .foregroundColor(.white)
                     .cornerRadius(10)
                     .disabled(viewModel.isLoading)
                 }
-                .padding(.horizontal, 32)
-                .padding(.top, 20)
+                .padding(.horizontal, horizontalPadding)
+                .padding(.top, isCompact ? 12 : 20)
 
                 Spacer()
             }

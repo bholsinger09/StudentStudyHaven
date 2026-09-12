@@ -5,10 +5,27 @@ import SwiftUI
 public struct ForgotPasswordView: View {
     @Environment(\.dismiss) private var dismiss
     @StateObject private var viewModel: ForgotPasswordViewModel
+    @Environment(\.horizontalSizeClass) var horizontalSizeClass
 
     public init(authRepository: AuthRepositoryProtocol) {
         _viewModel = StateObject(
             wrappedValue: ForgotPasswordViewModel(authRepository: authRepository))
+    }
+
+    private var isCompact: Bool {
+        horizontalSizeClass == .compact
+    }
+
+    private var horizontalPadding: CGFloat {
+        isCompact ? 16 : 40
+    }
+
+    private var iconSize: CGFloat {
+        isCompact ? 45 : 60
+    }
+
+    private var titleFontSize: CGFloat {
+        isCompact ? 18 : 22
     }
 
     public var body: some View {
@@ -16,66 +33,70 @@ public struct ForgotPasswordView: View {
             ZStack {
                 Color.black.ignoresSafeArea()
 
-                VStack(spacing: 24) {
-                    // Header
-                    VStack(spacing: 12) {
-                        Image(systemName: "lock.rotation")
-                            .font(.system(size: 60))
-                            .foregroundColor(Color(red: 0.73, green: 0.33, blue: 0.83))
+                ScrollView {
+                    VStack(spacing: isCompact ? 16 : 24) {
+                        // Header
+                        VStack(spacing: 12) {
+                            Image(systemName: "lock.rotation")
+                                .font(.system(size: iconSize))
+                                .foregroundColor(Color(red: 0.73, green: 0.33, blue: 0.83))
 
-                        Text("Reset Password")
-                            .font(.title)
-                            .fontWeight(.bold)
-                            .foregroundColor(.white)
+                            Text("Reset Password")
+                                .font(.system(size: titleFontSize, weight: .bold))
+                                .foregroundColor(.white)
 
-                        Text(
-                            "Enter your email address and we'll send you instructions to reset your password"
-                        )
-                        .font(.subheadline)
-                        .foregroundColor(.gray)
-                        .multilineTextAlignment(.center)
-                        .padding(.horizontal)
-                    }
-                    .padding(.top, 40)
-
-                    // Email Field
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text("Email")
-                            .font(.subheadline)
+                            Text(
+                                "Enter your email address and we'll send you instructions to reset your password"
+                            )
+                            .font(.caption)
                             .foregroundColor(.gray)
-
-                        TextField("Enter your email", text: $viewModel.email)
-                            .textFieldStyle(.roundedBorder)
-                            .disabled(viewModel.isLoading)
-                    }
-                    .padding(.horizontal)
-
-                    // Send Button
-                    Button {
-                        Task {
-                            await viewModel.sendResetEmail()
+                            .multilineTextAlignment(.center)
+                            .padding(.horizontal, isCompact ? 12 : 16)
                         }
-                    } label: {
-                        HStack {
-                            if viewModel.isLoading {
-                                ProgressView()
-                                    .progressViewStyle(.circular)
-                                    .tint(.white)
-                            } else {
-                                Text("Send Reset Link")
-                                    .fontWeight(.semibold)
+                        .padding(.top, isCompact ? 20 : 40)
+
+                        // Email Field
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("Email")
+                                .font(.subheadline)
+                                .foregroundColor(.gray)
+
+                            TextField("Enter your email", text: $viewModel.email)
+                                .textFieldStyle(.roundedBorder)
+                                .frame(minHeight: 44)
+                                .disabled(viewModel.isLoading)
+                        }
+                        .padding(.horizontal, horizontalPadding)
+
+                        // Send Button
+                        Button {
+                            Task {
+                                await viewModel.sendResetEmail()
                             }
+                        } label: {
+                            HStack {
+                                if viewModel.isLoading {
+                                    ProgressView()
+                                        .progressViewStyle(.circular)
+                                        .tint(.white)
+                                } else {
+                                    Text("Send Reset Link")
+                                        .fontWeight(.semibold)
+                                }
+                            }
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .frame(minHeight: 48)
+                            .background(Color(red: 0.73, green: 0.33, blue: 0.83))
+                            .foregroundColor(.white)
+                            .cornerRadius(12)
                         }
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(Color(red: 0.73, green: 0.33, blue: 0.83))
-                        .foregroundColor(.white)
-                        .cornerRadius(12)
-                    }
-                    .disabled(viewModel.isLoading || viewModel.email.isEmpty)
-                    .padding(.horizontal)
+                        .disabled(viewModel.isLoading || viewModel.email.isEmpty)
+                        .padding(.horizontal, horizontalPadding)
 
-                    Spacer()
+                        Spacer()
+                            .frame(minHeight: isCompact ? 24 : 40)
+                    }
                 }
             }
             .navigationTitle("Forgot Password")
