@@ -190,16 +190,28 @@ public struct AuthenticationLandingView: View {
                             .foregroundColor(.gray)
 
                         HStack(spacing: 4) {
-                            Link("Terms", destination: URL(string: "https://example.com/terms") ?? URL(fileURLWithPath: ""))
-                                .font(.caption2)
-                                .foregroundColor(.gray)
+                            if let termsURL = URL(string: "https://example.com/terms") {
+                                Link("Terms", destination: termsURL)
+                                    .font(.caption2)
+                                    .foregroundColor(.gray)
+                            } else {
+                                Text("Terms")
+                                    .font(.caption2)
+                                    .foregroundColor(.gray)
+                            }
 
                             Text("•")
                                 .foregroundColor(.gray)
 
-                            Link("Privacy", destination: URL(string: "https://example.com/privacy") ?? URL(fileURLWithPath: ""))
-                                .font(.caption2)
-                                .foregroundColor(.gray)
+                            if let privacyURL = URL(string: "https://example.com/privacy") {
+                                Link("Privacy", destination: privacyURL)
+                                    .font(.caption2)
+                                    .foregroundColor(.gray)
+                            } else {
+                                Text("Privacy")
+                                    .font(.caption2)
+                                    .foregroundColor(.gray)
+                            }
                         }
                     }
                     .padding(.bottom, isCompact ? 20 : 32)
