@@ -25,6 +25,7 @@
 		2E86C79C7C4A721ADFDEFA59 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6CF75791617481C91E7DF3A8 /* Foundation.framework */; };
 		2F85451A223B354918CC38C5 /* UserSearchViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 702B46DAF8E96760FF3C3363 /* UserSearchViewModel.swift */; };
 		33DB69FEC96BB34AECC0C21B /* Core.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D7705F51176DE21F73422CCF /* Core.framework */; };
+		3A04E813F966D1431E047806 /* CollegeSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7DF7BCB21957F7125900763 /* CollegeSelectionView.swift */; };
 		3A14A75BD98B37BBDDAA6CFD /* Activity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56BBD2005E8A6ABA2C2B640C /* Activity.swift */; };
 		3B63E136E2E8DC4C3A2CC04B /* CreateStudyGroupViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DBC49E852201A9F0F4D95AF /* CreateStudyGroupViewModel.swift */; };
 		3C01D7E63F4FD8C95F98DB72 /* CreateStudyGroupUseCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0248D91101ED41E0B8F2293 /* CreateStudyGroupUseCase.swift */; };
@@ -33,6 +34,7 @@
 		3ED6D2FB94ECA6842A73AF1E /* RepositoryProtocols.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C97372FFDFEB8A58144F4E2 /* RepositoryProtocols.swift */; };
 		45722B43785590799299DE81 /* GetGroupMessagesUseCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2FE7D4F4F804270DECA655A /* GetGroupMessagesUseCase.swift */; };
 		47CBBA393F383C50E6E4828D /* GetFlashcardsUseCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98BB8A373E48CB6EB4A1F8DE /* GetFlashcardsUseCase.swift */; };
+		48ED277B18639878597DB884 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F3A269289B24AD1EA7ECBC7 /* OnboardingView.swift */; };
 		50368994B82B28F86A78469E /* Flashcards.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B433F26D710B8075608E621F /* Flashcards.framework */; };
 		549C2749C5F42B49474F957D /* MockGroupMessageRepositoryImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27E9078AB21903320DDB9E18 /* MockGroupMessageRepositoryImpl.swift */; };
 		5661F18F995EA82B6D9C261E /* DeleteNoteUseCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED604760AE8176D67FAFF9ED /* DeleteNoteUseCase.swift */; };
@@ -47,6 +49,7 @@
 		68BD2659BE1931F9C6EB273F /* StudyGroupListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFA82B1386F5E0B0D490E637 /* StudyGroupListViewModel.swift */; };
 		6970E6EBCC04D41C36946696 /* AppError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93E588D6CFA3E2DDEAC7729B /* AppError.swift */; };
 		6BBCA02472992226176B69E6 /* UpdateFlashcardUseCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = C266B159E169099C7845E60E /* UpdateFlashcardUseCase.swift */; };
+		6C8C517E65678837E010B6C2 /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F0FEE41E4DD848765F2750A /* ProfileView.swift */; };
 		6E2E03628C6FF26A49A20CFD /* InviteUserToGroupUseCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0A7B05A83EFC440C3D76A8B /* InviteUserToGroupUseCase.swift */; };
 		6F764DCD2B7B3D4F86DD104B /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5946F26890AD29A73436C515 /* LoginView.swift */; };
 		764621C4393BB374437DE26A /* CollegeSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1BC8B57BD1F9F246D82DAB30 /* CollegeSelectionView.swift */; };
@@ -56,16 +59,20 @@
 		7F213D14DCC78337CFEE7AE6 /* MockFlashcardRepositoryImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 529AF6F617F9F208B799C380 /* MockFlashcardRepositoryImpl.swift */; };
 		81D6B2EFF886B4DF1BCB16AA /* GetStudyGroupsUseCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 727EDBD4B39D695DA0A244CE /* GetStudyGroupsUseCase.swift */; };
 		82E455AFB58952E168AF2E52 /* NotificationNames.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADF5CB778F9D2A520DA26AF6 /* NotificationNames.swift */; };
+		831D12C0B7E2C392D438746A /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 356716A8FB5522E670692C98 /* RootView.swift */; };
 		849C4D134BFD69D6BE2F86D8 /* NotesListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDBCFF80C4CE784B781D2306 /* NotesListView.swift */; };
 		856D0FBADCCF98B0F4C1E745 /* CreateClassUseCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = A85E677BDF1DDA4C93D93E5F /* CreateClassUseCase.swift */; };
 		89B9BABF876C6C04C337B3A8 /* FlashcardListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12D685DF8B9F84260A29A849 /* FlashcardListView.swift */; };
 		8AE46077F3759E88BC46B136 /* NoteLinkingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E8550F78382DF0AB94B8112 /* NoteLinkingView.swift */; };
 		8BD539A0EB998F7E8FC1D89C /* AICollegeStatsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 678041B02319A7A1041DBBD0 /* AICollegeStatsService.swift */; };
 		8DF2084BD90FFC7696E05185 /* GetNotesUseCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69915DA42BCBB2C0F5668930 /* GetNotesUseCase.swift */; };
+		8E0AE23C27693786D0CF2FB8 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8748693D875638B22550C358 /* HomeView.swift */; };
 		8E2E9F4B3086F68B5BB5A5A7 /* FirebaseStudyGroupRepositoryImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9B7BA3CB8DFDC54C99DED6C /* FirebaseStudyGroupRepositoryImpl.swift */; };
 		8EA770A5FAB5F6D2F23644EC /* Note.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95B6DC17B0445158E6717B17 /* Note.swift */; };
 		911F21C2628C59EE66BABF81 /* Core.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D7705F51176DE21F73422CCF /* Core.framework */; };
+		912F5810DE3C6E9D7B42D858 /* StudentStudyHavenApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00E94485A4193CECB64FC50D /* StudentStudyHavenApp.swift */; };
 		92B6B8B86D2B75BCBC974F65 /* Statistics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A0B36E767E17AA250C16311 /* Statistics.swift */; };
+		93BEA8DC52492150CBABBD83 /* ErrorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38EC5EC97D3AA39D52EDE6DF /* ErrorView.swift */; };
 		94A5BBEA31FC8F75C6744F52 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6CF75791617481C91E7DF3A8 /* Foundation.framework */; };
 		94E14C95501CE58E957D6D1D /* GetStudySessionsUseCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09943BDDA4561E29221F4257 /* GetStudySessionsUseCase.swift */; };
 		959A3553E0722489D0936446 /* ClassManagement.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 45F20B788E2F4E5274DAD6E6 /* ClassManagement.framework */; };
@@ -86,13 +93,17 @@
 		AD9AB565A78C77D5D2B33511 /* LeaveStudyGroupUseCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAB767E8C9D42F7140254D00 /* LeaveStudyGroupUseCase.swift */; };
 		B3548BA4312C24467125158A /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6CF75791617481C91E7DF3A8 /* Foundation.framework */; };
 		B41206B1FDB2BB8534D01E94 /* ErrorHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16A78AC3BA9E3D0579A1FE6B /* ErrorHandler.swift */; };
+		B5777F389D50F5302D46F43C /* LoadingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 075BA06F5B219172F76897F2 /* LoadingView.swift */; };
 		B7867E814F85EFDFC6613A13 /* SpacedRepetitionAlgorithm.swift in Sources */ = {isa = PBXBuildFile; fileRef = F464B956141E1C79909B3B01 /* SpacedRepetitionAlgorithm.swift */; };
+		B845C2DA1657F6D54DAAFAF6 /* DependencyContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AE21988F71004A3C88E5FE9 /* DependencyContainer.swift */; };
 		B8876775ADB17E58D93515E9 /* SendGroupMessageUseCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F7DCCCFF4AF599186E1CCDF /* SendGroupMessageUseCase.swift */; };
 		BC66BD0598D6450B5EC96161 /* StudyGroupsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2BAD5FEFB4E5CC946E0351C /* StudyGroupsView.swift */; };
 		C16BA611953DA446EB1CD058 /* AuthModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E3C75FB4CDE0DBDD6AA4749 /* AuthModels.swift */; };
+		C2FBB42867777AF8361BF24C /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBC9C5C70E19F9A9D61A8D0E /* SettingsView.swift */; };
 		C4F21780DDAA7CAA9F591459 /* Core.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D7705F51176DE21F73422CCF /* Core.framework */; };
 		C5BB91B631DA4E3E6C0CF80B /* SearchUsersUseCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 651492C9798710DC957A7218 /* SearchUsersUseCase.swift */; };
 		C7AC3C0050645E57F380CC24 /* StudySession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38F3CB462AF7D60EC83AC4DF /* StudySession.swift */; };
+		C8C9ED1911E1478FEE1CF864 /* ProfileViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B89B2FDDC13EC00D53A92714 /* ProfileViewModel.swift */; };
 		C97799E320675A76345414AD /* GroupMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = D058E3C3DC23D918D4D6CFE9 /* GroupMessage.swift */; };
 		CC4BD837A3E580C4718E73E7 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6CF75791617481C91E7DF3A8 /* Foundation.framework */; };
 		CDAFD56E40D08EE643AFE4C8 /* MockClassRepositoryImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC1FCC2B894F4A0F48C0342F /* MockClassRepositoryImpl.swift */; };
@@ -123,6 +134,7 @@
 		F6677064FD456F44C3A3048D /* LogoutUseCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFDE0E0F3EFF9518AEC93368 /* LogoutUseCase.swift */; };
 		F71647CB19E395A245D213D7 /* GetClassesUseCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B0AFD11D1B88A561F88E900 /* GetClassesUseCase.swift */; };
 		FB6B8B4788F0302F82C2691D /* MockAuthRepositoryImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1CEAAE1E2257507DF18964A9 /* MockAuthRepositoryImpl.swift */; };
+		FC2B87F443150C468BC46472 /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = E06B227B4821ADFB5ACEB3F2 /* AppState.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
