@@ -59,7 +59,6 @@
 		7F213D14DCC78337CFEE7AE6 /* MockFlashcardRepositoryImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 529AF6F617F9F208B799C380 /* MockFlashcardRepositoryImpl.swift */; };
 		81D6B2EFF886B4DF1BCB16AA /* GetStudyGroupsUseCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 727EDBD4B39D695DA0A244CE /* GetStudyGroupsUseCase.swift */; };
 		82E455AFB58952E168AF2E52 /* NotificationNames.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADF5CB778F9D2A520DA26AF6 /* NotificationNames.swift */; };
-		831D12C0B7E2C392D438746A /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 356716A8FB5522E670692C98 /* RootView.swift */; };
 		849C4D134BFD69D6BE2F86D8 /* NotesListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDBCFF80C4CE784B781D2306 /* NotesListView.swift */; };
 		856D0FBADCCF98B0F4C1E745 /* CreateClassUseCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = A85E677BDF1DDA4C93D93E5F /* CreateClassUseCase.swift */; };
 		89B9BABF876C6C04C337B3A8 /* FlashcardListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12D685DF8B9F84260A29A849 /* FlashcardListView.swift */; };
@@ -135,8 +134,6 @@
 		F71647CB19E395A245D213D7 /* GetClassesUseCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B0AFD11D1B88A561F88E900 /* GetClassesUseCase.swift */; };
 		FB6B8B4788F0302F82C2691D /* MockAuthRepositoryImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1CEAAE1E2257507DF18964A9 /* MockAuthRepositoryImpl.swift */; };
 		FC2B87F443150C468BC46472 /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = E06B227B4821ADFB5ACEB3F2 /* AppState.swift */; };
-		FFEEDD9C11CC22BB33AA4454 /* iOSAppWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFEEDD9C11CC22BB33AA4455 /* iOSAppWrapper.swift */; };
-		FFEEDD9C11CC22BB33AA4459 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFEEDD9C11CC22BB33AA4458 /* RootView.swift */; };
 		FFEEDD9C11CC22BB33AA4457 /* App.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FFEEDD9C11CC22BB33AA4456 /* App.framework */; };
 /* End PBXBuildFile section */
 
@@ -253,7 +250,6 @@
 		2B0AFD11D1B88A561F88E900 /* GetClassesUseCase.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = GetClassesUseCase.swift; path = Sources/ClassManagement/UseCases/GetClassesUseCase.swift; sourceTree = SOURCE_ROOT; };
 		324752EC2494A233255E7250 /* RegisterViewModel.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = RegisterViewModel.swift; path = Sources/Authentication/Presentation/ViewModels/RegisterViewModel.swift; sourceTree = SOURCE_ROOT; };
 		33CE42427BC33CFEDABA4543 /* ClassListView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ClassListView.swift; path = Sources/ClassManagement/Presentation/Views/ClassListView.swift; sourceTree = SOURCE_ROOT; };
-		356716A8FB5522E670692C98 /* RootView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = RootView.swift; path = Sources/App/RootView.swift; sourceTree = SOURCE_ROOT; };
 		35D3BE76529A78F64549FFEA /* MockNoteRepositoryImpl.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = MockNoteRepositoryImpl.swift; path = Sources/Notes/Data/MockNoteRepositoryImpl.swift; sourceTree = SOURCE_ROOT; };
 		37A4455E9172E46AA8C844FF /* StudySessionManager.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = StudySessionManager.swift; path = Sources/Core/Common/StudySessionManager.swift; sourceTree = SOURCE_ROOT; };
 		38EC5EC97D3AA39D52EDE6DF /* ErrorView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ErrorView.swift; path = Sources/App/Components/ErrorView.swift; sourceTree = SOURCE_ROOT; };
@@ -346,8 +342,6 @@
 		F5BE6C63EFE2D7C6868ED278 /* MockStudySessionRepositoryImpl.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = MockStudySessionRepositoryImpl.swift; path = Sources/StudyGroups/Data/MockStudySessionRepositoryImpl.swift; sourceTree = SOURCE_ROOT; };
 		F8423EF09F15AF0855467488 /* StudyGroupDetailViewModel.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = StudyGroupDetailViewModel.swift; path = Sources/StudyGroups/Presentation/ViewModels/StudyGroupDetailViewModel.swift; sourceTree = SOURCE_ROOT; };
 		FFA82B1386F5E0B0D490E637 /* StudyGroupListViewModel.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = StudyGroupListViewModel.swift; path = Sources/StudyGroups/Presentation/ViewModels/StudyGroupListViewModel.swift; sourceTree = SOURCE_ROOT; };
-		FFEEDD9C11CC22BB33AA4455 /* iOSAppWrapper.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = iOSAppWrapper.swift; path = iOSAppWrapper.swift; sourceTree = SOURCE_ROOT; };
-		FFEEDD9C11CC22BB33AA4458 /* RootView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = RootView.swift; path = App/RootView.swift; sourceTree = SOURCE_ROOT; };
 		FFEEDD9C11CC22BB33AA4456 /* App.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = App.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -531,7 +525,6 @@
 				4F3A269289B24AD1EA7ECBC7 /* OnboardingView.swift */,
 				6F0FEE41E4DD848765F2750A /* ProfileView.swift */,
 				B89B2FDDC13EC00D53A92714 /* ProfileViewModel.swift */,
-				356716A8FB5522E670692C98 /* RootView.swift */,
 				CBC9C5C70E19F9A9D61A8D0E /* SettingsView.swift */,
 				00E94485A4193CECB64FC50D /* StudentStudyHavenApp.swift */,
 				D13E17FC7FD63475E878D958 /* Info.plist */,
@@ -950,8 +943,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				FFEEDD9C11CC22BB33AA4454 /* iOSAppWrapper.swift in Sources */,
-				FFEEDD9C11CC22BB33AA4459 /* RootView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

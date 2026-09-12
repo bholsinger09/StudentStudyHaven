@@ -2,4 +2,6 @@
 <Workspace version = "1.0">
    <FileRef location = "group:Package.swift">
    </FileRef>
+   <FileRef location = "group:IOS_Student_Haven_Latest.xcodeproj">
+   </FileRef>
 </Workspace>
