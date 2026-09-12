@@ -136,6 +136,7 @@
 		FB6B8B4788F0302F82C2691D /* MockAuthRepositoryImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1CEAAE1E2257507DF18964A9 /* MockAuthRepositoryImpl.swift */; };
 		FC2B87F443150C468BC46472 /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = E06B227B4821ADFB5ACEB3F2 /* AppState.swift */; };
 		FFEEDD9C11CC22BB33AA4454 /* iOSAppWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFEEDD9C11CC22BB33AA4455 /* iOSAppWrapper.swift */; };
+		FFEEDD9C11CC22BB33AA4459 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFEEDD9C11CC22BB33AA4458 /* RootView.swift */; };
 		FFEEDD9C11CC22BB33AA4457 /* App.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FFEEDD9C11CC22BB33AA4456 /* App.framework */; };
 /* End PBXBuildFile section */
 
@@ -346,6 +347,7 @@
 		F8423EF09F15AF0855467488 /* StudyGroupDetailViewModel.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = StudyGroupDetailViewModel.swift; path = Sources/StudyGroups/Presentation/ViewModels/StudyGroupDetailViewModel.swift; sourceTree = SOURCE_ROOT; };
 		FFA82B1386F5E0B0D490E637 /* StudyGroupListViewModel.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = StudyGroupListViewModel.swift; path = Sources/StudyGroups/Presentation/ViewModels/StudyGroupListViewModel.swift; sourceTree = SOURCE_ROOT; };
 		FFEEDD9C11CC22BB33AA4455 /* iOSAppWrapper.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = iOSAppWrapper.swift; path = iOSAppWrapper.swift; sourceTree = SOURCE_ROOT; };
+		FFEEDD9C11CC22BB33AA4458 /* RootView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = RootView.swift; path = App/RootView.swift; sourceTree = SOURCE_ROOT; };
 		FFEEDD9C11CC22BB33AA4456 /* App.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = App.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -949,6 +951,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				FFEEDD9C11CC22BB33AA4454 /* iOSAppWrapper.swift in Sources */,
+				FFEEDD9C11CC22BB33AA4459 /* RootView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
