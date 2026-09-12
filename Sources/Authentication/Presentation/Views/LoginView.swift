@@ -181,33 +181,47 @@ public struct LoginView: View {
                             .disabled(viewModel.isLoading)
                             .padding(.top, 8)
 
+                            // Divider
+                            HStack {
+                                VStack {
+                                    Divider()
+                                }
+                                Text("OR")
+                                    .font(.caption)
+                                    .foregroundColor(.gray)
+                                    .fontWeight(.semibold)
+                                VStack {
+                                    Divider()
+                                }
+                            }
+                            .padding(.vertical, isCompact ? 8 : 12)
+
                             #if canImport(UIKit)
-                            // Sign in with Apple button
+                            // Sign in with Apple button - PROMINENT
                             Button(action: {
                                 Task {
                                     await viewModel.signInWithApple()
                                 }
                             }) {
-                                HStack {
+                                HStack(spacing: 8) {
                                     Image(systemName: "apple.logo")
-                                        .font(.system(size: isCompact ? 14 : 16, weight: .bold))
+                                        .font(.system(size: isCompact ? 16 : 18, weight: .bold))
                                     Text("Sign in with Apple")
                                         .fontWeight(.semibold)
                                         .font(.headline)
                                 }
                                 .frame(maxWidth: .infinity)
                                 .padding()
-                                .frame(minHeight: 48)
+                                .frame(minHeight: 50)
                                 .background(Color.black)
                                 .foregroundColor(.white)
                                 .cornerRadius(12)
                                 .shadow(
-                                    color: Color.black.opacity(0.3),
-                                    radius: 8, x: 0, y: 4)
+                                    color: Color.black.opacity(0.4),
+                                    radius: 10, x: 0, y: 5)
                             }
                             .buttonStyle(.plain)
                             .disabled(viewModel.isLoading)
-                            .padding(.top, 12)
                             #endif
                         }
                         .padding(.horizontal, horizontalPadding)
@@ -220,21 +234,45 @@ public struct LoginView: View {
                         .padding(.horizontal, isCompact ? 12 : 32)
 
                         Spacer()
-                            .frame(minHeight: isCompact ? 16 : 32)
+                            .frame(minHeight: isCompact ? 12 : 24)
 
-                        // Register Link with prettier styling
-                        HStack(spacing: 4) {
-                            Text("Don't have an account?")
-                                .foregroundColor(.gray)
-                                .font(.subheadline)
-                            NavigationLink("Sign Up") {
+                        // Register Button - PROMINENT
+                        VStack(spacing: isCompact ? 12 : 16) {
+                            NavigationLink(destination: {
                                 // RegisterView will be injected here
                                 Text("Register View")
+                            }) {
+                                HStack(spacing: 8) {
+                                    Image(systemName: "person.badge.plus")
+                                        .font(.system(size: isCompact ? 16 : 18, weight: .semibold))
+                                    Text("Create New Account")
+                                        .fontWeight(.semibold)
+                                        .font(.headline)
+                                }
+                                .frame(maxWidth: .infinity)
+                                .padding()
+                                .frame(minHeight: 50)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 12)
+                                        .stroke(
+                                            Color(red: 0.73, green: 0.33, blue: 0.83),
+                                            lineWidth: 2)
+                                )
+                                .foregroundColor(Color(red: 0.73, green: 0.33, blue: 0.83))
                             }
-                            .font(.subheadline)
-                            .fontWeight(.semibold)
-                            .foregroundColor(Color(red: 0.73, green: 0.33, blue: 0.83))
+
+                            HStack(spacing: 4) {
+                                Text("Already have an account?")
+                                    .foregroundColor(.gray)
+                                    .font(.caption)
+                                Text("Login above")
+                                    .foregroundColor(Color(red: 0.73, green: 0.33, blue: 0.83))
+                                    .font(.caption)
+                                    .fontWeight(.semibold)
+                            }
+                            .frame(maxWidth: .infinity)
                         }
+                        .padding(.horizontal, isCompact ? 12 : 32)
                         .padding(.bottom, isCompact ? 20 : 40)
                     }
                 }
