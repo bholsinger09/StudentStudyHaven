@@ -6,9 +6,11 @@ public struct RegisterView: View {
     @StateObject private var viewModel: RegisterViewModel
     @Environment(\.dismiss) private var dismiss
     @Environment(\.horizontalSizeClass) var horizontalSizeClass
+    var backAction: (() -> Void)?
 
-    public init(viewModel: RegisterViewModel) {
+    public init(viewModel: RegisterViewModel, backAction: (() -> Void)? = nil) {
         _viewModel = StateObject(wrappedValue: viewModel)
+        self.backAction = backAction
     }
 
     private var isCompact: Bool {
@@ -26,6 +28,26 @@ public struct RegisterView: View {
     public var body: some View {
         ScrollView {
             VStack(spacing: isCompact ? 16 : 20) {
+                // Back button
+                HStack {
+                    if let backAction = backAction {
+                        Button(action: backAction) {
+                            HStack(spacing: 4) {
+                                Image(systemName: "chevron.left")
+                                    .font(.system(size: isCompact ? 14 : 16, weight: .semibold))
+                                Text("Back")
+                                    .font(.subheadline)
+                                    .fontWeight(.semibold)
+                            }
+                            .foregroundColor(.blue)
+                        }
+                        .buttonStyle(.plain)
+                    }
+                    Spacer()
+                }
+                .padding(.horizontal, horizontalPadding)
+                .padding(.top, isCompact ? 12 : 16)
+
                 // Header
                 VStack(spacing: 8) {
                     Image(systemName: "person.badge.plus")
@@ -35,7 +57,7 @@ public struct RegisterView: View {
                         .font(isCompact ? .headline : .title2)
                         .fontWeight(.bold)
                 }
-                .padding(.top, isCompact ? 20 : 40)
+                .padding(.top, isCompact ? 8 : 12)
 
                 // Registration Form
                 VStack(spacing: fieldSpacing) {

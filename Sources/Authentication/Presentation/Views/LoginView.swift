@@ -6,9 +6,11 @@ public struct LoginView: View {
     @StateObject private var viewModel: LoginViewModel
     @State private var isPasswordVisible = false
     @Environment(\.horizontalSizeClass) var horizontalSizeClass
+    var backAction: (() -> Void)?
 
-    public init(viewModel: LoginViewModel) {
+    public init(viewModel: LoginViewModel, backAction: (() -> Void)? = nil) {
         _viewModel = StateObject(wrappedValue: viewModel)
+        self.backAction = backAction
     }
 
     private var isCompact: Bool {
@@ -48,8 +50,28 @@ public struct LoginView: View {
 
                 ScrollView {
                     VStack(spacing: contentSpacing) {
+                        // Back button
+                        HStack {
+                            if let backAction = backAction {
+                                Button(action: backAction) {
+                                    HStack(spacing: 4) {
+                                        Image(systemName: "chevron.left")
+                                            .font(.system(size: isCompact ? 14 : 16, weight: .semibold))
+                                        Text("Back")
+                                            .font(.subheadline)
+                                            .fontWeight(.semibold)
+                                    }
+                                    .foregroundColor(Color(red: 0.73, green: 0.33, blue: 0.83))
+                                }
+                                .buttonStyle(.plain)
+                            }
+                            Spacer()
+                        }
+                        .padding(.horizontal, horizontalPadding)
+                        .padding(.top, isCompact ? 12 : 16)
+
                         Spacer()
-                            .frame(minHeight: isCompact ? 20 : 40)
+                            .frame(minHeight: isCompact ? 12 : 24)
 
                         // App Logo/Title with softer styling
                         VStack(spacing: 12) {

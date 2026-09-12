@@ -29,18 +29,50 @@ struct RootView: View {
     }
 }
 
-/// Authentication coordinator
+/// Authentication coordinator with landing page
 struct AuthenticationCoordinator: View {
     @EnvironmentObject var appState: AppState
+    @State private var authStep: AuthStep = .landing
 
     var body: some View {
-        LoginView(
-            viewModel: LoginViewModel(
-                loginUseCase: LoginUseCase(
-                    authRepository: appState.authRepository
-                )
-            )
-        )
+        NavigationStack {
+            Group {
+                switch authStep {
+                case .landing:
+                    AuthenticationLandingView(authStep: $authStep)
+
+                case .login:
+                    LoginView(
+                        viewModel: LoginViewModel(
+                            loginUseCase: LoginUseCase(
+                                authRepository: appState.authRepository
+                            )
+                        ),
+                        backAction: { authStep = .landing }
+                    )
+
+                case .register:
+                    RegisterView(
+                        viewModel: RegisterViewModel(
+                            registerUseCase: RegisterUseCase(
+                                authRepository: appState.authRepository
+                            )
+                        ),
+                        backAction: { authStep = .landing }
+                    )
+
+                case .appleSignIn:
+                    LoginView(
+                        viewModel: LoginViewModel(
+                            loginUseCase: LoginUseCase(
+                                authRepository: appState.authRepository
+                            )
+                        ),
+                        backAction: { authStep = .landing }
+                    )
+                }
+            }
+        }
         .onReceive(NotificationCenter.default.publisher(for: .userDidLogin)) { notification in
             if let user = notification.object as? User {
                 appState.login(user: user)
