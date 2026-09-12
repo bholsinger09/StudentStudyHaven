@@ -6,7 +6,7 @@ import Notes
 import SwiftUI
 
 @main
-struct StudentStudyHavenApp: App {
+public struct StudentStudyHavenApp: App {
     @StateObject private var appState = AppState()
 
     init() {
