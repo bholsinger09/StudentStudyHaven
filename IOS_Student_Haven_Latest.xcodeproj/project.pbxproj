@@ -41,6 +41,7 @@
 		57AB947FDFF5C804B4C89DF9 /* CreateNoteUseCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0972F6BEBA98A9755B6C790 /* CreateNoteUseCase.swift */; };
 		58211D305B7E93ABCCAEE33F /* ClassListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33CE42427BC33CFEDABA4543 /* ClassListView.swift */; };
 		5AE89CBACB5A614DC40B1E0C /* RealtimeListener.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A7CC1AA234CD30AB26DF8EB /* RealtimeListener.swift */; };
+		5E913C39785BF0B1EF911E85 /* AppleSignInCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EA05314D7BAA0233514F0E7 /* AppleSignInCoordinator.swift */; };
 		5FCB4703848F7FDDEDAE10FB /* JoinStudySessionUseCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E156776851A062120F4E893 /* JoinStudySessionUseCase.swift */; };
 		60437E5F4919CEC8BF8A2D06 /* UpdateClassUseCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40CA1BEFC4AAB964BE37BEC6 /* UpdateClassUseCase.swift */; };
 		65B091CC95C463AFDD19937B /* UserSearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E85483BD5C8440AAA396631 /* UserSearchView.swift */; };
@@ -51,6 +52,7 @@
 		6C8C517E65678837E010B6C2 /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F0FEE41E4DD848765F2750A /* ProfileView.swift */; };
 		6E2E03628C6FF26A49A20CFD /* InviteUserToGroupUseCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0A7B05A83EFC440C3D76A8B /* InviteUserToGroupUseCase.swift */; };
 		6F764DCD2B7B3D4F86DD104B /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5946F26890AD29A73436C515 /* LoginView.swift */; };
+		764621C4393BB374437DE26A /* CollegeSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1BC8B57BD1F9F246D82DAB30 /* CollegeSelectionView.swift */; };
 		77239CDED7BE4EEDB2FAE571 /* ResetPasswordUseCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = D368A0C3D682A42934A5C578 /* ResetPasswordUseCase.swift */; };
 		772B141197FEB9DA3046CBC8 /* FlashcardEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCD7C324E38331017EF7CF4F /* FlashcardEditorView.swift */; };
 		78682F3F29A3543551988B63 /* FlashcardStudyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F276F71394F556A0DDCA4E9A /* FlashcardStudyView.swift */; };
@@ -235,8 +237,10 @@
 		12D685DF8B9F84260A29A849 /* FlashcardListView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = FlashcardListView.swift; path = Sources/Flashcards/Presentation/Views/FlashcardListView.swift; sourceTree = SOURCE_ROOT; };
 		16A78AC3BA9E3D0579A1FE6B /* ErrorHandler.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ErrorHandler.swift; path = Sources/Core/Common/ErrorHandler.swift; sourceTree = SOURCE_ROOT; };
 		1AA16FFC68DD06F58931AF3C /* LoginUseCase.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = LoginUseCase.swift; path = Sources/Authentication/UseCases/LoginUseCase.swift; sourceTree = SOURCE_ROOT; };
+		1BC8B57BD1F9F246D82DAB30 /* CollegeSelectionView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = CollegeSelectionView.swift; path = Sources/Authentication//Presentation/Views/CollegeSelectionView.swift; sourceTree = "<group>"; };
 		1CEAAE1E2257507DF18964A9 /* MockAuthRepositoryImpl.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = MockAuthRepositoryImpl.swift; path = Sources/Authentication/Data/MockAuthRepositoryImpl.swift; sourceTree = SOURCE_ROOT; };
 		1E8550F78382DF0AB94B8112 /* NoteLinkingView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = NoteLinkingView.swift; path = Sources/Notes/Presentation/Views/NoteLinkingView.swift; sourceTree = SOURCE_ROOT; };
+		1EA05314D7BAA0233514F0E7 /* AppleSignInCoordinator.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = AppleSignInCoordinator.swift; path = Sources/Authentication//Presentation/Coordinators/AppleSignInCoordinator.swift; sourceTree = "<group>"; };
 		24985B58A08B2445628E10CE /* FirebaseUserRepositoryImpl.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = FirebaseUserRepositoryImpl.swift; path = Sources/Core/Data/FirebaseUserRepositoryImpl.swift; sourceTree = SOURCE_ROOT; };
 		252873F50DF2DF1F5C64FC16 /* AIFunFactService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = AIFunFactService.swift; path = Sources/Core/Services/AIFunFactService.swift; sourceTree = SOURCE_ROOT; };
 		273C0644A71F2BBD0CAECBCA /* LoginViewModel.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = LoginViewModel.swift; path = Sources/Authentication/Presentation/ViewModels/LoginViewModel.swift; sourceTree = SOURCE_ROOT; };
@@ -534,6 +538,8 @@
 				BF5022994C83B522263B3AA0 /* Products */,
 				9F214374590B2DC1D434FBDF /* Frameworks */,
 				368FE150301A53F400DC8CEC /* Recovered References */,
+				1EA05314D7BAA0233514F0E7 /* AppleSignInCoordinator.swift */,
+				1BC8B57BD1F9F246D82DAB30 /* CollegeSelectionView.swift */,
 			);
 			sourceTree = "<group>";
 		};
@@ -911,6 +917,8 @@
 				F6677064FD456F44C3A3048D /* LogoutUseCase.swift in Sources */,
 				CE6B89719EB8AE1399C69A6F /* RegisterUseCase.swift in Sources */,
 				77239CDED7BE4EEDB2FAE571 /* ResetPasswordUseCase.swift in Sources */,
+				5E913C39785BF0B1EF911E85 /* AppleSignInCoordinator.swift in Sources */,
+				764621C4393BB374437DE26A /* CollegeSelectionView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

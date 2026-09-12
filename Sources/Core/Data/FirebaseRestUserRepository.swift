@@ -1,4 +1,3 @@
-import Core
 import Foundation
 
 /// REST API-based Firestore User Repository
