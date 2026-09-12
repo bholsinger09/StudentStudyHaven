@@ -21,7 +21,7 @@ final class CreateClassUseCaseTests: XCTestCase {
 
     func testCreateClassWithValidData() async throws {
         // Given
-        let userId = UUID()
+        let userId = UUID().uuidString.uuidString
         let classItem = Class(
             userId: userId,
             name: "Introduction to CS",
@@ -40,7 +40,7 @@ final class CreateClassUseCaseTests: XCTestCase {
 
     func testCreateClassWithEmptyName() async {
         // Given
-        let userId = UUID()
+        let userId = UUID().uuidString
         let classItem = Class(
             userId: userId,
             name: "",
@@ -64,7 +64,7 @@ final class CreateClassUseCaseTests: XCTestCase {
 
     func testCreateClassWithOverlappingTimeSlots() async {
         // Given
-        let userId = UUID()
+        let userId = UUID().uuidString
         let baseTime = Date()
         let timeSlot1 = TimeSlot(
             dayOfWeek: .monday,

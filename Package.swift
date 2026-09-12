@@ -67,7 +67,7 @@ let package = Package(
             ],
             path: "Sources/Authentication",
             linkerSettings: [
-                .linkedFramework("AuthenticationServices"),
+                .linkedFramework("AuthenticationServices", .when(platforms: [.iOS, .macOS])),
             ]),
         .testTarget(
             name: "AuthenticationTests",

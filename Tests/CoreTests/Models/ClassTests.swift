@@ -4,7 +4,7 @@ import XCTest
 
 final class ClassTests: XCTestCase {
     func testClassInitialization() {
-        let userId = UUID()
+        let userId = UUID().uuidString
         let classItem = Class(
             userId: userId,
             name: "Introduction to Computer Science",
@@ -35,7 +35,7 @@ final class ClassTests: XCTestCase {
     }
 
     func testClassWithSchedule() {
-        let userId = UUID()
+        let userId = UUID().uuidString
         let timeSlot = TimeSlot(
             dayOfWeek: .monday,
             startTime: Date(),

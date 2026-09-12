@@ -33,7 +33,7 @@ public final class AppleSignInCoordinator: NSObject {
     }
 }
 
-extension AppleSignInCoordinator: ASAuthorizationControllerDelegate, ASAuthorizationControllerPresentationContextProvider {
+extension AppleSignInCoordinator: ASAuthorizationControllerDelegate, ASAuthorizationControllerPresentationContextProviding {
     public func authorizationController(
         controller: ASAuthorizationController,
         didCompleteWithAuthorization authorization: ASAuthorization
@@ -83,17 +83,20 @@ extension AppleSignInCoordinator: ASAuthorizationControllerDelegate, ASAuthoriza
         continuation?.resume(throwing: appError)
     }
 
-    @objc
     public func presentationAnchor(for controller: ASAuthorizationController) -> ASPresentationAnchor {
-        guard let window = UIApplication.shared.connectedScenes
+        if let window = UIApplication.shared.connectedScenes
             .compactMap({ $0 as? UIWindowScene })
             .first?
             .windows
-            .first(where: { $0.isKeyWindow })
-        else {
-            fatalError("No key window found")
+            .first(where: { $0.isKeyWindow }) {
+            return window
         }
-        return window
+        // Fallback for edge cases
+        if let window = UIApplication.shared.windows.first(where: { $0.isKeyWindow }) {
+            return window
+        }
+        // Last resort - use first available window
+        return UIApplication.shared.windows.first ?? UIWindow()
     }
 }
 

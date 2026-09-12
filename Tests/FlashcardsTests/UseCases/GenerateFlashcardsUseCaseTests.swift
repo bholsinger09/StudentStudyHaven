@@ -21,8 +21,8 @@ final class GenerateFlashcardsUseCaseTests: XCTestCase {
 
     func testGenerateFlashcardsFromNoteWithDefinitions() async throws {
         // Given
-        let userId = UUID()
-        let classId = UUID()
+        let userId = UUID().uuidString.uuidString
+        let classId = UUID().uuidString.uuidString
         let note = Note(
             classId: classId,
             userId: userId,
@@ -51,8 +51,8 @@ final class GenerateFlashcardsUseCaseTests: XCTestCase {
 
     func testGenerateFlashcardsFromEmptyContent() async {
         // Given
-        let userId = UUID()
-        let classId = UUID()
+        let userId = UUID().uuidString.uuidString
+        let classId = UUID().uuidString.uuidString
         let note = Note(
             classId: classId,
             userId: userId,

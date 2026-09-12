@@ -21,8 +21,8 @@ final class LinkNotesUseCaseTests: XCTestCase {
 
     func testLinkNotesSuccessfully() async throws {
         // Given
-        let userId = UUID()
-        let classId = UUID()
+        let userId = UUID().uuidString
+        let classId = UUID().uuidString
         let sourceNoteId = UUID()
         let targetNoteId = UUID()
 
@@ -55,8 +55,8 @@ final class LinkNotesUseCaseTests: XCTestCase {
 
     func testLinkNotesWithNonexistentTarget() async {
         // Given
-        let userId = UUID()
-        let classId = UUID()
+        let userId = UUID().uuidString
+        let classId = UUID().uuidString
         let sourceNoteId = UUID()
         let targetNoteId = UUID()
 

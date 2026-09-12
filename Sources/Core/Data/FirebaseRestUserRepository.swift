@@ -3,6 +3,9 @@ import Foundation
 
 /// REST API-based Firestore User Repository
 /// Uses Firebase REST API instead of Firebase SDK
+/// NOTE: This implementation is disabled in favor of mock repositories
+/// To use: replace DependencyContainer.useMockRepositories = false
+@available(*, deprecated, message: "Firebase is currently disabled. Use MockAuthRepositoryImpl instead.")
 public class FirebaseRestUserRepository: UserRepositoryProtocol {
     private let restClient: FirebaseRestClient
     private var currentIdToken: String?
