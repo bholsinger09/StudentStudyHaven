@@ -10,8 +10,8 @@ let package = Package(
         .macOS(.v13),
     ],
     products: [
-        .library(
-            name: "App",
+        .executable(
+            name: "StudentStudyHaven",
             targets: ["App"]),
         .library(
             name: "Core",
@@ -36,8 +36,8 @@ let package = Package(
         // No external dependencies - using Firebase REST API
     ],
     targets: [
-        // MARK: - App Library Target
-        .target(
+        // MARK: - App Executable Target
+        .executableTarget(
             name: "App",
             dependencies: [
                 "Core",
