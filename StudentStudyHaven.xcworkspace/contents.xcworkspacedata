@@ -2,6 +2,4 @@
 <Workspace version = "1.0">
    <FileRef location = "group:IOS_Student_Haven_Latest.xcodeproj">
    </FileRef>
-   <FileRef location = "group:">
-   </FileRef>
 </Workspace>
