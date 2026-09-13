@@ -28,10 +28,6 @@ public class FirebaseRestUserRepository: UserRepositoryProtocol {
     }
     
     public func getCurrentUser() async throws -> User? {
-        guard let idToken = currentIdToken else {
-            return nil
-        }
-        
         // Get user ID from token (would need to decode JWT in production)
         // For now, we'll rely on the auth repository to provide the user
         return nil

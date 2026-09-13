@@ -83,47 +83,35 @@ class ProfileViewModel: ObservableObject {
         isLoading = true
         defer { isLoading = false }
 
-        do {
-            // Update user in Firestore
-            // TODO: Implement UpdateUserUseCase
-            // For now, update locally
-            let updatedUser = User(
-                id: user.id,
-                email: email,
-                name: name,
-                collegeId: user.collegeId,
-                createdAt: user.createdAt,
-                updatedAt: Date()
-            )
+        // Update user in Firestore
+        // TODO: Implement UpdateUserUseCase
+        // For now, update locally
+        let updatedUser = User(
+            id: user.id,
+            email: email,
+            name: name,
+            collegeId: user.collegeId,
+            createdAt: user.createdAt,
+            updatedAt: Date()
+        )
 
-            appState.currentUser = updatedUser
-            userName = name
-            userEmail = email
+        appState.currentUser = updatedUser
+        userName = name
+        userEmail = email
 
-            // TODO: Persist to Firestore
-            // try await updateUserUseCase.execute(user: updatedUser)
-
-        } catch {
-            errorMessage = "Failed to update profile: \(error.localizedDescription)"
-            showError = true
-        }
+        // TODO: Persist to Firestore
+        // try await updateUserUseCase.execute(user: updatedUser)
     }
 
     func changePassword(current: String, new: String) async {
         isLoading = true
         defer { isLoading = false }
 
-        do {
-            // TODO: Implement ChangePasswordUseCase with Firebase Auth
-            // try await authRepository.changePassword(current: current, new: new)
+        // TODO: Implement ChangePasswordUseCase with Firebase Auth
+        // try await authRepository.changePassword(current: current, new: new)
 
-            errorMessage = "Password changed successfully"
-            showError = true
-
-        } catch {
-            errorMessage = "Failed to change password: \(error.localizedDescription)"
-            showError = true
-        }
+        errorMessage = "Password changed successfully"
+        showError = true
     }
 
     func uploadProfilePhoto(imageData: Data) async {
@@ -132,18 +120,12 @@ class ProfileViewModel: ObservableObject {
         isLoading = true
         defer { isLoading = false }
 
-        do {
-            // TODO: Implement photo upload to Firebase Storage
-            // let photoURL = try await storageService.uploadProfilePhoto(userId: user.id, data: imageData)
-            // profilePhotoURL = photoURL
+        // TODO: Implement photo upload to Firebase Storage
+        // let photoURL = try await storageService.uploadProfilePhoto(userId: user.id, data: imageData)
+        // profilePhotoURL = photoURL
 
-            errorMessage = "Photo uploaded successfully"
-            showError = true
-
-        } catch {
-            errorMessage = "Failed to upload photo: \(error.localizedDescription)"
-            showError = true
-        }
+        errorMessage = "Photo uploaded successfully"
+        showError = true
     }
 
     func logout() async {
