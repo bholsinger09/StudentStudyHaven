@@ -63,24 +63,22 @@ extension AppleSignInCoordinator: ASAuthorizationControllerDelegate, ASAuthoriza
     ) {
         let appError: Error
         if let asError = error as? ASAuthorizationError {
+            let message: String
             switch asError.code {
             case .canceled:
-                appError = AppError.authenticationFailed("Sign in with Apple was cancelled")
+                message = "Sign in with Apple was cancelled"
             case .failed:
-                appError = AppError.authenticationFailed("Sign in with Apple failed")
+                message = "Sign in with Apple failed"
             case .invalidResponse:
-                appError = AppError.authenticationFailed("Invalid response from Apple")
+                message = "Invalid response from Apple"
             case .notHandled:
-                appError = AppError.authenticationFailed("Sign in request not handled")
+                message = "Sign in request not handled"
             case .unknown:
-                appError = AppError.authenticationFailed("Unknown error occurred")
-            case .notInteractive:
-                appError = AppError.authenticationFailed("Sign in with Apple is not interactive")
-            case .matchedExcludedCredential:
-                appError = AppError.authenticationFailed("Matched credential is excluded")
-            @unknown default:
-                appError = AppError.authenticationFailed("Unknown error occurred")
+                message = "Unknown error occurred"
+            default:
+                message = asError.localizedDescription
             }
+            appError = AppError.authenticationFailed(message)
         } else {
             appError = error
         }

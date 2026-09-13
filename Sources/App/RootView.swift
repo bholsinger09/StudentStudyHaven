@@ -12,6 +12,10 @@ public struct RootView: View {
     @AppStorage("hasCompletedOnboarding") private var hasCompletedOnboarding = false
     @State private var showOnboarding = false
 
+    public init() {
+        // Empty init for SwiftUI View
+    }
+
     public var body: some View {
         if appState.isAuthenticated {
             MainTabView()
