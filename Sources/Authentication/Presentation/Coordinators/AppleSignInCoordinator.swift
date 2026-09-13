@@ -72,8 +72,6 @@ extension AppleSignInCoordinator: ASAuthorizationControllerDelegate, ASAuthoriza
                 appError = AppError.authenticationFailed("Invalid response from Apple")
             case .notHandled:
                 appError = AppError.authenticationFailed("Sign in request not handled")
-            case .unknown:
-                appError = AppError.authenticationFailed("Unknown error occurred")
             @unknown default:
                 appError = AppError.authenticationFailed("Unknown error occurred")
             }
@@ -92,11 +90,12 @@ extension AppleSignInCoordinator: ASAuthorizationControllerDelegate, ASAuthoriza
             return window
         }
         // Fallback for edge cases
-        if let window = UIApplication.shared.windows.first(where: { $0.isKeyWindow }) {
+        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+           let window = windowScene.windows.first(where: { $0.isKeyWindow }) {
             return window
         }
-        // Last resort - use first available window
-        return UIApplication.shared.windows.first ?? UIWindow()
+        // Last resort
+        return UIWindow()
     }
 }
 
