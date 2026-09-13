@@ -72,6 +72,20 @@ extension AppleSignInCoordinator: ASAuthorizationControllerDelegate, ASAuthoriza
                 appError = AppError.authenticationFailed("Invalid response from Apple")
             case .notHandled:
                 appError = AppError.authenticationFailed("Sign in request not handled")
+            case .unknown:
+                appError = AppError.authenticationFailed("Unknown error occurred")
+            case .notInteractive:
+                appError = AppError.authenticationFailed("Sign in with Apple is not interactive")
+            case .matchedExcludedCredential:
+                appError = AppError.authenticationFailed("Matched credential is excluded")
+            case .credentialImportImport:
+                appError = AppError.authenticationFailed("Credential import failed")
+            case .credentialExport:
+                appError = AppError.authenticationFailed("Credential export failed")
+            case .preferSignInWithApple:
+                appError = AppError.authenticationFailed("Sign in preference not met")
+            case .deviceNotConfiguredForPasskeyCreation:
+                appError = AppError.authenticationFailed("Device not configured for passkey creation")
             @unknown default:
                 appError = AppError.authenticationFailed("Unknown error occurred")
             }
