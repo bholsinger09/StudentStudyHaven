@@ -31,12 +31,6 @@ let package = Package(
         .library(
             name: "StudyGroups",
             targets: ["StudyGroups"]),
-        .executable(
-            name: "StudentStudyHavenIOS",
-            targets: ["StudentStudyHavenIOSApp"]),
-        .executable(
-            name: "StudentStudyHavenMacOS",
-            targets: ["StudentStudyHavenMacOSApp"]),
     ],
     dependencies: [
         // No external dependencies - using Firebase REST API
@@ -127,33 +121,5 @@ let package = Package(
             name: "StudyGroupsTests",
             dependencies: ["StudyGroups", "Core"],
             path: "Tests/StudyGroupsTests"),
-
-        // MARK: - iOS App Executable
-        .executableTarget(
-            name: "StudentStudyHavenIOSApp",
-            dependencies: [
-                "App",
-                "Core",
-                "Authentication",
-                "ClassManagement",
-                "Flashcards",
-                "Notes",
-                "StudyGroups",
-            ],
-            path: "StudentStudyHaven-iOS/StudentStudyHaven"),
-
-        // MARK: - macOS App Executable
-        .executableTarget(
-            name: "StudentStudyHavenMacOSApp",
-            dependencies: [
-                "App",
-                "Core",
-                "Authentication",
-                "ClassManagement",
-                "Flashcards",
-                "Notes",
-                "StudyGroups",
-            ],
-            path: "StudentStudyHaven-macOS/StudentStudyHaven"),
     ]
 )

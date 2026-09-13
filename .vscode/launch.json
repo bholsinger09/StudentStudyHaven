@@ -119,6 +119,46 @@
             "target": "StudentStudyHavenMacOS",
             "configuration": "release",
             "preLaunchTask": "swift: Build Release StudentStudyHavenMacOS"
+        },
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:StudentStudyHaven}",
+            "name": "Debug StudentStudyHavenMacOSApp",
+            "target": "StudentStudyHavenMacOSApp",
+            "configuration": "debug",
+            "preLaunchTask": "swift: Build Debug StudentStudyHavenMacOSApp"
+        },
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:StudentStudyHaven}",
+            "name": "Release StudentStudyHavenMacOSApp",
+            "target": "StudentStudyHavenMacOSApp",
+            "configuration": "release",
+            "preLaunchTask": "swift: Build Release StudentStudyHavenMacOSApp"
+        },
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:StudentStudyHaven}",
+            "name": "Debug StudentStudyHavenIOSApp",
+            "target": "StudentStudyHavenIOSApp",
+            "configuration": "debug",
+            "preLaunchTask": "swift: Build Debug StudentStudyHavenIOSApp"
+        },
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:StudentStudyHaven}",
+            "name": "Release StudentStudyHavenIOSApp",
+            "target": "StudentStudyHavenIOSApp",
+            "configuration": "release",
+            "preLaunchTask": "swift: Build Release StudentStudyHavenIOSApp"
         }
     ]
 }
