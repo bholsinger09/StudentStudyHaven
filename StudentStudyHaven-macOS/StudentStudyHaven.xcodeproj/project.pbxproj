@@ -1,0 +1,210 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+		/* Begin PBXBuildFile section */
+		E1000000000000000000000000000001B /* macOSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1000000000000000000000000000001; };
+		E1000000000000000000000000000100 /* App in Frameworks */ = {isa = PBXBuildFile; productRef = E10000000000000000000000000001FF; };
+		E1000000000000000000000000000101 /* Core in Frameworks */ = {isa = PBXBuildFile; productRef = E1000000000000000000000000000200; };
+		E1000000000000000000000000000102 /* Authentication in Frameworks */ = {isa = PBXBuildFile; productRef = E1000000000000000000000000000201; };
+		E1000000000000000000000000000103 /* ClassManagement in Frameworks */ = {isa = PBXBuildFile; productRef = E1000000000000000000000000000202; };
+		E1000000000000000000000000000104 /* Flashcards in Frameworks */ = {isa = PBXBuildFile; productRef = E1000000000000000000000000000203; };
+		E1000000000000000000000000000105 /* Notes in Frameworks */ = {isa = PBXBuildFile; productRef = E1000000000000000000000000000204; };
+		E1000000000000000000000000000106 /* StudyGroups in Frameworks */ = {isa = PBXBuildFile; productRef = E1000000000000000000000000000205; };
+		/* End PBXBuildFile section */
+		
+		/* Begin PBXFileReference section */
+		E1000000000000000000000000000001 /* macOSApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = macOSApp.swift; sourceTree = "<group>"; };
+		E1000000000000000000000000000002 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		E1000000000000000000000000000005 /* StudentStudyHaven.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = StudentStudyHaven.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		/* End PBXFileReference section */
+		
+		/* Begin PBXFrameworksBuildPhase section */
+		E1000000000000000000000000000040 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E1000000000000000000000000000100 /* App in Frameworks */,
+				E1000000000000000000000000000101 /* Core in Frameworks */,
+				E1000000000000000000000000000102 /* Authentication in Frameworks */,
+				E1000000000000000000000000000103 /* ClassManagement in Frameworks */,
+				E1000000000000000000000000000104 /* Flashcards in Frameworks */,
+				E1000000000000000000000000000105 /* Notes in Frameworks */,
+				E1000000000000000000000000000106 /* StudyGroups in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		/* End PBXFrameworksBuildPhase section */
+		
+		/* Begin PBXGroup section */
+		E1000000000000000000000000000020 /* StudentStudyHaven */ = {isa = PBXGroup; children = (E1000000000000000000000000000001, E1000000000000000000000000000002); path = StudentStudyHaven; sourceTree = "<group>"; };
+		E1000000000000000000000000000010 /* StudentStudyHaven */ = {isa = PBXGroup; children = (E1000000000000000000000000000020, E1000000000000000000000000000005); sourceTree = "<group>"; };
+		/* End PBXGroup section */
+		
+		/* Begin PBXNativeTarget section */
+		E1000000000000000000000000000003 /* StudentStudyHaven */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E1000000000000000000000000000004;
+			buildPhases = (
+				E1000000000000000000000000000030 /* Sources */,
+				E1000000000000000000000000000040 /* Frameworks */,
+				E1000000000000000000000000000050 /* Resources */,
+			);
+			buildRules = ();
+			dependencies = ();
+			name = StudentStudyHaven;
+			packageProductDependencies = (
+				E10000000000000000000000000001FF /* App */,
+				E1000000000000000000000000000200 /* Core */,
+				E1000000000000000000000000000201 /* Authentication */,
+				E1000000000000000000000000000202 /* ClassManagement */,
+				E1000000000000000000000000000203 /* Flashcards */,
+				E1000000000000000000000000000204 /* Notes */,
+				E1000000000000000000000000000205 /* StudyGroups */,
+			);
+			productName = StudentStudyHaven;
+			productReference = E1000000000000000000000000000005 /* StudentStudyHaven.app */;
+			productType = "com.apple.product-type.application";
+		};
+		/* End PBXNativeTarget section */
+		
+		/* Begin PBXPackageProductDependency section */
+		E10000000000000000000000000001FF /* App */ = {isa = PBXPackageProductDependency; package = E1000000000000000000000000000300; productName = App; };
+		E1000000000000000000000000000200 /* Core */ = {isa = PBXPackageProductDependency; package = E1000000000000000000000000000300; productName = Core; };
+		E1000000000000000000000000000201 /* Authentication */ = {isa = PBXPackageProductDependency; package = E1000000000000000000000000000300; productName = Authentication; };
+		E1000000000000000000000000000202 /* ClassManagement */ = {isa = PBXPackageProductDependency; package = E1000000000000000000000000000300; productName = ClassManagement; };
+		E1000000000000000000000000000203 /* Flashcards */ = {isa = PBXPackageProductDependency; package = E1000000000000000000000000000300; productName = Flashcards; };
+		E1000000000000000000000000000204 /* Notes */ = {isa = PBXPackageProductDependency; package = E1000000000000000000000000000300; productName = Notes; };
+		E1000000000000000000000000000205 /* StudyGroups */ = {isa = PBXPackageProductDependency; package = E1000000000000000000000000000300; productName = StudyGroups; };
+		/* End PBXPackageProductDependency section */
+		
+		/* Begin PBXProject section */
+		E1000000000000000000000000000008 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+			};
+			buildConfigurationList = E1000000000000000000000000000009;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = E1000000000000000000000000000010;
+			packageReferences = (
+				E1000000000000000000000000000300 /* XCRemoteSwiftPackageReference */,
+			);
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				E1000000000000000000000000000003 /* StudentStudyHaven */,
+			);
+		};
+		/* End PBXProject section */
+		
+		/* Begin PBXResourcesBuildPhase section */
+		E1000000000000000000000000000050 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		/* End PBXResourcesBuildPhase section */
+		
+		/* Begin PBXSourcesBuildPhase section */
+		E1000000000000000000000000000030 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E1000000000000000000000000000001B /* macOSApp.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		/* End PBXSourcesBuildPhase section */
+		
+		/* Begin XCBuildConfiguration section */
+		E100000000000000000000000000000A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+			};
+			name = Debug;
+		};
+		E100000000000000000000000000000B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+			};
+			name = Release;
+		};
+		E1000000000000000000000000000006 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_IDENTIFIER = "com.studentstudyhaven.macos";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = StudentStudyHaven/Info.plist;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_NAME = StudentStudyHaven;
+				SDKROOT = macosx;
+				SWIFT_VERSION = 6.0;
+			};
+			name = Debug;
+		};
+		E1000000000000000000000000000007 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_IDENTIFIER = "com.studentstudyhaven.macos";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = StudentStudyHaven/Info.plist;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_NAME = StudentStudyHaven;
+				SDKROOT = macosx;
+				SWIFT_VERSION = 6.0;
+			};
+			name = Release;
+		};
+		/* End XCBuildConfiguration section */
+		
+		/* Begin XCConfigurationList section */
+		E1000000000000000000000000000004 /* Build configuration list for PBXNativeTarget "StudentStudyHaven" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E1000000000000000000000000000006 /* Debug */,
+				E1000000000000000000000000000007 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		E1000000000000000000000000000009 /* Build configuration list for PBXProject "StudentStudyHaven" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E100000000000000000000000000000A /* Debug */,
+				E100000000000000000000000000000B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		/* End XCConfigurationList section */
+		
+		/* Begin XCRemoteSwiftPackageReference section */
+		E1000000000000000000000000000300 /* XCRemoteSwiftPackageReference */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "file:///Users/benh/Documents/StudentStudyHaven";
+			requirement = {
+				kind = branch;
+				branch = Latest;
+			};
+		};
+		/* End XCRemoteSwiftPackageReference section */
+	};
+	rootObject = E1000000000000000000000000000008 /* Project object */;
+}
