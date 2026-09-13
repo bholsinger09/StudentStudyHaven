@@ -5,7 +5,6 @@ import Flashcards
 import Notes
 import SwiftUI
 
-@main
 public struct StudentStudyHavenApp: App {
     @StateObject private var appState = AppState()
 
