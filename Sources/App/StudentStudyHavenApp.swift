@@ -9,7 +9,7 @@ import SwiftUI
 public struct StudentStudyHavenApp: App {
     @StateObject private var appState = AppState()
 
-    init() {
+    public init() {
         // Configure Firebase on app launch
         // Firebase temporarily disabled - using mock repositories
         // Task { @MainActor in
@@ -20,7 +20,7 @@ public struct StudentStudyHavenApp: App {
         DependencyContainer.shared.useMockRepositories = true
     }
 
-    var body: some Scene {
+    public var body: some Scene {
         WindowGroup {
             RootView()
                 .environmentObject(appState)

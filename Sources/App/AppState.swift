@@ -15,21 +15,21 @@ import SwiftUI
 
 /// Application state management
 @MainActor
-class AppState: ObservableObject {
-    @Published var currentUser: User?
-    @Published var isAuthenticated: Bool = false
+public class AppState: ObservableObject {
+    @Published public var currentUser: User?
+    @Published public var isAuthenticated: Bool = false
 
     // Dependencies
-    let authRepository: AuthRepositoryProtocol
-    let userRepository: UserRepositoryProtocol
-    let classRepository: ClassRepositoryProtocol
-    let flashcardRepository: FlashcardRepositoryProtocol
-    let noteRepository: NoteRepositoryProtocol
-    let studyGroupRepository: StudyGroupRepositoryProtocol
-    let studySessionRepository: GroupStudySessionRepositoryProtocol
-    let groupMessageRepository: GroupMessageRepositoryProtocol
+    public let authRepository: AuthRepositoryProtocol
+    public let userRepository: UserRepositoryProtocol
+    public let classRepository: ClassRepositoryProtocol
+    public let flashcardRepository: FlashcardRepositoryProtocol
+    public let noteRepository: NoteRepositoryProtocol
+    public let studyGroupRepository: StudyGroupRepositoryProtocol
+    public let studySessionRepository: GroupStudySessionRepositoryProtocol
+    public let groupMessageRepository: GroupMessageRepositoryProtocol
 
-    init() {
+    public init() {
         // Initialize with Firebase repositories for Study Groups, mocks for others
         let container = DependencyContainer.shared
         self.authRepository = container.authRepository
@@ -53,12 +53,12 @@ class AppState: ObservableObject {
         }
     }
 
-    func login(user: User) {
+    public func login(user: User) {
         currentUser = user
         isAuthenticated = true
     }
 
-    func logout() async {
+    public func logout() async {
         try? await authRepository.logout()
         currentUser = nil
         isAuthenticated = false

@@ -1,3 +1,10 @@
+//
+//  macOSApp.swift
+//  StudentStudyHaven
+//
+//  Created by Ben H on 9/12/26.
+//
+
 import SwiftUI
 import App
 
@@ -8,5 +15,4 @@ struct macOSApp: App {
             StudentStudyHavenApp()
         }
     }
-}
 }

@@ -19,6 +19,66 @@
             "target": "StudentStudyHaven",
             "configuration": "release",
             "preLaunchTask": "swift: Build Release StudentStudyHaven"
+        },
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:StudentStudyHaven}",
+            "name": "Debug StudentStudyHavenApp",
+            "target": "StudentStudyHavenApp",
+            "configuration": "debug",
+            "preLaunchTask": "swift: Build Debug StudentStudyHavenApp"
+        },
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:StudentStudyHaven}",
+            "name": "Release StudentStudyHavenApp",
+            "target": "StudentStudyHavenApp",
+            "configuration": "release",
+            "preLaunchTask": "swift: Build Release StudentStudyHavenApp"
+        },
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:StudentStudyHaven}",
+            "name": "Debug StudentStudyHaven-iOS",
+            "target": "StudentStudyHaven-iOS",
+            "configuration": "debug",
+            "preLaunchTask": "swift: Build Debug StudentStudyHaven-iOS"
+        },
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:StudentStudyHaven}",
+            "name": "Release StudentStudyHaven-iOS",
+            "target": "StudentStudyHaven-iOS",
+            "configuration": "release",
+            "preLaunchTask": "swift: Build Release StudentStudyHaven-iOS"
+        },
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:StudentStudyHaven}",
+            "name": "Debug StudentStudyHaven-macOS",
+            "target": "StudentStudyHaven-macOS",
+            "configuration": "debug",
+            "preLaunchTask": "swift: Build Debug StudentStudyHaven-macOS"
+        },
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:StudentStudyHaven}",
+            "name": "Release StudentStudyHaven-macOS",
+            "target": "StudentStudyHaven-macOS",
+            "configuration": "release",
+            "preLaunchTask": "swift: Build Release StudentStudyHaven-macOS"
         }
     ]
 }
