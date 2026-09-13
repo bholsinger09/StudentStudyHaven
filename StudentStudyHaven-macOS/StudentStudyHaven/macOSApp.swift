@@ -1,6 +1,10 @@
 import SwiftUI
 import App
 
+#if os(macOS)
+import AppKit
+#endif
+
 @main
 struct macOSApp: App {
     @StateObject private var appState = AppState()
@@ -14,7 +18,9 @@ struct macOSApp: App {
             RootView()
                 .environmentObject(appState)
                 .onAppear {
+                    #if os(macOS)
                     NSApp?.activate(ignoringOtherApps: true)
+                    #endif
                 }
         }
         .commands {
