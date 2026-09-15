@@ -66,6 +66,38 @@ public class FirebaseAuthRepositoryImpl: AuthRepositoryProtocol {
             throw mapFirebaseError(error)
         }
     }
+
+    public func loginWithAppleID(appleUserID: String, email: String, fullName: String?) async throws -> AuthSession {
+        do {
+            // Create or get Apple ID auth user
+            // This would typically use Firebase's signInAnonymously or a custom auth token
+            // For now, we'll create an anonymous session and link it to Apple credentials
+            let authResult = try await auth.signInAnonymously()
+            let userId = authResult.user.uid
+            
+            // Create or update user profile in Firestore
+            let user = User(
+                id: userId,
+                email: email,
+                name: fullName ?? "Apple User",
+                collegeId: nil
+            )
+            
+            try await saveUserProfile(user)
+            
+            // Get ID token for session
+            let token = try await authResult.user.getIDToken()
+            
+            // Create auth session
+            let expiresAt = Date().addingTimeInterval(3600)
+            let session = AuthSession(user: user, token: token, expiresAt: expiresAt)
+            
+            return session
+        } catch let error as NSError {
+            throw mapFirebaseError(error)
+        }
+    }
+
     
     public func logout() async throws {
         do {

@@ -5,6 +5,7 @@ import Foundation
 public final class MockAuthRepositoryImpl: AuthRepositoryProtocol {
     private var currentSession: AuthSession?
     private var users: [String: (User, String)] = [:]  // email -> (user, password)
+    private var appleUsers: [String: User] = [:]  // appleUserID -> user
 
     public init() {
         // Pre-populate with a default test user for demos and code reviews
@@ -65,6 +66,42 @@ public final class MockAuthRepositoryImpl: AuthRepositoryProtocol {
         currentSession = session
         return session
     }
+
+    public func loginWithAppleID(appleUserID: String, email: String, fullName: String?) async throws -> AuthSession {
+        // Simulate network delay
+        try await Task.sleep(nanoseconds: 500_000_000)
+
+        // Check if this Apple ID has signed in before
+        if let existingUser = appleUsers[appleUserID] {
+            let session = AuthSession(
+                user: existingUser,
+                token: UUID().uuidString,
+                expiresAt: Date().addingTimeInterval(3600)
+            )
+            currentSession = session
+            return session
+        }
+
+        // First time signing in with this Apple ID - create new user
+        let newUser = User(
+            id: appleUserID,
+            email: email,
+            name: fullName ?? "Apple User",
+            collegeId: ""
+        )
+
+        appleUsers[appleUserID] = newUser
+
+        let session = AuthSession(
+            user: newUser,
+            token: UUID().uuidString,
+            expiresAt: Date().addingTimeInterval(3600)
+        )
+
+        currentSession = session
+        return session
+    }
+
 
     public func logout() async throws {
         currentSession = nil

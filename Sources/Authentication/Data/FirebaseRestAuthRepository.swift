@@ -71,6 +71,29 @@ public class FirebaseRestAuthRepository: AuthRepositoryProtocol {
             expiresAt: tokenExpirationDate ?? Date().addingTimeInterval(3600)
         )
     }
+
+    public func loginWithAppleID(appleUserID: String, email: String, fullName: String?) async throws -> AuthSession {
+        // For Apple sign-in, we create a local session without going through Firebase REST auth
+        // In a real backend, this would validate the Apple token with your server
+        
+        // Store tokens as a valid Apple sign-in session
+        currentIdToken = "apple_idtoken_\(appleUserID)"
+        currentRefreshToken = "apple_refresh_\(appleUserID)"
+        currentUserId = appleUserID
+        tokenExpirationDate = Date().addingTimeInterval(3600)
+        
+        saveSession()
+        
+        // Get or create user profile
+        let user = try await getOrCreateUser(userId: appleUserID, email: email, fullName: fullName)
+        
+        return AuthSession(
+            user: user,
+            token: currentIdToken!,
+            expiresAt: tokenExpirationDate ?? Date().addingTimeInterval(3600)
+        )
+    }
+
     
     public func logout() async throws {
         currentIdToken = nil
@@ -136,7 +159,7 @@ public class FirebaseRestAuthRepository: AuthRepositoryProtocol {
     
     // MARK: - Helper Methods
     
-    private func getOrCreateUser(userId: String, email: String) async throws -> User {
+    private func getOrCreateUser(userId: String, email: String, fullName: String? = nil) async throws -> User {
         // Try to get existing user
         if let existingUser = try? await userRepository.getUser(by: userId) {
             return existingUser
@@ -146,7 +169,7 @@ public class FirebaseRestAuthRepository: AuthRepositoryProtocol {
         let user = User(
             id: userId,
             email: email,
-            name: email.components(separatedBy: "@").first ?? "User",
+            name: fullName ?? email.components(separatedBy: "@").first ?? "User",
             collegeId: nil,
             createdAt: Date(),
             updatedAt: Date()

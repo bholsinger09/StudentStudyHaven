@@ -45,11 +45,10 @@ extension AppleSignInCoordinator: ASAuthorizationControllerDelegate, ASAuthoriza
 
         Task {
             do {
-                let email = appleIDCredential.email ?? ""
                 let userID = appleIDCredential.user
-                let emailToUse = !email.isEmpty ? email : "\(userID)@appleid.local"
-                let credentials = LoginCredentials(email: emailToUse, password: userID)
-                let session = try await authRepository.login(credentials: credentials)
+                let email = appleIDCredential.email ?? "\(userID)@appleid.local"
+                let fullName = appleIDCredential.fullName?.givenName
+                let session = try await authRepository.loginWithAppleID(appleUserID: userID, email: email, fullName: fullName)
                 continuation?.resume(returning: session)
             } catch {
                 continuation?.resume(throwing: error)
