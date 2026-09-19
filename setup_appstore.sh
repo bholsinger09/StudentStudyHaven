@@ -8,7 +8,8 @@ set -e
 echo "🚀 Setting up StudentStudyHaven for App Store deployment..."
 echo ""
 
-PROJECT_DIR="/Users/benh/Documents/StudentStudyHaven"
+# Use script directory as project root (works anywhere)
+PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$PROJECT_DIR"
 
 # Create app directories

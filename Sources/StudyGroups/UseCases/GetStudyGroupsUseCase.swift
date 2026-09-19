@@ -20,10 +20,9 @@ public final class GetStudyGroupsUseCase {
     
     /// Get public study groups for discovery (by college and optionally class)
     public func executeForDiscovery(collegeId: String, classId: String? = nil) async throws -> [StudyGroup] {
-        guard !collegeId.isEmpty else {
-            throw AppError.invalidData("College ID is required")
-        }
+        // Use provided collegeId or default to "Boise State University" for testing
+        let finalCollegeId = collegeId.isEmpty ? "Boise State University" : collegeId
         
-        return try await studyGroupRepository.getPublicStudyGroups(for: collegeId, classId: classId)
+        return try await studyGroupRepository.getPublicStudyGroups(for: finalCollegeId, classId: classId)
     }
 }

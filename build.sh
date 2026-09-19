@@ -5,7 +5,8 @@
 
 set -e
 
-PROJECT_DIR="/Users/benh/Documents/StudentStudyHaven"
+# Use script directory as project root (works on any system/cloud environment)
+PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$PROJECT_DIR"
 
 # Color codes

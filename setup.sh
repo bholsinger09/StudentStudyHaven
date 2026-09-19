@@ -9,7 +9,8 @@ echo "🎓 StudentStudyHaven - Xcode Project Setup"
 echo "=========================================="
 echo ""
 
-PROJECT_DIR="/Users/benh/Documents/StudentStudyHaven"
+# Use script directory as project root (works anywhere)
+PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 APP_NAME="StudentStudyHaven"
 BUNDLE_ID="com.studyhaven.StudentStudyHaven"
 

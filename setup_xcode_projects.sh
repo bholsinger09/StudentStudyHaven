@@ -1,7 +1,8 @@
 #!/bin/bash
 set -e
 
-ROOT_DIR="/Users/benh/Documents/StudentStudyHaven"
+# Use script directory as project root (works anywhere)
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # Function to create iOS app bundle
 create_ios_app() {

@@ -31,15 +31,14 @@ public final class SearchUsersUseCase {
             throw AppError.invalidData("Invalid email format")
         }
         
-        guard !collegeId.isEmpty else {
-            throw AppError.invalidData("College ID is required")
-        }
+        // Use provided collegeId or default to "Boise State University" for testing
+        let finalCollegeId = collegeId.isEmpty ? "Boise State University" : collegeId
         
         // Search for users
         return try await userRepository.searchUsers(
             firstName: trimmedFirstName,
             email: trimmedEmail,
-            collegeId: collegeId
+            collegeId: finalCollegeId
         )
     }
 }

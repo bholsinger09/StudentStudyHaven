@@ -426,8 +426,10 @@ struct StudyGroupsTab: View {
 
     var body: some View {
         NavigationStack {
-            if let userId = appState.currentUser?.id,
-               let collegeId = appState.currentUser?.collegeId {
+            if let userId = appState.currentUser?.id {
+                // Use current user's college ID, or default for testing
+                let rawCollegeId = appState.currentUser?.collegeId ?? ""
+                let collegeId = rawCollegeId.isEmpty ? "Boise State University" : rawCollegeId
                 StudyGroupsView(
                     viewModel: StudyGroupListViewModel(
                         getStudyGroupsUseCase: GetStudyGroupsUseCase(

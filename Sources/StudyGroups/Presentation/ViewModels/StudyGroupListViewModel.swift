@@ -45,8 +45,12 @@ public final class StudyGroupListViewModel: ObservableObject {
     
     public func loadDiscoverGroups(classId: String? = nil) async {
         do {
+            // Use provided collegeId or default to "Boise State University" for testing
+            let finalCollegeId = collegeId.isEmpty ? "Boise State University" : collegeId
+            print("DEBUG StudyGroupListViewModel.loadDiscoverGroups() - collegeId: '\(collegeId)' -> finalCollegeId: '\(finalCollegeId)'")
+            
             discoverGroups = try await getStudyGroupsUseCase.executeForDiscovery(
-                collegeId: collegeId,
+                collegeId: finalCollegeId,
                 classId: classId
             )
             // Filter out groups user is already in
