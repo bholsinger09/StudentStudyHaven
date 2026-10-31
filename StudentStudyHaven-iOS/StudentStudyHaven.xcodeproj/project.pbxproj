@@ -1,0 +1,297 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 60;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		3660E77430574659006DEB60 /* App in Frameworks */ = {isa = PBXBuildFile; productRef = 3660E77330574659006DEB60 /* App */; };
+		3660E7763057465E006DEB60 /* Authentication in Frameworks */ = {isa = PBXBuildFile; productRef = 3660E7753057465E006DEB60 /* Authentication */; };
+		3660E77830574663006DEB60 /* ClassManagement in Frameworks */ = {isa = PBXBuildFile; productRef = 3660E77730574663006DEB60 /* ClassManagement */; };
+		3660E77A30574669006DEB60 /* Core in Frameworks */ = {isa = PBXBuildFile; productRef = 3660E77930574669006DEB60 /* Core */; };
+		3660E77C3057466E006DEB60 /* Flashcards in Frameworks */ = {isa = PBXBuildFile; productRef = 3660E77B3057466E006DEB60 /* Flashcards */; };
+		3660E77E30574673006DEB60 /* Notes in Frameworks */ = {isa = PBXBuildFile; productRef = 3660E77D30574673006DEB60 /* Notes */; };
+		3660E78030574678006DEB60 /* StudyGroups in Frameworks */ = {isa = PBXBuildFile; productRef = 3660E77F30574678006DEB60 /* StudyGroups */; };
+		E1000000000000000000000000000001B /* iOSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1000000000000000000000000000001 /* iOSApp.swift */; };
+		E1000000000000000000000000000011B /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E1000000000000000000000000000011 /* LaunchScreen.storyboard */; };
+		E1000000000000000000000000000012B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E1000000000000000000000000000012 /* Assets.xcassets */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		3660E76F30574475006DEB60 /* StudentStudyHaven.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = StudentStudyHaven.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		3660E78130598FC8006DEB60 /* StudentStudyHaven.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = StudentStudyHaven.entitlements; sourceTree = "<group>"; };
+		E1000000000000000000000000000001 /* iOSApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = iOSApp.swift; sourceTree = "<group>"; };
+		E1000000000000000000000000000002 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		E1000000000000000000000000000011 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
+		E1000000000000000000000000000012 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		E1000000000000000000000000000040 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3660E77E30574673006DEB60 /* Notes in Frameworks */,
+				3660E7763057465E006DEB60 /* Authentication in Frameworks */,
+				3660E77A30574669006DEB60 /* Core in Frameworks */,
+				3660E77C3057466E006DEB60 /* Flashcards in Frameworks */,
+				3660E78030574678006DEB60 /* StudyGroups in Frameworks */,
+				3660E77830574663006DEB60 /* ClassManagement in Frameworks */,
+				3660E77430574659006DEB60 /* App in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		3660E77030574475006DEB60 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				3660E76F30574475006DEB60 /* StudentStudyHaven.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		3660E77230574659006DEB60 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		E1000000000000000000000000000010 = {
+			isa = PBXGroup;
+			children = (
+				E1000000000000000000000000000020 /* StudentStudyHaven */,
+				3660E77230574659006DEB60 /* Frameworks */,
+				3660E77030574475006DEB60 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		E1000000000000000000000000000020 /* StudentStudyHaven */ = {
+			isa = PBXGroup;
+			children = (
+				3660E78130598FC8006DEB60 /* StudentStudyHaven.entitlements */,
+				E1000000000000000000000000000001 /* iOSApp.swift */,
+				E1000000000000000000000000000002 /* Info.plist */,
+				E1000000000000000000000000000011 /* LaunchScreen.storyboard */,
+				E1000000000000000000000000000012 /* Assets.xcassets */,
+			);
+			path = StudentStudyHaven;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		E1000000000000000000000000000003 /* StudentStudyHaven */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E1000000000000000000000000000004 /* Build configuration list for PBXNativeTarget "StudentStudyHaven" */;
+			buildPhases = (
+				E1000000000000000000000000000030 /* Sources */,
+				E1000000000000000000000000000040 /* Frameworks */,
+				E1000000000000000000000000000050 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = StudentStudyHaven;
+			packageProductDependencies = (
+				3660E77330574659006DEB60 /* App */,
+				3660E7753057465E006DEB60 /* Authentication */,
+				3660E77730574663006DEB60 /* ClassManagement */,
+				3660E77930574669006DEB60 /* Core */,
+				3660E77B3057466E006DEB60 /* Flashcards */,
+				3660E77D30574673006DEB60 /* Notes */,
+				3660E77F30574678006DEB60 /* StudyGroups */,
+			);
+			productName = StudentStudyHaven;
+			productReference = 3660E76F30574475006DEB60 /* StudentStudyHaven.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		E1000000000000000000000000000008 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+			};
+			buildConfigurationList = E1000000000000000000000000000009 /* Build configuration list for PBXProject "StudentStudyHaven" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = E1000000000000000000000000000010;
+			packageReferences = (
+				3660E7713057454C006DEB60 /* XCLocalSwiftPackageReference "../../StudentStudyHaven" */,
+			);
+			productRefGroup = 3660E77030574475006DEB60 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				E1000000000000000000000000000003 /* StudentStudyHaven */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		E1000000000000000000000000000050 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E1000000000000000000000000000011B /* LaunchScreen.storyboard in Resources */,
+				E1000000000000000000000000000012B /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		E1000000000000000000000000000030 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E1000000000000000000000000000001B /* iOSApp.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		E1000000000000000000000000000006 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				BUNDLE_IDENTIFIER = com.studentstudyhaven.ios;
+				CODE_SIGN_ENTITLEMENTS = StudentStudyHaven/StudentStudyHaven.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = PL58734CZ4;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = StudentStudyHaven/Info.plist;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UIRequiredDeviceCapabilities = armv7;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				MARKETING_VERSION = 2.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.bholsinger.studentstudyhaven;
+				PRODUCT_NAME = StudentStudyHaven;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		E1000000000000000000000000000007 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				BUNDLE_IDENTIFIER = com.studentstudyhaven.ios;
+				CODE_SIGN_ENTITLEMENTS = StudentStudyHaven/StudentStudyHaven.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+			CURRENT_PROJECT_VERSION = 1;
+			DEVELOPMENT_TEAM = PL58734CZ4;
+			GENERATE_INFOPLIST_FILE = YES;
+			INFOPLIST_FILE = StudentStudyHaven/Info.plist;
+			INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+			INFOPLIST_KEY_UIRequiredDeviceCapabilities = armv7;
+			INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+			INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+			IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+			MARKETING_VERSION = 2.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.bholsinger.studentstudyhaven;
+				PRODUCT_NAME = StudentStudyHaven;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		E100000000000000000000000000000A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+			};
+			name = Debug;
+		};
+		E100000000000000000000000000000B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		E1000000000000000000000000000004 /* Build configuration list for PBXNativeTarget "StudentStudyHaven" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E1000000000000000000000000000006 /* Debug */,
+				E1000000000000000000000000000007 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		E1000000000000000000000000000009 /* Build configuration list for PBXProject "StudentStudyHaven" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E100000000000000000000000000000A /* Debug */,
+				E100000000000000000000000000000B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		3660E7713057454C006DEB60 /* XCLocalSwiftPackageReference "../../StudentStudyHaven" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ../../StudentStudyHaven;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		3660E77330574659006DEB60 /* App */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 3660E7713057454C006DEB60 /* XCLocalSwiftPackageReference "../../StudentStudyHaven" */;
+			productName = App;
+		};
+		3660E7753057465E006DEB60 /* Authentication */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 3660E7713057454C006DEB60 /* XCLocalSwiftPackageReference "../../StudentStudyHaven" */;
+			productName = Authentication;
+		};
+		3660E77730574663006DEB60 /* ClassManagement */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 3660E7713057454C006DEB60 /* XCLocalSwiftPackageReference "../../StudentStudyHaven" */;
+			productName = ClassManagement;
+		};
+		3660E77930574669006DEB60 /* Core */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 3660E7713057454C006DEB60 /* XCLocalSwiftPackageReference "../../StudentStudyHaven" */;
+			productName = Core;
+		};
+		3660E77B3057466E006DEB60 /* Flashcards */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 3660E7713057454C006DEB60 /* XCLocalSwiftPackageReference "../../StudentStudyHaven" */;
+			productName = Flashcards;
+		};
+		3660E77D30574673006DEB60 /* Notes */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 3660E7713057454C006DEB60 /* XCLocalSwiftPackageReference "../../StudentStudyHaven" */;
+			productName = Notes;
+		};
+		3660E77F30574678006DEB60 /* StudyGroups */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 3660E7713057454C006DEB60 /* XCLocalSwiftPackageReference "../../StudentStudyHaven" */;
+			productName = StudyGroups;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = E1000000000000000000000000000008 /* Project object */;
+}
