@@ -112,3 +112,21 @@ public protocol GroupMessageRepositoryProtocol {
     func observeNewMessages(for groupId: String) -> AnyPublisher<GroupMessage, Never>
     func stopObserving()
 }
+
+/// Protocol for Assignment Repository
+public protocol AssignmentRepositoryProtocol {
+    func createAssignment(_ assignment: Assignment) async throws -> Assignment
+    func getAssignments(for classId: String) async throws -> [Assignment]
+    func getAssignment(by id: String) async throws -> Assignment
+    func updateAssignment(_ assignment: Assignment) async throws -> Assignment
+    func deleteAssignment(id: String) async throws
+    
+    // Query functions
+    func getUpcomingAssignments(daysAhead: Int) async throws -> [Assignment]
+    func getAssignmentsDue(by date: Date, for classId: String) async throws -> [Assignment]
+    
+    // Real-time listeners
+    func observeAssignments(for classId: String) -> AnyPublisher<[Assignment], Never>
+    func observeAssignmentChanges(for classId: String) -> AnyPublisher<DataChange<Assignment>, Never>
+    func stopObserving()
+}

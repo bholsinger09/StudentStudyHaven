@@ -31,6 +31,9 @@ let package = Package(
         .library(
             name: "StudyGroups",
             targets: ["StudyGroups"]),
+        .library(
+            name: "GradeTracking",
+            targets: ["GradeTracking"]),
     ],
     dependencies: [
         // No external dependencies - using Firebase REST API
@@ -46,6 +49,7 @@ let package = Package(
                 "Flashcards",
                 "Notes",
                 "StudyGroups",
+                "GradeTracking",
             ],
             path: "Sources/App"),
 
@@ -79,6 +83,7 @@ let package = Package(
             name: "ClassManagement",
             dependencies: [
                 "Core",
+                "GradeTracking",
             ],
             path: "Sources/ClassManagement"),
         .testTarget(
@@ -121,5 +126,17 @@ let package = Package(
             name: "StudyGroupsTests",
             dependencies: ["StudyGroups", "Core"],
             path: "Tests/StudyGroupsTests"),
+
+        // MARK: - Grade Tracking Module
+        .target(
+            name: "GradeTracking",
+            dependencies: [
+                "Core",
+            ],
+            path: "Sources/GradeTracking"),
+        .testTarget(
+            name: "GradeTrackingTests",
+            dependencies: ["GradeTracking", "Core"],
+            path: "Tests/GradeTrackingTests"),
     ]
 )

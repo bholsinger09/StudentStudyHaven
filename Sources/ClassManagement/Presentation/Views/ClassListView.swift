@@ -8,17 +8,23 @@ public struct ClassListView: View {
 
     private let createClassUseCase: CreateClassUseCase
     private let updateClassUseCase: UpdateClassUseCase
+    private let assignmentRepository: AssignmentRepositoryProtocol
+    private let classRepository: ClassRepositoryProtocol
     private let userId: String
 
     public init(
         viewModel: ClassListViewModel,
         createClassUseCase: CreateClassUseCase,
         updateClassUseCase: UpdateClassUseCase,
+        assignmentRepository: AssignmentRepositoryProtocol,
+        classRepository: ClassRepositoryProtocol,
         userId: String
     ) {
         _viewModel = StateObject(wrappedValue: viewModel)
         self.createClassUseCase = createClassUseCase
         self.updateClassUseCase = updateClassUseCase
+        self.assignmentRepository = assignmentRepository
+        self.classRepository = classRepository
         self.userId = userId
     }
 
@@ -88,7 +94,19 @@ public struct ClassListView: View {
                 Section("All Classes") {
                     ForEach(viewModel.classes) { classItem in
                         NavigationLink(destination: ClassDetailView(classItem: classItem)) {
-                            ClassRowView(classItem: classItem)
+                            ClassRowWithAssignmentsView(
+                                classItem: classItem,
+                                assignmentStats: viewModel.assignmentStats[classItem.id],
+                                assignments: viewModel.assignmentsByClass[classItem.id] ?? [],
+                                assignmentRepository: assignmentRepository,
+                                classRepository: classRepository,
+                                userId: userId,
+                                onAssignmentUpdated: {
+                                    Task {
+                                        await viewModel.loadAssignmentData()
+                                    }
+                                }
+                            )
                         }
                     }
                     .onDelete { indexSet in
@@ -188,9 +206,10 @@ struct TodayClassRow: View {
 /// Regular class row
 struct ClassRowView: View {
     let classItem: Class
+    let assignmentStats: AssignmentStats?
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: 12) {
             HStack {
                 Text(classItem.name)
                     .font(.headline)
@@ -232,6 +251,91 @@ struct ClassRowView: View {
                         .background(Color.blue)
                         .clipShape(Circle())
                 }
+            }
+            
+            // Assignment stats section
+            if let stats = assignmentStats, stats.total > 0 {
+                VStack(alignment: .leading, spacing: 8) {
+                    HStack {
+                        Text("Assignments")
+                            .font(.caption)
+                            .fontWeight(.semibold)
+                            .foregroundColor(.secondary)
+                        
+                        Spacer()
+                        
+                        Text("\(stats.completed)/\(stats.total)")
+                            .font(.caption)
+                            .fontWeight(.semibold)
+                            .foregroundColor(.blue)
+                    }
+                    
+                    HStack(spacing: 12) {
+                        // Completed
+                        if stats.completed > 0 {
+                            HStack(spacing: 4) {
+                                Image(systemName: "checkmark.circle.fill")
+                                    .font(.caption)
+                                    .foregroundColor(.green)
+                                Text("\(stats.completed) done")
+                                    .font(.caption2)
+                            }
+                        }
+                        
+                        // Due this week
+                        if stats.currentDue > 0 {
+                            HStack(spacing: 4) {
+                                Image(systemName: "clock.fill")
+                                    .font(.caption)
+                                    .foregroundColor(.orange)
+                                Text("\(stats.currentDue) due soon")
+                                    .font(.caption2)
+                            }
+                        }
+                        
+                        // Expired/Not submitted
+                        if stats.expired > 0 {
+                            HStack(spacing: 4) {
+                                Image(systemName: "exclamationmark.circle.fill")
+                                    .font(.caption)
+                                    .foregroundColor(.red)
+                                Text("\(stats.expired) expired")
+                                    .font(.caption2)
+                            }
+                        }
+                        
+                        // Upcoming (more than a week)
+                        if stats.upcoming > 0 {
+                            HStack(spacing: 4) {
+                                Image(systemName: "calendar")
+                                    .font(.caption)
+                                    .foregroundColor(.gray)
+                                Text("\(stats.upcoming) upcoming")
+                                    .font(.caption2)
+                            }
+                        }
+                    }
+                    
+                    // Not submitted
+                    if stats.notSubmitted > 0 {
+                        HStack(spacing: 4) {
+                            Image(systemName: "square")
+                                .font(.caption)
+                                .foregroundColor(.gray)
+                            Text("\(stats.notSubmitted) not submitted")
+                                .font(.caption2)
+                        }
+                    }
+                }
+                .padding(.vertical, 8)
+                .padding(.horizontal, 10)
+                .background(Color(red: 0.95, green: 0.95, blue: 0.96))
+                .cornerRadius(8)
+            } else if assignmentStats != nil && (assignmentStats?.total ?? 0) == 0 {
+                Text("No assignments yet")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                    .italic()
             }
         }
         .padding(.vertical, 4)

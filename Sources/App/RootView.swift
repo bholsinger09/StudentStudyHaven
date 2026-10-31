@@ -2,6 +2,7 @@ import Authentication
 import ClassManagement
 import Core
 import Flashcards
+import GradeTracking
 import Notes
 import StudyGroups
 import SwiftUI
@@ -115,18 +116,24 @@ struct MainTabView: View {
                     Label("Flashcards", systemImage: "rectangle.stack.fill")
                 }
                 .tag(3)
+
+            GradesTab()
+                .tabItem {
+                    Label("Grades", systemImage: "chart.pie.fill")
+                }
+                .tag(4)
             
             StudyGroupsTab()
                 .tabItem {
                     Label("Study Groups", systemImage: "person.3.fill")
                 }
-                .tag(4)
+                .tag(5)
 
             ProfileTab()
                 .tabItem {
                     Label("Profile", systemImage: "person.fill")
                 }
-                .tag(5)
+                .tag(6)
         }
     }
 }
@@ -142,10 +149,14 @@ struct ClassesTab: View {
                     getClassesUseCase: GetClassesUseCase(classRepository: appState.classRepository),
                     deleteClassUseCase: DeleteClassUseCase(
                         classRepository: appState.classRepository),
+                    getAssignmentsForClassUseCase: GetAssignmentsForClassUseCase(
+                        assignmentRepository: appState.assignmentRepository),
                     userId: appState.currentUser?.id ?? UUID().uuidString
                 ),
                 createClassUseCase: CreateClassUseCase(classRepository: appState.classRepository),
                 updateClassUseCase: UpdateClassUseCase(classRepository: appState.classRepository),
+                assignmentRepository: appState.assignmentRepository,
+                classRepository: appState.classRepository,
                 userId: appState.currentUser?.id ?? UUID().uuidString
             )
         }
@@ -415,6 +426,42 @@ struct EmptyFlashcardsView: View {
                 }
                 .buttonStyle(.plain)
                 .padding(.top, 10)
+            }
+        }
+    }
+}
+
+/// Grades tab
+struct GradesTab: View {
+    @EnvironmentObject var appState: AppState
+
+    var body: some View {
+        NavigationStack {
+            if let userId = appState.currentUser?.id {
+                GradeTrackerView(
+                    viewModel: GradeTrackerViewModel(
+                        calculateGPAUseCase: CalculateGPAUseCase(
+                            classRepository: appState.classRepository,
+                            assignmentRepository: appState.assignmentRepository
+                        ),
+                        calculateClassGradeUseCase: CalculateClassGradeUseCase(
+                            assignmentRepository: appState.assignmentRepository
+                        ),
+                        getGradeAnalyticsUseCase: GetGradeAnalyticsUseCase(
+                            classRepository: appState.classRepository,
+                            assignmentRepository: appState.assignmentRepository
+                        ),
+                        classRepository: appState.classRepository,
+                        assignmentRepository: appState.assignmentRepository,
+                        userId: userId
+                    )
+                )
+            } else {
+                ZStack {
+                    Color.black.ignoresSafeArea()
+                    Text("Please log in to view grades")
+                        .foregroundColor(.white)
+                }
             }
         }
     }

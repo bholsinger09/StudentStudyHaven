@@ -2,6 +2,7 @@ import Authentication
 import ClassManagement
 import Core
 import Flashcards
+import GradeTracking
 import Notes
 import StudyGroups
 import Foundation
@@ -19,6 +20,11 @@ public class DependencyContainer {
     public var useMockRepositories: Bool = false
     
     // MARK: - Repository Instances
+    
+    // Assignment repository (shared singleton for data persistence)
+    public lazy var assignmentRepository: AssignmentRepositoryProtocol = {
+        return MockAssignmentRepository()
+    }()
     
     public lazy var authRepository: AuthRepositoryProtocol = {
         if useMockRepositories {

@@ -23,6 +23,7 @@ public class AppState: ObservableObject {
     public let authRepository: AuthRepositoryProtocol
     public let userRepository: UserRepositoryProtocol
     public let classRepository: ClassRepositoryProtocol
+    public let assignmentRepository: AssignmentRepositoryProtocol
     public let flashcardRepository: FlashcardRepositoryProtocol
     public let noteRepository: NoteRepositoryProtocol
     public let studyGroupRepository: StudyGroupRepositoryProtocol
@@ -35,6 +36,7 @@ public class AppState: ObservableObject {
         self.authRepository = container.authRepository
         self.userRepository = container.userRepository
         self.classRepository = container.classRepository
+        self.assignmentRepository = container.assignmentRepository
         self.flashcardRepository = container.flashcardRepository
         self.noteRepository = container.noteRepository
         self.studyGroupRepository = container.studyGroupRepository
