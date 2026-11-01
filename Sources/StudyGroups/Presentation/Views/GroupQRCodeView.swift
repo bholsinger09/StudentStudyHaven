@@ -74,7 +74,7 @@ public struct GroupQRCodeView: View {
                 Button("Done") {
                     dismiss()
                 }
-                .buttonStyle(.primary)
+                .buttonStyle(.borderedProminent)
             }
             .padding()
             .navigationBarTitleDisplayMode(.inline)
