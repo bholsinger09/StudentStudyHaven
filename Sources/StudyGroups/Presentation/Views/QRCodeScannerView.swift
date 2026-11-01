@@ -20,7 +20,9 @@ public class QRScannerCoordinator: NSObject, AVCaptureMetadataOutputObjectsDeleg
         let captureSession = AVCaptureSession()
         
         guard let videoCaptureDevice = AVCaptureDevice.default(for: .video) else {
-            scannedCode = nil
+            DispatchQueue.main.async {
+                self.scannedCode = nil
+            }
             return
         }
         
@@ -28,14 +30,18 @@ public class QRScannerCoordinator: NSObject, AVCaptureMetadataOutputObjectsDeleg
         do {
             videoInput = try AVCaptureDeviceInput(device: videoCaptureDevice)
         } catch {
-            errorMessage = "Unable to access camera"
+            DispatchQueue.main.async {
+                self.errorMessage = "Unable to access camera"
+            }
             return
         }
         
         if (captureSession.canAddInput(videoInput)) {
             captureSession.addInput(videoInput)
         } else {
-            errorMessage = "Cannot add video input"
+            DispatchQueue.main.async {
+                self.errorMessage = "Cannot add video input"
+            }
             return
         }
         
@@ -46,7 +52,9 @@ public class QRScannerCoordinator: NSObject, AVCaptureMetadataOutputObjectsDeleg
             metadataOutput.setMetadataObjectsDelegate(self, queue: DispatchQueue.main)
             metadataOutput.metadataObjectTypes = [.qr]
         } else {
-            errorMessage = "Cannot add metadata output"
+            DispatchQueue.main.async {
+                self.errorMessage = "Cannot add metadata output"
+            }
             return
         }
         
@@ -69,8 +77,10 @@ public class QRScannerCoordinator: NSObject, AVCaptureMetadataOutputObjectsDeleg
         if let metadataObject = metadataObjects.first as? AVMetadataMachineReadableCodeObject,
            metadataObject.type == .qr,
            let stringValue = metadataObject.stringValue {
-            scannedCode = stringValue
-            stopSession()
+            DispatchQueue.main.async {
+                self.scannedCode = stringValue
+                self.stopSession()
+            }
         }
     }
 }
