@@ -18,18 +18,22 @@ public class QRScannerCoordinator: NSObject, AVCaptureMetadataOutputObjectsDeleg
     
     public func setupCamera() {
         let captureSession = AVCaptureSession()
+        print("🎥 QRScannerCoordinator.setupCamera() - Starting camera setup")
         
         guard let videoCaptureDevice = AVCaptureDevice.default(for: .video) else {
+            print("❌ QRScannerCoordinator: No video device available")
             DispatchQueue.main.async {
                 self.scannedCode = nil
             }
             return
         }
+        print("✅ QRScannerCoordinator: Video device found - \(videoCaptureDevice.localizedName)")
         
         let videoInput: AVCaptureDeviceInput
         do {
             videoInput = try AVCaptureDeviceInput(device: videoCaptureDevice)
         } catch {
+            print("❌ QRScannerCoordinator: Failed to create video input - \(error)")
             DispatchQueue.main.async {
                 self.errorMessage = "Unable to access camera"
             }
@@ -38,7 +42,9 @@ public class QRScannerCoordinator: NSObject, AVCaptureMetadataOutputObjectsDeleg
         
         if (captureSession.canAddInput(videoInput)) {
             captureSession.addInput(videoInput)
+            print("✅ QRScannerCoordinator: Video input added")
         } else {
+            print("❌ QRScannerCoordinator: Cannot add video input")
             DispatchQueue.main.async {
                 self.errorMessage = "Cannot add video input"
             }
@@ -51,7 +57,9 @@ public class QRScannerCoordinator: NSObject, AVCaptureMetadataOutputObjectsDeleg
             captureSession.addOutput(metadataOutput)
             metadataOutput.setMetadataObjectsDelegate(self, queue: DispatchQueue.main)
             metadataOutput.metadataObjectTypes = [.qr]
+            print("✅ QRScannerCoordinator: Metadata output added with QR type")
         } else {
+            print("❌ QRScannerCoordinator: Cannot add metadata output")
             DispatchQueue.main.async {
                 self.errorMessage = "Cannot add metadata output"
             }
@@ -59,16 +67,24 @@ public class QRScannerCoordinator: NSObject, AVCaptureMetadataOutputObjectsDeleg
         }
         
         self.captureSession = captureSession
+        print("✅ QRScannerCoordinator: Setup complete")
     }
     
     public func startSession() {
         if let captureSession = captureSession, !captureSession.isRunning {
+            print("🎥 QRScannerCoordinator: Starting capture session")
             captureSession.startRunning()
+            print("✅ QRScannerCoordinator: Capture session running = \(captureSession.isRunning)")
+        } else if let captureSession = captureSession {
+            print("⚠️ QRScannerCoordinator: Session already running")
+        } else {
+            print("❌ QRScannerCoordinator: No capture session to start")
         }
     }
     
     public func stopSession() {
         if let captureSession = captureSession, captureSession.isRunning {
+            print("🎥 QRScannerCoordinator: Stopping capture session")
             captureSession.stopRunning()
         }
     }
@@ -77,6 +93,7 @@ public class QRScannerCoordinator: NSObject, AVCaptureMetadataOutputObjectsDeleg
         if let metadataObject = metadataObjects.first as? AVMetadataMachineReadableCodeObject,
            metadataObject.type == .qr,
            let stringValue = metadataObject.stringValue {
+            print("🎉 QRScannerCoordinator: QR code detected! Value: \(stringValue)")
             DispatchQueue.main.async {
                 self.scannedCode = stringValue
                 self.stopSession()
@@ -88,21 +105,42 @@ public class QRScannerCoordinator: NSObject, AVCaptureMetadataOutputObjectsDeleg
 /// Controller for camera preview
 public class QRScannerViewController: UIViewController {
     var coordinator: QRScannerCoordinator?
+    var previewLayer: AVCaptureVideoPreviewLayer?
     
     public override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .black
+        print("🎥 QRScannerViewController.viewDidLoad() - Starting camera setup")
         
-        guard let coordinator = coordinator else { return }
+        guard let coordinator = coordinator else {
+            print("❌ QRScannerViewController: No coordinator available")
+            return
+        }
         coordinator.setupCamera()
         
         if let captureSession = coordinator.captureSession {
-            let previewLayer = AVCaptureVideoPreviewLayer(session: captureSession)
-            previewLayer.frame = view.layer.bounds
-            previewLayer.videoGravity = .resizeAspectFill
-            view.layer.addSublayer(previewLayer)
+            print("✅ QRScannerViewController: Capture session created, isRunning=\(captureSession.isRunning)")
+            previewLayer = AVCaptureVideoPreviewLayer(session: captureSession)
+            previewLayer?.videoGravity = .resizeAspectFill
+            previewLayer?.frame = view.bounds
+            
+            if let layer = previewLayer {
+                view.layer.addSublayer(layer)
+                print("✅ QRScannerViewController: Preview layer added with frame \(layer.frame)")
+            }
             
             coordinator.startSession()
+            print("✅ QRScannerViewController: Capture session started, isRunning=\(captureSession.isRunning)")
+        } else {
+            print("❌ QRScannerViewController: No capture session available")
+        }
+    }
+    
+    public override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        if let layer = previewLayer, layer.frame != view.bounds {
+            print("🎥 QRScannerViewController.viewDidLayoutSubviews() - Updating frame from \(layer.frame) to \(view.bounds)")
+            layer.frame = view.bounds
         }
     }
 }
