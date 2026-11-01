@@ -184,6 +184,7 @@
 				PRODUCT_NAME = StudentStudyHaven;
 				SDKROOT = iphoneos;
 				SWIFT_VERSION = 6.0;
+				ALWAYS_SEARCH_USER_PATHS = NO;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
@@ -209,6 +210,7 @@
 				PRODUCT_NAME = StudentStudyHaven;
 				SDKROOT = iphoneos;
 				SWIFT_VERSION = 6.0;
+				ALWAYS_SEARCH_USER_PATHS = NO;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
