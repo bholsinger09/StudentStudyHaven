@@ -199,16 +199,21 @@ public struct StudyGroupsView: View {
         }
         
         if extractedGroupId.isEmpty {
+            print("❌ StudyGroupsView.handleJoinGroup() - Empty groupId!")
             joinError = "Invalid QR code: empty group ID"
             scannedGroupId = nil
             return
         }
         
+        print("📱 StudyGroupsView.handleJoinGroup() - Starting join task for groupId: '\(extractedGroupId)', userId: '\(userId)'")
         Task {
+            print("📱 StudyGroupsView.handleJoinGroup() - Inside task, calling viewModel.joinGroupByQRCode()")
             await viewModel.joinGroupByQRCode(groupId: extractedGroupId, userId: userId)
+            print("📱 StudyGroupsView.handleJoinGroup() - Back from joinGroupByQRCode(), reloading groups")
             scannedGroupId = nil
             showJoinSheet = false
             await viewModel.loadMyGroups()
+            print("📱 StudyGroupsView.handleJoinGroup() - Complete! myGroups count: \(viewModel.myGroups.count)")
         }
     }
 }

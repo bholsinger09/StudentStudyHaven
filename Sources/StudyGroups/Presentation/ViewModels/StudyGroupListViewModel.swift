@@ -81,21 +81,36 @@ public final class StudyGroupListViewModel: ObservableObject {
     }
     
     public func joinGroupByQRCode(groupId: String, userId: String) async {
+        print("🔗 StudyGroupListViewModel.joinGroupByQRCode() - Starting join for groupId: '\(groupId)', userId: '\(userId)'")
         do {
+            print("🔗 StudyGroupListViewModel: Calling joinStudyGroupUseCase.execute()")
             let updatedGroup = try await joinStudyGroupUseCase.execute(
                 groupId: groupId,
                 userId: userId
             )
+            print("✅ StudyGroupListViewModel: Join succeeded! Group: \(updatedGroup.name)")
+            
             // Add to my groups
             if !myGroups.contains(where: { $0.id == groupId }) {
                 myGroups.append(updatedGroup)
+                print("✅ StudyGroupListViewModel: Added group to myGroups. Total groups: \(myGroups.count)")
+            } else {
+                print("⚠️ StudyGroupListViewModel: Group already in myGroups")
             }
+            
             // Remove from discover if it's there
-            discoverGroups.removeAll { $0.id == groupId }
+            if discoverGroups.contains(where: { $0.id == groupId }) {
+                discoverGroups.removeAll { $0.id == groupId }
+                print("✅ StudyGroupListViewModel: Removed group from discoverGroups")
+            }
+            
             errorMessage = nil
+            print("✅ StudyGroupListViewModel: Join complete!")
         } catch let error as AppError {
+            print("❌ StudyGroupListViewModel: Join failed with AppError: \(error.localizedDescription)")
             errorMessage = error.localizedDescription
         } catch {
+            print("❌ StudyGroupListViewModel: Join failed with error: \(error)")
             errorMessage = "Failed to join group"
         }
     }
