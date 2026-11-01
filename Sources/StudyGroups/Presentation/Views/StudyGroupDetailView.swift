@@ -255,18 +255,13 @@ struct GroupMembersView: View {
             }
         }
         .sheet(isPresented: $showUserSearch) {
-            if let searchUseCase = searchUsersUseCase,
-               let inviteUseCase = inviteUserToGroupUseCase {
-                UserSearchView(
-                    viewModel: UserSearchViewModel(
-                        searchUsersUseCase: searchUseCase,
-                        inviteUserToGroupUseCase: inviteUseCase,
-                        groupId: group.id,
-                        currentUserId: currentUserId,
-                        collegeId: collegeId
-                    )
-                )
-            }
+            AddMemberView(
+                group: group,
+                currentUserId: currentUserId,
+                collegeId: collegeId,
+                searchUsersUseCase: searchUsersUseCase,
+                inviteUserToGroupUseCase: inviteUserToGroupUseCase
+            )
         }
     }
 }
