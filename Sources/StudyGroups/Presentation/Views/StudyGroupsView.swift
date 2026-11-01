@@ -186,8 +186,26 @@ public struct StudyGroupsView: View {
     }
     
     private func handleJoinGroup(groupId: String) {
+        // Extract groupId from QR code URL format: studyhaven://group/{groupId}
+        let extractedGroupId: String
+        if groupId.hasPrefix("studyhaven://group/") {
+            // Remove the prefix to get just the group ID
+            extractedGroupId = String(groupId.dropFirst("studyhaven://group/".count))
+            print("📱 StudyGroupsView.handleJoinGroup() - Extracted groupId: '\(extractedGroupId)' from QR: '\(groupId)'")
+        } else {
+            // Fallback: assume it's already just the group ID
+            print("📱 StudyGroupsView.handleJoinGroup() - Using groupId as-is: '\(groupId)'")
+            extractedGroupId = groupId
+        }
+        
+        if extractedGroupId.isEmpty {
+            joinError = "Invalid QR code: empty group ID"
+            scannedGroupId = nil
+            return
+        }
+        
         Task {
-            await viewModel.joinGroupByQRCode(groupId: groupId, userId: userId)
+            await viewModel.joinGroupByQRCode(groupId: extractedGroupId, userId: userId)
             scannedGroupId = nil
             showJoinSheet = false
             await viewModel.loadMyGroups()
