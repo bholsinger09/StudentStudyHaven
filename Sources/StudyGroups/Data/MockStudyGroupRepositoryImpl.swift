@@ -3,8 +3,12 @@ import Core
 import Foundation
 
 /// Mock implementation of StudyGroupRepository for development and testing
+/// 
+/// NOTE: For production, disable mock repositories in DependencyContainer.useMockRepositories
+/// and use FirebaseStudyGroupRepositoryImpl instead for real persistent data.
 public final class MockStudyGroupRepositoryImpl: StudyGroupRepositoryProtocol {
     // Shared static storage so all instances (simulator, iPhone) share the same data
+    // This allows testing the QR code join flow across multiple devices during development
     private static var sharedStudyGroups: [String: StudyGroup] = [:]
     private static let sharedLock = NSLock()
     
