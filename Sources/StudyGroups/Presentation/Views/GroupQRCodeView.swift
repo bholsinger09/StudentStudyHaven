@@ -93,7 +93,7 @@ public struct GroupQRCodeView: View {
     
     private func generateQRCode() {
         DispatchQueue.global(qos: .userInitiated).async {
-            let image = QRCodeGenerator.generateQRCode(for: group.id) as? UIImage
+            let image = QRCodeGenerator.generateQRCode(for: group.id)
             DispatchQueue.main.async {
                 self.qrCodeImage = image
             }
