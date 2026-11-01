@@ -112,6 +112,21 @@ public class QRScannerViewController: UIViewController {
         view.backgroundColor = .black
         print("🎥 QRScannerViewController.viewDidLoad() - Starting camera setup")
         
+        // Request camera permission first
+        AVCaptureDevice.requestAccess(for: .video) { [weak self] granted in
+            DispatchQueue.main.async {
+                if granted {
+                    print("✅ QRScannerViewController: Camera permission granted")
+                    self?.setupCameraSession()
+                } else {
+                    print("❌ QRScannerViewController: Camera permission denied")
+                    self?.coordinator?.errorMessage = "Camera permission is required to scan QR codes"
+                }
+            }
+        }
+    }
+    
+    private func setupCameraSession() {
         guard let coordinator = coordinator else {
             print("❌ QRScannerViewController: No coordinator available")
             return
