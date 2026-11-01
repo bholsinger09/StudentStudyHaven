@@ -67,6 +67,7 @@ public struct RegisterView: View {
 
                     TextField("Email", text: $viewModel.email)
                         .textFieldStyle(.roundedBorder)
+                        .textInputAutocapitalization(.never)
                         .frame(minHeight: 44)
 
                     SecureField("Password", text: $viewModel.password)

@@ -63,6 +63,7 @@ public struct ForgotPasswordView: View {
 
                             TextField("Enter your email", text: $viewModel.email)
                                 .textFieldStyle(.roundedBorder)
+                                .textInputAutocapitalization(.never)
                                 .frame(minHeight: 44)
                                 .disabled(viewModel.isLoading)
                         }

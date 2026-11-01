@@ -98,6 +98,7 @@ public struct LoginView: View {
                                     .textFieldStyle(.plain)
                                     .fontWeight(.bold)
                                     .foregroundColor(.black)
+                                    .textInputAutocapitalization(.never)
                                     .padding()
                                     .frame(minHeight: 44)
                                     .background(Color.white.opacity(0.9))
