@@ -79,4 +79,24 @@ public final class StudyGroupListViewModel: ObservableObject {
             errorMessage = "Failed to join group"
         }
     }
+    
+    public func joinGroupByQRCode(groupId: String, userId: String) async {
+        do {
+            let updatedGroup = try await joinStudyGroupUseCase.execute(
+                groupId: groupId,
+                userId: userId
+            )
+            // Add to my groups
+            if !myGroups.contains(where: { $0.id == groupId }) {
+                myGroups.append(updatedGroup)
+            }
+            // Remove from discover if it's there
+            discoverGroups.removeAll { $0.id == groupId }
+            errorMessage = nil
+        } catch let error as AppError {
+            errorMessage = error.localizedDescription
+        } catch {
+            errorMessage = "Failed to join group"
+        }
+    }
 }

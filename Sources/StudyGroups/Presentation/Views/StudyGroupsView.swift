@@ -6,6 +6,9 @@ public struct StudyGroupsView: View {
     @StateObject private var viewModel: StudyGroupListViewModel
     @State private var selectedTab = 0
     @State private var showCreateSheet = false
+    @State private var showJoinSheet = false
+    @State private var scannedGroupId: String? = nil
+    @State private var joinError: String? = nil
     
     private let createStudyGroupUseCase: CreateStudyGroupUseCase
     private let searchUsersUseCase: SearchUsersUseCase
@@ -72,6 +75,14 @@ public struct StudyGroupsView: View {
                     )
                 }
             }
+            .sheet(isPresented: $showJoinSheet) {
+                joinSheetContent
+            }
+            .onChange(of: scannedGroupId) { newGroupId in
+                if let groupId = newGroupId {
+                    handleJoinGroup(groupId: groupId)
+                }
+            }
             .task {
                 await viewModel.loadMyGroups()
                 await viewModel.loadDiscoverGroups()
@@ -82,6 +93,15 @@ public struct StudyGroupsView: View {
                 }
             } message: {
                 if let error = viewModel.errorMessage {
+                    Text(error)
+                }
+            }
+            .alert("Join Error", isPresented: .constant(joinError != nil)) {
+                Button("OK") {
+                    joinError = nil
+                }
+            } message: {
+                if let error = joinError {
                     Text(error)
                 }
             }
@@ -96,10 +116,10 @@ public struct StudyGroupsView: View {
             EmptyStateView(
                 icon: "person.3",
                 title: "No Study Groups",
-                message: "Join or create a study group to collaborate with classmates"
-            ) {
-                showCreateSheet = true
-            }
+                message: "Join or create a study group to collaborate with classmates",
+                primaryAction: { showCreateSheet = true },
+                secondaryAction: { showJoinSheet = true }
+            )
         } else {
             List(viewModel.myGroups) { group in
                 NavigationLink(destination: StudyGroupDetailView(
@@ -143,6 +163,34 @@ public struct StudyGroupsView: View {
             .refreshable {
                 await viewModel.loadDiscoverGroups()
             }
+        }
+    }
+    
+    private var joinSheetContent: some View {
+        NavigationStack {
+            VStack {
+                QRCodeScannerWrapper(onScan: { scannedId in
+                    scannedGroupId = scannedId
+                })
+            }
+            .navigationTitle("Join Group")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button("Done") {
+                        showJoinSheet = false
+                    }
+                }
+            }
+        }
+    }
+    
+    private func handleJoinGroup(groupId: String) {
+        Task {
+            await viewModel.joinGroupByQRCode(groupId: groupId, userId: userId)
+            scannedGroupId = nil
+            showJoinSheet = false
+            await viewModel.loadMyGroups()
         }
     }
 }
@@ -252,7 +300,8 @@ struct EmptyStateView: View {
     let icon: String
     let title: String
     let message: String
-    var action: (() -> Void)? = nil
+    var primaryAction: (() -> Void)? = nil
+    var secondaryAction: (() -> Void)? = nil
     
     var body: some View {
         VStack(spacing: 20) {
@@ -270,11 +319,20 @@ struct EmptyStateView: View {
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, 40)
             
-            if let action = action {
-                Button("Create Group") {
-                    action()
+            VStack(spacing: 12) {
+                if let action = primaryAction {
+                    Button("Create Group") {
+                        action()
+                    }
+                    .buttonStyle(.borderedProminent)
                 }
-                .buttonStyle(.borderedProminent)
+                
+                if let action = secondaryAction {
+                    Button("Join via QR Code") {
+                        action()
+                    }
+                    .buttonStyle(.bordered)
+                }
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
