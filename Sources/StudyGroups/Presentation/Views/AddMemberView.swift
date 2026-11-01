@@ -11,6 +11,7 @@ public struct AddMemberView: View {
     @State private var showQRCode = false
     @State private var showUserSearch = false
     @State private var showQRScanner = false
+    @State private var scannedGroupId: String?
     @Environment(\.dismiss) private var dismiss
     
     public init(
@@ -27,66 +28,102 @@ public struct AddMemberView: View {
         self.inviteUserToGroupUseCase = inviteUserToGroupUseCase
     }
     
+    var isGroupCreator: Bool {
+        group.createdBy == currentUserId
+    }
+    
     public var body: some View {
         NavigationStack {
             VStack(spacing: 0) {
-                // Display QR Code Section
-                VStack(spacing: 20) {
-                    VStack(spacing: 12) {
-                        Image(systemName: "qrcode")
-                            .font(.system(size: 40))
-                            .foregroundColor(.blue)
-                        
-                        Text("Share via QR Code")
-                            .font(.headline)
-                        
-                        Text("Display QR code for others to scan")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                    }
-                    .frame(maxWidth: .infinity)
-                    .padding(16)
-                    .background(Color(.systemBlue).opacity(0.1))
-                    .cornerRadius(12)
+                // Show different content based on if user is creator
+                if isGroupCreator {
+                    // CREATOR VIEW: Options to invite others
                     
-                    Button(action: { showQRCode = true }) {
-                        Label("Show QR Code", systemImage: "qrcode.viewfinder")
-                            .frame(maxWidth: .infinity)
-                    }
-                    .buttonStyle(.bordered)
-                }
-                .padding()
-                
-                Divider()
-                    .padding(.vertical, 12)
-                
-                // Search User Section
-                VStack(spacing: 20) {
-                    VStack(spacing: 12) {
-                        Image(systemName: "magnifyingglass.circle")
-                            .font(.system(size: 40))
-                            .foregroundColor(.green)
+                    // Display QR Code Section
+                    VStack(spacing: 20) {
+                        VStack(spacing: 12) {
+                            Image(systemName: "qrcode")
+                                .font(.system(size: 40))
+                                .foregroundColor(.blue)
+                            
+                            Text("Share via QR Code")
+                                .font(.headline)
+                            
+                            Text("Display QR code for others to scan")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding(16)
+                        .background(Color(.systemBlue).opacity(0.1))
+                        .cornerRadius(12)
                         
-                        Text("Search & Invite")
-                            .font(.headline)
-                        
-                        Text("Find users by name and email")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
+                        Button(action: { showQRCode = true }) {
+                            Label("Show QR Code", systemImage: "qrcode.viewfinder")
+                                .frame(maxWidth: .infinity)
+                        }
+                        .buttonStyle(.bordered)
                     }
-                    .frame(maxWidth: .infinity)
-                    .padding(16)
-                    .background(Color(.systemGreen).opacity(0.1))
-                    .cornerRadius(12)
+                    .padding()
                     
-                    Button(action: { showUserSearch = true }) {
-                        Label("Search Members", systemImage: "person.badge.plus")
-                            .frame(maxWidth: .infinity)
+                    Divider()
+                        .padding(.vertical, 12)
+                    
+                    // Search User Section
+                    VStack(spacing: 20) {
+                        VStack(spacing: 12) {
+                            Image(systemName: "magnifyingglass.circle")
+                                .font(.system(size: 40))
+                                .foregroundColor(.green)
+                            
+                            Text("Search & Invite")
+                                .font(.headline)
+                            
+                            Text("Find users by name and email")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding(16)
+                        .background(Color(.systemGreen).opacity(0.1))
+                        .cornerRadius(12)
+                        
+                        Button(action: { showUserSearch = true }) {
+                            Label("Search Members", systemImage: "person.badge.plus")
+                                .frame(maxWidth: .infinity)
+                        }
+                        .buttonStyle(.bordered)
+                        .disabled(searchUsersUseCase == nil || inviteUserToGroupUseCase == nil)
                     }
-                    .buttonStyle(.bordered)
-                    .disabled(searchUsersUseCase == nil || inviteUserToGroupUseCase == nil)
+                    .padding()
+                } else {
+                    // MEMBER VIEW: Option to join another group via QR code
+                    VStack(spacing: 20) {
+                        VStack(spacing: 12) {
+                            Image(systemName: "qrcode.viewfinder")
+                                .font(.system(size: 50))
+                                .foregroundColor(.blue)
+                            
+                            Text("Scan QR Code")
+                                .font(.headline)
+                            
+                            Text("Scan a QR code to join a group")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding(16)
+                        .background(Color(.systemBlue).opacity(0.1))
+                        .cornerRadius(12)
+                        
+                        Button(action: { showQRScanner = true }) {
+                            Label("Scan QR Code", systemImage: "camera.fill")
+                                .frame(maxWidth: .infinity)
+                        }
+                        .buttonStyle(.borderedProminent)
+                    }
+                    .padding()
                 }
-                .padding()
                 
                 Spacer()
             }
@@ -119,5 +156,17 @@ public struct AddMemberView: View {
                 )
             }
         }
+        .sheet(isPresented: $showQRScanner) {
+            QRCodeScannerWrapper { scannedCode in
+                // Handle scanned code - extract group ID from studyhaven://group/groupId
+                if scannedCode.starts(with: "studyhaven://group/") {
+                    let groupId = String(scannedCode.dropFirst("studyhaven://group/".count))
+                    scannedGroupId = groupId
+                    // TODO: Join group with scannedGroupId
+                    dismiss()
+                }
+            }
+        }
     }
 }
+
