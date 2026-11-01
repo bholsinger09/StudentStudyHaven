@@ -174,6 +174,7 @@ public struct StudyGroupsView: View {
                 })
             }
             .navigationTitle("Join Group")
+            #if !os(macOS)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
@@ -182,6 +183,7 @@ public struct StudyGroupsView: View {
                     }
                 }
             }
+            #endif
         }
     }
     

@@ -10,7 +10,6 @@ public struct StudentStudyHavenApp: App {
 
     public init() {
         // Configure Firebase on app launch
-        // Firebase temporarily disabled - using mock repositories
         // Task { @MainActor in
         //     FirebaseManager.shared.configure()
         // }
