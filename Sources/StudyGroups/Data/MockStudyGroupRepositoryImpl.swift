@@ -4,7 +4,23 @@ import Foundation
 
 /// Mock implementation of StudyGroupRepository for development and testing
 public final class MockStudyGroupRepositoryImpl: StudyGroupRepositoryProtocol {
-    private var studyGroups: [String: StudyGroup] = [:]
+    // Shared static storage so all instances (simulator, iPhone) share the same data
+    private static var sharedStudyGroups: [String: StudyGroup] = [:]
+    private static let sharedLock = NSLock()
+    
+    private var studyGroups: [String: StudyGroup] {
+        get {
+            Self.sharedLock.lock()
+            defer { Self.sharedLock.unlock() }
+            return Self.sharedStudyGroups
+        }
+        set {
+            Self.sharedLock.lock()
+            defer { Self.sharedLock.unlock() }
+            Self.sharedStudyGroups = newValue
+        }
+    }
+    
     private let studyGroupsSubject = CurrentValueSubject<[StudyGroup], Never>([])
     private let changesSubject = PassthroughSubject<DataChange<StudyGroup>, Never>()
     private var isObserving = false
