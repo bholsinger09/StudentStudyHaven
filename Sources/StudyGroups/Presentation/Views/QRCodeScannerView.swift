@@ -40,7 +40,7 @@ public class QRScannerCoordinator: NSObject, AVCaptureMetadataOutputObjectsDeleg
             return
         }
         
-        if (captureSession.canAddInput(videoInput)) {
+        if captureSession.canAddInput(videoInput) {
             captureSession.addInput(videoInput)
             print("✅ QRScannerCoordinator: Video input added")
         } else {
@@ -53,7 +53,7 @@ public class QRScannerCoordinator: NSObject, AVCaptureMetadataOutputObjectsDeleg
         
         let metadataOutput = AVCaptureMetadataOutput()
         
-        if (captureSession.canAddOutput(metadataOutput)) {
+        if captureSession.canAddOutput(metadataOutput) {
             captureSession.addOutput(metadataOutput)
             metadataOutput.setMetadataObjectsDelegate(self, queue: DispatchQueue.main)
             metadataOutput.metadataObjectTypes = [.qr]
@@ -75,7 +75,7 @@ public class QRScannerCoordinator: NSObject, AVCaptureMetadataOutputObjectsDeleg
             print("🎥 QRScannerCoordinator: Starting capture session")
             captureSession.startRunning()
             print("✅ QRScannerCoordinator: Capture session running = \(captureSession.isRunning)")
-        } else if let captureSession = captureSession {
+        } else if captureSession != nil {
             print("⚠️ QRScannerCoordinator: Session already running")
         } else {
             print("❌ QRScannerCoordinator: No capture session to start")
