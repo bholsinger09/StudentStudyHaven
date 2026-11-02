@@ -172,25 +172,24 @@ public class CloudKitNoteRepositoryImpl: NoteRepositoryProtocol {
 extension Note {
     /// Convert Note to CKRecord for CloudKit storage
     func toCKRecord() -> CKRecord {
-        let record = CKRecord(recordType: CloudKitRecord.RecordType.note.rawValue)
-        record.setObject(id as NSString, forKey: "id")
-        record.setObject(classId as NSString, forKey: "classId")
-        record.setObject(userId as NSString, forKey: "userId")
-        record.setObject(title as NSString, forKey: "title")
-        record.setObject(content as NSString, forKey: "content")
+        let recordID = CKRecord.ID(recordName: id)
+        let record = CKRecord(recordType: CloudKitRecord.RecordType.note.rawValue, recordID: recordID)
         
-        // Encode dates
-        let dateFormatter = ISO8601DateFormatter()
-        record.setObject(dateFormatter.string(from: createdAt) as NSString, forKey: "createdAt")
-        record.setObject(dateFormatter.string(from: updatedAt) as NSString, forKey: "updatedAt")
+        record["id"] = id
+        record["classId"] = classId
+        record["userId"] = userId
+        record["title"] = title
+        record["content"] = content
+        record["createdAt"] = createdAt
+        record["updatedAt"] = updatedAt
         
         // Encode linked notes and tags
         if !linkedNoteIds.isEmpty {
-            record.setObject(linkedNoteIds as NSArray, forKey: "linkedNoteIds")
+            record["linkedNoteIds"] = linkedNoteIds as NSArray
         }
         
         if !tags.isEmpty {
-            record.setObject(tags as NSArray, forKey: "tags")
+            record["tags"] = tags as NSArray
         }
         
         return record
@@ -198,26 +197,14 @@ extension Note {
     
     /// Create Note from CKRecord
     static func fromCKRecord(_ record: CKRecord) -> Note? {
-        guard let id = record["id"] as? String,
-              let classId = record["classId"] as? String,
+        let id = record.recordID.recordName
+        guard let classId = record["classId"] as? String,
               let userId = record["userId"] as? String,
               let title = record["title"] as? String,
-              let content = record["content"] as? String else {
+              let content = record["content"] as? String,
+              let createdAt = record["createdAt"] as? Date,
+              let updatedAt = record["updatedAt"] as? Date else {
             return nil
-        }
-        
-        let dateFormatter = ISO8601DateFormatter()
-        var createdAt = Date()
-        var updatedAt = Date()
-        
-        if let createdAtString = record["createdAt"] as? String,
-           let parsed = dateFormatter.date(from: createdAtString) {
-            createdAt = parsed
-        }
-        
-        if let updatedAtString = record["updatedAt"] as? String,
-           let parsed = dateFormatter.date(from: updatedAtString) {
-            updatedAt = parsed
         }
         
         let linkedNoteIds = (record["linkedNoteIds"] as? [String]) ?? []

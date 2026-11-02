@@ -150,26 +150,25 @@ public class CloudKitFlashcardRepositoryImpl: FlashcardRepositoryProtocol {
 extension Flashcard {
     /// Convert Flashcard to CKRecord for CloudKit storage
     func toCKRecord() -> CKRecord {
-        let record = CKRecord(recordType: CloudKitRecord.RecordType.flashcard.rawValue)
-        record.setObject(id as NSString, forKey: "id")
-        record.setObject(classId as NSString, forKey: "classId")
-        record.setObject(userId as NSString, forKey: "userId")
-        record.setObject(front as NSString, forKey: "front")
-        record.setObject(back as NSString, forKey: "back")
+        let recordID = CKRecord.ID(recordName: id)
+        let record = CKRecord(recordType: CloudKitRecord.RecordType.flashcard.rawValue, recordID: recordID)
         
-        // Encode dates
-        let dateFormatter = ISO8601DateFormatter()
-        record.setObject(dateFormatter.string(from: createdAt) as NSString, forKey: "createdAt")
-        record.setObject(dateFormatter.string(from: updatedAt) as NSString, forKey: "updatedAt")
+        record["id"] = id
+        record["classId"] = classId
+        record["userId"] = userId
+        record["front"] = front
+        record["back"] = back
+        record["createdAt"] = createdAt
+        record["updatedAt"] = updatedAt
         
         // Encode optional fields
         if let lastReviewedAt = lastReviewedAt {
-            record.setObject(dateFormatter.string(from: lastReviewedAt) as NSString, forKey: "lastReviewedAt")
+            record["lastReviewedAt"] = lastReviewedAt
         }
         
         // Encode arrays
         if !noteIds.isEmpty {
-            record.setObject(noteIds as NSArray, forKey: "noteIds")
+            record["noteIds"] = noteIds as NSArray
         }
         
         return record
@@ -177,34 +176,17 @@ extension Flashcard {
     
     /// Create Flashcard from CKRecord
     static func fromCKRecord(_ record: CKRecord) -> Flashcard? {
-        guard let id = record["id"] as? String,
-              let classId = record["classId"] as? String,
+        let id = record.recordID.recordName
+        guard let classId = record["classId"] as? String,
               let userId = record["userId"] as? String,
               let front = record["front"] as? String,
-              let back = record["back"] as? String else {
+              let back = record["back"] as? String,
+              let createdAt = record["createdAt"] as? Date,
+              let updatedAt = record["updatedAt"] as? Date else {
             return nil
         }
         
-        let dateFormatter = ISO8601DateFormatter()
-        var createdAt = Date()
-        var updatedAt = Date()
-        var lastReviewedAt: Date? = nil
-        
-        if let createdAtString = record["createdAt"] as? String,
-           let parsed = dateFormatter.date(from: createdAtString) {
-            createdAt = parsed
-        }
-        
-        if let updatedAtString = record["updatedAt"] as? String,
-           let parsed = dateFormatter.date(from: updatedAtString) {
-            updatedAt = parsed
-        }
-        
-        if let lastReviewedAtString = record["lastReviewedAt"] as? String,
-           let parsed = dateFormatter.date(from: lastReviewedAtString) {
-            lastReviewedAt = parsed
-        }
-        
+        let lastReviewedAt = record["lastReviewedAt"] as? Date
         let noteIds = (record["noteIds"] as? [String]) ?? []
         
         return Flashcard(

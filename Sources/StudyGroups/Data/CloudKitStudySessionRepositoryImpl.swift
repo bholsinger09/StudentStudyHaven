@@ -180,66 +180,59 @@ public class CloudKitStudySessionRepositoryImpl: GroupStudySessionRepositoryProt
 extension GroupStudySession {
     /// Convert GroupStudySession to CKRecord for CloudKit storage
     func toCKRecord() -> CKRecord {
-        let record = CKRecord(recordType: CloudKitRecord.RecordType.studySession.rawValue)
-        record.setObject(id as NSString, forKey: "id")
-        record.setObject(studyGroupId as NSString, forKey: "studyGroupId")
-        record.setObject(title as NSString, forKey: "title")
+        let recordID = CKRecord.ID(recordName: id)
+        let record = CKRecord(recordType: CloudKitRecord.RecordType.studySession.rawValue, recordID: recordID)
+        
+        record["id"] = id
+        record["studyGroupId"] = studyGroupId
+        record["title"] = title
         
         if let description = description {
-            record.setObject(description as NSString, forKey: "description")
+            record["description"] = description
         }
         
-        // Encode dates
-        let dateFormatter = ISO8601DateFormatter()
-        record.setObject(dateFormatter.string(from: scheduledAt) as NSString, forKey: "scheduledAt")
-        record.setObject(dateFormatter.string(from: createdAt) as NSString, forKey: "createdAt")
-        record.setObject(dateFormatter.string(from: updatedAt) as NSString, forKey: "updatedAt")
+        record["scheduledAt"] = scheduledAt
+        record["createdAt"] = createdAt
+        record["updatedAt"] = updatedAt
         
         // Encode session details
-        record.setObject(NSNumber(value: durationMinutes), forKey: "durationMinutes")
-        record.setObject(NSNumber(value: isVirtual), forKey: "isVirtual")
-        record.setObject(createdBy as NSString, forKey: "createdBy")
-        record.setObject(status.rawValue as NSString, forKey: "status")
+        record["durationMinutes"] = NSNumber(value: durationMinutes)
+        record["isVirtual"] = NSNumber(value: isVirtual)
+        record["createdBy"] = createdBy
+        record["status"] = status.rawValue
         
         // Encode optional fields
         if let location = location {
-            record.setObject(location as NSString, forKey: "location")
+            record["location"] = location
         }
         
         if let meetingLink = meetingLink {
-            record.setObject(meetingLink as NSString, forKey: "meetingLink")
+            record["meetingLink"] = meetingLink
         }
         
         if let maxAttendees = maxAttendees {
-            record.setObject(NSNumber(value: maxAttendees), forKey: "maxAttendees")
+            record["maxAttendees"] = NSNumber(value: maxAttendees)
         }
         
         // Encode attendees
-        record.setObject(attendeeIds as NSArray, forKey: "attendeeIds")
+        record["attendeeIds"] = attendeeIds as NSArray
         
         return record
     }
     
     /// Create GroupStudySession from CKRecord
     static func fromCKRecord(_ record: CKRecord) -> GroupStudySession? {
-        guard let id = record["id"] as? String,
-              let studyGroupId = record["studyGroupId"] as? String,
+        let id = record.recordID.recordName
+        guard let studyGroupId = record["studyGroupId"] as? String,
               let title = record["title"] as? String,
-              let scheduledAtString = record["scheduledAt"] as? String,
-              let createdAtString = record["createdAt"] as? String,
-              let updatedAtString = record["updatedAt"] as? String,
+              let scheduledAt = record["scheduledAt"] as? Date,
+              let createdAt = record["createdAt"] as? Date,
+              let updatedAt = record["updatedAt"] as? Date,
               let durationMinutes = record["durationMinutes"] as? NSNumber,
               let isVirtual = record["isVirtual"] as? NSNumber,
               let createdBy = record["createdBy"] as? String,
               let statusString = record["status"] as? String,
               let status = GroupStudySession.SessionStatus(rawValue: statusString) else {
-            return nil
-        }
-        
-        let dateFormatter = ISO8601DateFormatter()
-        guard let scheduledAt = dateFormatter.date(from: scheduledAtString),
-              let createdAt = dateFormatter.date(from: createdAtString),
-              let updatedAt = dateFormatter.date(from: updatedAtString) else {
             return nil
         }
         

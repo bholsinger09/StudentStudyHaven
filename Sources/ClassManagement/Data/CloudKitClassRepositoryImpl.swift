@@ -142,30 +142,29 @@ public class CloudKitClassRepositoryImpl: ClassRepositoryProtocol {
 extension Class {
     /// Convert Class to CKRecord for CloudKit storage
     func toCKRecord() -> CKRecord {
-        let record = CKRecord(recordType: CloudKitRecord.RecordType.class.rawValue)
-        record.setObject(id as NSString, forKey: "id")
-        record.setObject(userId as NSString, forKey: "userId")
-        record.setObject(name as NSString, forKey: "name")
-        record.setObject(courseCode as NSString, forKey: "courseCode")
+        let recordID = CKRecord.ID(recordName: id)
+        let record = CKRecord(recordType: CloudKitRecord.RecordType.class.rawValue, recordID: recordID)
         
-        // Encode dates
-        let dateFormatter = ISO8601DateFormatter()
-        record.setObject(dateFormatter.string(from: createdAt) as NSString, forKey: "createdAt")
-        record.setObject(dateFormatter.string(from: updatedAt) as NSString, forKey: "updatedAt")
+        record["id"] = id
+        record["userId"] = userId
+        record["name"] = name
+        record["courseCode"] = courseCode
+        record["createdAt"] = createdAt
+        record["updatedAt"] = updatedAt
         
         // Encode optional fields
         if let professor = professor {
-            record.setObject(professor as NSString, forKey: "professor")
+            record["professor"] = professor
         }
         
         if let location = location {
-            record.setObject(location as NSString, forKey: "location")
+            record["location"] = location
         }
         
         // Encode schedule
         if let scheduleData = try? JSONEncoder().encode(schedule),
            let scheduleJSON = String(data: scheduleData, encoding: .utf8) {
-            record.setObject(scheduleJSON as NSString, forKey: "schedule")
+            record["schedule"] = scheduleJSON
         }
         
         return record
@@ -173,29 +172,17 @@ extension Class {
     
     /// Create Class from CKRecord
     static func fromCKRecord(_ record: CKRecord) -> Class? {
-        guard let id = record["id"] as? String,
-              let userId = record["userId"] as? String,
+        let id = record.recordID.recordName
+        guard let userId = record["userId"] as? String,
               let name = record["name"] as? String,
-              let courseCode = record["courseCode"] as? String else {
+              let courseCode = record["courseCode"] as? String,
+              let createdAt = record["createdAt"] as? Date,
+              let updatedAt = record["updatedAt"] as? Date else {
             return nil
         }
         
         let professor = record["professor"] as? String
         let location = record["location"] as? String
-        
-        let dateFormatter = ISO8601DateFormatter()
-        var createdAt = Date()
-        var updatedAt = Date()
-        
-        if let createdAtString = record["createdAt"] as? String,
-           let parsed = dateFormatter.date(from: createdAtString) {
-            createdAt = parsed
-        }
-        
-        if let updatedAtString = record["updatedAt"] as? String,
-           let parsed = dateFormatter.date(from: updatedAtString) {
-            updatedAt = parsed
-        }
         
         var schedule: [Class.TimeSlot] = []
         if let scheduleJSON = record["schedule"] as? String,

@@ -148,21 +148,20 @@ public class CloudKitGroupMessageRepositoryImpl: GroupMessageRepositoryProtocol 
 extension GroupMessage {
     /// Convert GroupMessage to CKRecord for CloudKit storage
     func toCKRecord() -> CKRecord {
-        let record = CKRecord(recordType: CloudKitRecord.RecordType.groupMessage.rawValue)
-        record.setObject(id as NSString, forKey: "id")
-        record.setObject(studyGroupId as NSString, forKey: "studyGroupId")
-        record.setObject(senderId as NSString, forKey: "senderId")
-        record.setObject(senderName as NSString, forKey: "senderName")
-        record.setObject(content as NSString, forKey: "content")
-        record.setObject(messageType.rawValue as NSString, forKey: "messageType")
-        record.setObject(NSNumber(value: isEdited), forKey: "isEdited")
+        let recordID = CKRecord.ID(recordName: id)
+        let record = CKRecord(recordType: CloudKitRecord.RecordType.groupMessage.rawValue, recordID: recordID)
         
-        // Encode timestamps
-        let dateFormatter = ISO8601DateFormatter()
-        record.setObject(dateFormatter.string(from: timestamp) as NSString, forKey: "timestamp")
+        record["id"] = id
+        record["studyGroupId"] = studyGroupId
+        record["senderId"] = senderId
+        record["senderName"] = senderName
+        record["content"] = content
+        record["messageType"] = messageType.rawValue
+        record["isEdited"] = NSNumber(value: isEdited)
+        record["timestamp"] = timestamp
         
         if let editedAt = editedAt {
-            record.setObject(dateFormatter.string(from: editedAt) as NSString, forKey: "editedAt")
+            record["editedAt"] = editedAt
         }
         
         return record
@@ -170,28 +169,19 @@ extension GroupMessage {
     
     /// Create GroupMessage from CKRecord
     static func fromCKRecord(_ record: CKRecord) -> GroupMessage? {
-        guard let id = record["id"] as? String,
-              let studyGroupId = record["studyGroupId"] as? String,
+        let id = record.recordID.recordName
+        guard let studyGroupId = record["studyGroupId"] as? String,
               let senderId = record["senderId"] as? String,
               let senderName = record["senderName"] as? String,
               let content = record["content"] as? String,
               let messageTypeString = record["messageType"] as? String,
               let messageType = GroupMessage.MessageType(rawValue: messageTypeString),
               let isEdited = record["isEdited"] as? NSNumber,
-              let timestampString = record["timestamp"] as? String else {
+              let timestamp = record["timestamp"] as? Date else {
             return nil
         }
         
-        let dateFormatter = ISO8601DateFormatter()
-        guard let timestamp = dateFormatter.date(from: timestampString) else {
-            return nil
-        }
-        
-        var editedAt: Date? = nil
-        if let editedAtString = record["editedAt"] as? String,
-           let parsed = dateFormatter.date(from: editedAtString) {
-            editedAt = parsed
-        }
+        let editedAt = record["editedAt"] as? Date
         
         return GroupMessage(
             id: id,
