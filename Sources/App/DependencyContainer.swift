@@ -3,6 +3,7 @@ import ClassManagement
 import Core
 import Flashcards
 import GradeTracking
+import iCloudIntegration
 import Notes
 import StudyGroups
 import Foundation
@@ -21,12 +22,12 @@ public class DependencyContainer {
     
     // MARK: - Repository Instances
     
-    // Assignment repository (shared singleton for data persistence)
+    // Assignment repository (uses CloudKit via iCloudIntegration)
     public lazy var assignmentRepository: AssignmentRepositoryProtocol = {
         if useMockRepositories {
             return MockAssignmentRepository()
         } else {
-            return FirestoreAssignmentRepositoryImpl()
+            return CloudKitAssignmentRepositoryImpl()
         }
     }()
     
