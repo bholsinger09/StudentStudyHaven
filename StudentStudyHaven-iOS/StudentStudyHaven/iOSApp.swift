@@ -10,13 +10,9 @@ class AppDelegate: NSObject, UIApplicationDelegate {
         let log = OSLog(subsystem: "com.bholsinger.studentstudyhaven", category: "startup")
         os_log("🚀 App launching - AppDelegate.application()", log: log, type: .info)
         
-        do {
-            os_log("📍 Before Firebase initialization", log: log, type: .info)
-            FirebaseService.shared.initialize()
-            os_log("✅ Firebase initialized successfully", log: log, type: .info)
-        } catch {
-            os_log("❌ Firebase initialization failed: %@", log: log, type: .error, error.localizedDescription)
-        }
+        os_log("📍 Initializing Firebase", log: log, type: .info)
+        FirebaseService.shared.initialize()
+        os_log("✅ Firebase initialized successfully", log: log, type: .info)
         
         return true
     }

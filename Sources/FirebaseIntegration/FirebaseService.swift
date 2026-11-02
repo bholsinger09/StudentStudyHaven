@@ -22,38 +22,30 @@ public class FirebaseService {
     public func initialize() {
         guard !isInitialized else { return }
         
-        do {
-            // Verify GoogleService-Info.plist exists
-            guard let configPath = Bundle.main.path(forResource: "GoogleService-Info", ofType: "plist") else {
-                print("❌ ERROR: GoogleService-Info.plist not found in bundle")
-                print("Bundle path: \(Bundle.main.bundlePath)")
-                print("Bundle contents: \(try? FileManager.default.contentsOfDirectory(atPath: Bundle.main.bundlePath) ?? [])")
-                fatalError("GoogleService-Info.plist is missing from app bundle")
-            }
-            
-            print("✅ Found GoogleService-Info.plist at: \(configPath)")
-            
-            // Attempt Firebase configuration
-            do {
-                FirebaseApp.configure()
-                print("✅ Firebase configured successfully")
-            } catch {
-                print("❌ Firebase configuration failed: \(error)")
-                throw error
-            }
-            
-            // Configure Firestore settings
-            let settings = FirestoreSettings()
-            settings.isPersistenceEnabled = true
-            Firestore.firestore().settings = settings
-            
-            print("✅ Firestore persistence enabled")
-            
-            isInitialized = true
-        } catch {
-            print("❌ Fatal error during Firebase initialization: \(error)")
-            fatalError("Firebase initialization failed: \(error)")
+        // Verify GoogleService-Info.plist exists
+        guard let configPath = Bundle.main.path(forResource: "GoogleService-Info", ofType: "plist") else {
+            let bundleContents = (try? FileManager.default.contentsOfDirectory(atPath: Bundle.main.bundlePath)) ?? []
+            print("❌ ERROR: GoogleService-Info.plist not found in bundle")
+            print("Bundle path: \(Bundle.main.bundlePath)")
+            print("Bundle contents: \(bundleContents)")
+            fatalError("GoogleService-Info.plist is missing from app bundle")
         }
+        
+        print("✅ Found GoogleService-Info.plist at: \(configPath)")
+        
+        // Configure Firebase
+        FirebaseApp.configure()
+        print("✅ Firebase configured successfully")
+        
+        // Configure Firestore settings with new API
+        let cacheSettings = PersistentCacheSettings(sizeBytes: 100_000_000)
+        let settings = FirestoreSettings()
+        settings.cacheSettings = cacheSettings
+        Firestore.firestore().settings = settings
+        
+        print("✅ Firestore persistence enabled")
+        
+        isInitialized = true
     }
     
     /// Get current authenticated user
