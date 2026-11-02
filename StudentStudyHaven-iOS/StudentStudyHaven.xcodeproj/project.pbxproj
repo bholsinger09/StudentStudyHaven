@@ -12,6 +12,7 @@
 		3660E77830574663006DEB60 /* ClassManagement in Frameworks */ = {isa = PBXBuildFile; productRef = 3660E77730574663006DEB60 /* ClassManagement */; };
 		3660E77A30574669006DEB60 /* Core in Frameworks */ = {isa = PBXBuildFile; productRef = 3660E77930574669006DEB60 /* Core */; };
 		3660E77C3057466E006DEB60 /* Flashcards in Frameworks */ = {isa = PBXBuildFile; productRef = 3660E77B3057466E006DEB60 /* Flashcards */; };
+		3660E78230598FCA006DEB60 /* GradeTracking in Frameworks */ = {isa = PBXBuildFile; productRef = 3660E78230598FCB006DEB60 /* GradeTracking */; };
 		3660E77E30574673006DEB60 /* Notes in Frameworks */ = {isa = PBXBuildFile; productRef = 3660E77D30574673006DEB60 /* Notes */; };
 		3660E78030574678006DEB60 /* StudyGroups in Frameworks */ = {isa = PBXBuildFile; productRef = 3660E77F30574678006DEB60 /* StudyGroups */; };
 		36AC9ED13097E77900B6E86E /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 36AC9ED03097E77900B6E86E /* GoogleService-Info.plist */; };
@@ -39,6 +40,7 @@
 			3660E7763057465E006DEB60 /* Authentication in Frameworks */,
 			3660E77A30574669006DEB60 /* Core in Frameworks */,
 			3660E77C3057466E006DEB60 /* Flashcards in Frameworks */,
+			3660E78230598FCA006DEB60 /* GradeTracking in Frameworks */,
 			3660E78030574678006DEB60 /* StudyGroups in Frameworks */,
 			3660E77830574663006DEB60 /* ClassManagement in Frameworks */,
 			3660E77430574659006DEB60 /* App in Frameworks */,
@@ -107,6 +109,7 @@
 				3660E77730574663006DEB60 /* ClassManagement */,
 				3660E77930574669006DEB60 /* Core */,
 				3660E77B3057466E006DEB60 /* Flashcards */,
+				3660E78230598FCB006DEB60 /* GradeTracking */,
 				3660E77D30574673006DEB60 /* Notes */,
 				3660E77F30574678006DEB60 /* StudyGroups */,
 			);
@@ -291,6 +294,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 3660E7713057454C006DEB60 /* XCLocalSwiftPackageReference "../../StudentStudyHaven" */;
 			productName = Flashcards;
+		};
+		3660E78230598FCB006DEB60 /* GradeTracking */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 3660E7713057454C006DEB60 /* XCLocalSwiftPackageReference "../../StudentStudyHaven" */;
+			productName = GradeTracking;
 		};
 		3660E77D30574673006DEB60 /* Notes */ = {
 			isa = XCSwiftPackageProductDependency;
