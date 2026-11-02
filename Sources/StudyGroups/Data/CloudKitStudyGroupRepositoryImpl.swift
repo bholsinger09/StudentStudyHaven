@@ -187,27 +187,25 @@ public class CloudKitStudyGroupRepositoryImpl: StudyGroupRepositoryProtocol {
 extension StudyGroup {
     /// Convert StudyGroup to CKRecord for CloudKit storage
     func toCKRecord() -> CKRecord {
-        let record = CKRecord(recordType: CloudKitRecord.RecordType.studyGroup.rawValue)
-        record.setObject(id as NSString, forKey: "id")
-        record.setObject(name as NSString, forKey: "name")
-        record.setObject(classId as NSString, forKey: "classId")
-        record.setObject(collegeId as NSString, forKey: "collegeId")
-        record.setObject(createdBy as NSString, forKey: "createdBy")
-        record.setObject(NSNumber(value: isPublic), forKey: "isPublic")
-        record.setObject(memberIds as NSArray, forKey: "memberIds")
+        let recordID = CKRecord.ID(recordName: id)
+        let record = CKRecord(recordType: CloudKitRecord.RecordType.studyGroup.rawValue, recordID: recordID)
         
-        // Encode dates
-        let dateFormatter = ISO8601DateFormatter()
-        record.setObject(dateFormatter.string(from: createdAt) as NSString, forKey: "createdAt")
-        record.setObject(dateFormatter.string(from: updatedAt) as NSString, forKey: "updatedAt")
+        record["id"] = id
+        record["name"] = name
+        record["classId"] = classId
+        record["collegeId"] = collegeId
+        record["createdBy"] = createdBy
+        record["isPublic"] = NSNumber(value: isPublic)
+        record["memberIds"] = memberIds
+        record["createdAt"] = createdAt
+        record["updatedAt"] = updatedAt
         
-        // Encode optional fields
         if let description = description {
-            record.setObject(description as NSString, forKey: "description")
+            record["description"] = description
         }
         
         if let maxMembers = maxMembers {
-            record.setObject(NSNumber(value: maxMembers), forKey: "maxMembers")
+            record["maxMembers"] = NSNumber(value: maxMembers)
         }
         
         return record
@@ -215,32 +213,20 @@ extension StudyGroup {
     
     /// Create StudyGroup from CKRecord
     static func fromCKRecord(_ record: CKRecord) -> StudyGroup? {
-        guard let id = record["id"] as? String,
+        guard let id = record.recordID.recordName as? String,
               let name = record["name"] as? String,
               let classId = record["classId"] as? String,
               let collegeId = record["collegeId"] as? String,
               let createdBy = record["createdBy"] as? String,
               let isPublic = record["isPublic"] as? NSNumber,
               let memberIds = record["memberIds"] as? [String],
-              let createdAtString = record["createdAt"] as? String,
-              let updatedAtString = record["updatedAt"] as? String else {
+              let createdAt = record["createdAt"] as? Date,
+              let updatedAt = record["updatedAt"] as? Date else {
             return nil
         }
         
         let description = record["description"] as? String
         let maxMembers = (record["maxMembers"] as? NSNumber)?.intValue
-        
-        let dateFormatter = ISO8601DateFormatter()
-        var createdAt = Date()
-        var updatedAt = Date()
-        
-        if let parsed = dateFormatter.date(from: createdAtString) {
-            createdAt = parsed
-        }
-        
-        if let parsed = dateFormatter.date(from: updatedAtString) {
-            updatedAt = parsed
-        }
         
         return StudyGroup(
             id: id,
