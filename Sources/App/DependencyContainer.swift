@@ -44,27 +44,51 @@ public class DependencyContainer {
     }()
     
     public lazy var classRepository: ClassRepositoryProtocol = {
-        return MockClassRepositoryImpl()
+        if useMockRepositories {
+            return MockClassRepositoryImpl()
+        } else {
+            return CloudKitClassRepositoryImpl()
+        }
     }()
     
     public lazy var flashcardRepository: FlashcardRepositoryProtocol = {
-        return MockFlashcardRepositoryImpl()
+        if useMockRepositories {
+            return MockFlashcardRepositoryImpl()
+        } else {
+            return CloudKitFlashcardRepositoryImpl()
+        }
     }()
     
     public lazy var noteRepository: NoteRepositoryProtocol = {
-        return MockNoteRepositoryImpl()
+        if useMockRepositories {
+            return MockNoteRepositoryImpl()
+        } else {
+            return CloudKitNoteRepositoryImpl()
+        }
     }()
     
     public lazy var studyGroupRepository: StudyGroupRepositoryProtocol = {
-        return MockStudyGroupRepositoryImpl()
+        if useMockRepositories {
+            return MockStudyGroupRepositoryImpl()
+        } else {
+            return CloudKitStudyGroupRepositoryImpl()
+        }
     }()
     
     public lazy var studySessionRepository: GroupStudySessionRepositoryProtocol = {
-        return MockStudySessionRepositoryImpl()
+        if useMockRepositories {
+            return MockStudySessionRepositoryImpl()
+        } else {
+            return CloudKitStudySessionRepositoryImpl()
+        }
     }()
     
     public lazy var groupMessageRepository: GroupMessageRepositoryProtocol = {
-        return MockGroupMessageRepositoryImpl()
+        if useMockRepositories {
+            return MockGroupMessageRepositoryImpl()
+        } else {
+            return CloudKitGroupMessageRepositoryImpl()
+        }
     }()
     
     // MARK: - Initialization
@@ -73,14 +97,26 @@ public class DependencyContainer {
     
     /// Reset all repository instances (useful for testing or switching modes)
     public func reset() {
-        authRepository = MockAuthRepositoryImpl()
-        userRepository = MockUserRepositoryImpl()
-        classRepository = MockClassRepositoryImpl()
-        flashcardRepository = MockFlashcardRepositoryImpl()
-        noteRepository = MockNoteRepositoryImpl()
-        studyGroupRepository = MockStudyGroupRepositoryImpl()
-        studySessionRepository = MockStudySessionRepositoryImpl()
-        groupMessageRepository = MockGroupMessageRepositoryImpl()
-        assignmentRepository = CloudKitAssignmentRepositoryImpl()
+        if useMockRepositories {
+            authRepository = MockAuthRepositoryImpl()
+            userRepository = MockUserRepositoryImpl()
+            classRepository = MockClassRepositoryImpl()
+            flashcardRepository = MockFlashcardRepositoryImpl()
+            noteRepository = MockNoteRepositoryImpl()
+            studyGroupRepository = MockStudyGroupRepositoryImpl()
+            studySessionRepository = MockStudySessionRepositoryImpl()
+            groupMessageRepository = MockGroupMessageRepositoryImpl()
+            assignmentRepository = MockAssignmentRepository()
+        } else {
+            authRepository = MockAuthRepositoryImpl()
+            userRepository = MockUserRepositoryImpl()
+            classRepository = CloudKitClassRepositoryImpl()
+            flashcardRepository = CloudKitFlashcardRepositoryImpl()
+            noteRepository = CloudKitNoteRepositoryImpl()
+            studyGroupRepository = CloudKitStudyGroupRepositoryImpl()
+            studySessionRepository = CloudKitStudySessionRepositoryImpl()
+            groupMessageRepository = CloudKitGroupMessageRepositoryImpl()
+            assignmentRepository = CloudKitAssignmentRepositoryImpl()
+        }
     }
 }

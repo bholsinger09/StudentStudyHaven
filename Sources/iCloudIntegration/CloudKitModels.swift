@@ -33,6 +33,10 @@ public struct CloudKitRecord {
         case grade = "Grade"
         case gpa = "GPA"
         case studyGroup = "StudyGroup"
+        case studySession = "StudySession"
+        case flashcard = "Flashcard"
+        case note = "Note"
+        case groupMessage = "GroupMessage"
         case groupAssignment = "GroupAssignment"
     }
     
