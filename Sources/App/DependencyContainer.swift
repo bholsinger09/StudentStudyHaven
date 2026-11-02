@@ -23,7 +23,11 @@ public class DependencyContainer {
     
     // Assignment repository (shared singleton for data persistence)
     public lazy var assignmentRepository: AssignmentRepositoryProtocol = {
-        return MockAssignmentRepository()
+        if useMockRepositories {
+            return MockAssignmentRepository()
+        } else {
+            return FirestoreAssignmentRepositoryImpl()
+        }
     }()
     
     public lazy var authRepository: AuthRepositoryProtocol = {
@@ -46,7 +50,7 @@ public class DependencyContainer {
         if useMockRepositories {
             return MockClassRepositoryImpl()
         } else {
-            return MockClassRepositoryImpl() // FirebaseClassRepositoryImpl() when ready
+            return FirestoreClassRepositoryImpl()
         }
     }()
     
@@ -54,7 +58,7 @@ public class DependencyContainer {
         if useMockRepositories {
             return MockFlashcardRepositoryImpl()
         } else {
-            return MockFlashcardRepositoryImpl() // FirebaseFlashcardRepositoryImpl() when ready
+            return FirestoreFlashcardRepositoryImpl()
         }
     }()
     
@@ -62,7 +66,7 @@ public class DependencyContainer {
         if useMockRepositories {
             return MockNoteRepositoryImpl()
         } else {
-            return MockNoteRepositoryImpl() // FirebaseNoteRepositoryImpl() when ready
+            return FirestoreNoteRepositoryImpl()
         }
     }()
     
@@ -78,7 +82,7 @@ public class DependencyContainer {
         if useMockRepositories {
             return MockStudySessionRepositoryImpl()
         } else {
-            return FirebaseStudySessionRepositoryImpl()
+            return FirestoreGroupStudySessionRepositoryImpl()
         }
     }()
     
@@ -86,7 +90,7 @@ public class DependencyContainer {
         if useMockRepositories {
             return MockGroupMessageRepositoryImpl()
         } else {
-            return FirebaseGroupMessageRepositoryImpl()
+            return FirestoreGroupMessageRepositoryImpl()
         }
     }()
     
@@ -107,13 +111,13 @@ public class DependencyContainer {
             groupMessageRepository = MockGroupMessageRepositoryImpl()
         } else {
             authRepository = MockAuthRepositoryImpl() // FirebaseAuthRepositoryImpl()
-            userRepository = FirebaseUserRepositoryImpl()
-            classRepository = MockClassRepositoryImpl() // FirebaseClassRepositoryImpl()
-            flashcardRepository = MockFlashcardRepositoryImpl() // FirebaseFlashcardRepositoryImpl()
-            noteRepository = MockNoteRepositoryImpl() // FirebaseNoteRepositoryImpl()
-            studyGroupRepository = FirebaseStudyGroupRepositoryImpl()
-            studySessionRepository = FirebaseStudySessionRepositoryImpl()
-            groupMessageRepository = FirebaseGroupMessageRepositoryImpl()
+            userRepository = FirestoreUserRepositoryImpl()
+            classRepository = FirestoreClassRepositoryImpl()
+            flashcardRepository = FirestoreFlashcardRepositoryImpl()
+            noteRepository = FirestoreNoteRepositoryImpl()
+            studyGroupRepository = FirestoreStudyGroupRepositoryImpl()
+            studySessionRepository = FirestoreGroupStudySessionRepositoryImpl()
+            groupMessageRepository = FirestoreGroupMessageRepositoryImpl()
         }
     }
 }

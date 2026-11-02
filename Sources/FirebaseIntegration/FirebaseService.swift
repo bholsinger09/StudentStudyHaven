@@ -22,14 +22,38 @@ public class FirebaseService {
     public func initialize() {
         guard !isInitialized else { return }
         
-        FirebaseApp.configure()
-        
-        // Configure Firestore settings
-        let settings = FirestoreSettings()
-        settings.isPersistenceEnabled = true
-        Firestore.firestore().settings = settings
-        
-        isInitialized = true
+        do {
+            // Verify GoogleService-Info.plist exists
+            guard let configPath = Bundle.main.path(forResource: "GoogleService-Info", ofType: "plist") else {
+                print("❌ ERROR: GoogleService-Info.plist not found in bundle")
+                print("Bundle path: \(Bundle.main.bundlePath)")
+                print("Bundle contents: \(try? FileManager.default.contentsOfDirectory(atPath: Bundle.main.bundlePath) ?? [])")
+                fatalError("GoogleService-Info.plist is missing from app bundle")
+            }
+            
+            print("✅ Found GoogleService-Info.plist at: \(configPath)")
+            
+            // Attempt Firebase configuration
+            do {
+                FirebaseApp.configure()
+                print("✅ Firebase configured successfully")
+            } catch {
+                print("❌ Firebase configuration failed: \(error)")
+                throw error
+            }
+            
+            // Configure Firestore settings
+            let settings = FirestoreSettings()
+            settings.isPersistenceEnabled = true
+            Firestore.firestore().settings = settings
+            
+            print("✅ Firestore persistence enabled")
+            
+            isInitialized = true
+        } catch {
+            print("❌ Fatal error during Firebase initialization: \(error)")
+            fatalError("Firebase initialization failed: \(error)")
+        }
     }
     
     /// Get current authenticated user

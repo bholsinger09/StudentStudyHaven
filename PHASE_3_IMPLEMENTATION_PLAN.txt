@@ -1,0 +1,358 @@
+# Phase 3: Detailed Implementation Plan
+
+## Strategy
+1. Analyze each repository protocol carefully
+2. Check domain models for structure
+3. Plan Firestore collection schema
+4. Implement with full CRUD + listeners
+5. Verify build after each implementation
+6. Document any special considerations
+
+## Order of Implementation
+1. ClassRepositoryImpl - Foundation, no complex queries
+2. NoteRepositoryImpl - Add search capability
+3. FlashcardRepositoryImpl - Handle nested ReviewData struct
+4. AssignmentRepositoryImpl - Critical for grades, date queries
+5. UserRepositoryImpl - Verify/complete existing
+6. GroupStudySessionRepositoryImpl - Member/attendee arrays
+7. GroupMessageRepositoryImpl - Handle message limits
+
+## Implementation Checklist Per Repository
+
+For each repository:
+[ ] Review protocol - understand ALL methods
+[ ] Check domain model - verify Codable
+[ ] Plan Firestore schema
+[ ] Implement CRUD methods (get, create, update, delete)
+[ ] Implement query methods (specific to repo)
+[ ] Implement real-time listeners
+[ ] Test build - must pass clean
+[ ] Commit with descriptive message
+
+---
+
+## Repository Analysis Details
+
+### STEP 1: CLASSEREPOSITORYIMPL
+File: Sources/ClassManagement/Data/FirestoreClassRepositoryImpl.swift
+Protocol: ClassRepositoryProtocol
+Model: Class (has TimeSlot nested struct)
+
+METHODS TO IMPLEMENT:
+1. getClasses(for userId) - filter by userId
+2. getClass(by id) - simple get
+3. createClass(_) - create
+4. updateClass(_) - update with timestamp
+5. deleteClass(id) - delete
+6. observeClasses(for userId) - listen to user's classes
+7. observeClassChanges(for userId) - listen to changes
+8. stopObserving()
+
+FIRESTORE COLLECTION: classes/{id}
+FIELDS:
+- id: string
+- userId: string (KEY: used for filtering)
+- name: string
+- courseCode: string
+- schedule: array<{dayOfWeek, startTime, endTime}>
+- professor: string (optional)
+- location: string (optional)
+- createdAt: timestamp
+- updatedAt: timestamp
+
+SPECIAL CONSIDERATIONS:
+- TimeSlot is nested struct with Codable
+- Filter by userId in queries
+- Two listener methods (both for userId) - ensure no duplicate listeners
+
+---
+
+### STEP 2: NOTEREPOSITORYIMPL
+File: Sources/Notes/Data/FirestoreNoteRepositoryImpl.swift
+Protocol: NoteRepositoryProtocol
+Model: Note
+
+METHODS TO IMPLEMENT:
+1. getNotes(for classId) - filter by classId
+2. getNote(by id) - simple get
+3. getLinkedNotes(for noteId) - find notes in linkedNoteIds
+4. createNote(_) - create
+5. updateNote(_) - update
+6. deleteNote(id) - delete
+7. searchNotes(query, classId) - TEXT SEARCH (tricky!)
+8. observeNotes(for classId) - listen
+9. observeNoteChanges(for classId) - listen changes
+10. stopObserving()
+
+FIRESTORE COLLECTION: notes/{id}
+FIELDS:
+- id: string
+- classId: string (KEY: used for filtering)
+- userId: string
+- title: string (searchable)
+- content: string (searchable)
+- linkedNoteIds: array<string>
+- tags: array<string> (searchable)
+- createdAt: timestamp
+- updatedAt: timestamp
+
+SPECIAL CONSIDERATIONS:
+- searchNotes(query, classId) is tricky because:
+  - Firestore doesn't support full-text search natively
+  - Option 1: Search in-memory after fetching all notes (SIMPLE)
+  - Option 2: Use Algolia/Meilisearch (COMPLEX)
+  - RECOMMEND: Use Option 1 for MVP - filter client-side
+- linkedNoteIds references other notes (no join needed, simple lookup)
+
+---
+
+### STEP 3: FLASHCARDREPOSITORYIMPL
+File: Sources/Flashcards/Data/FirestoreFlashcardRepositoryImpl.swift
+Protocol: FlashcardRepositoryProtocol
+Model: Flashcard (with nested ReviewData struct)
+
+METHODS TO IMPLEMENT:
+1. getFlashcards(for classId) - filter by classId
+2. getFlashcard(by id) - simple get
+3. createFlashcard(_) - create one
+4. createFlashcards(_) - batch create (SPECIAL!)
+5. updateFlashcard(_) - update
+6. deleteFlashcard(id) - delete
+7. observeFlashcards(for classId) - listen
+8. observeFlashcardChanges(for classId) - changes
+9. stopObserving()
+
+FIRESTORE COLLECTION: flashcards/{id}
+FIELDS:
+- id: string
+- classId: string (KEY)
+- userId: string
+- front: string
+- back: string
+- noteIds: array<string>
+- lastReviewedAt: timestamp (optional)
+- reviewData: {repetitions, easeFactor, interval, nextReviewDate, lastReviewDate}
+- createdAt: timestamp
+- updatedAt: timestamp
+
+SPECIAL CONSIDERATIONS:
+- ReviewData is nested struct with Codable - JSON encoding handles it automatically
+- createFlashcards(_) needs batch operation:
+  ```swift
+  try await database.batch { writeBatch in
+    for flashcard in flashcards {
+      writeBatch.setData(...)
+    }
+  }
+  ```
+- Update might include changes to reviewData (spaced repetition algorithm result)
+
+---
+
+### STEP 4: ASSIGNMENTREPOSITORYIMPL
+File: Sources/GradeTracking/Data/FirestoreAssignmentRepositoryImpl.swift
+Protocol: AssignmentRepositoryProtocol
+Model: Assignment (with AssignmentType enum)
+
+METHODS TO IMPLEMENT:
+1. getAssignments(for classId) - filter by classId
+2. getAssignment(by id) - simple get
+3. createAssignment(_) - create
+4. updateAssignment(_) - update (score updates here!)
+5. deleteAssignment(id) - delete
+6. getUpcomingAssignments(daysAhead) - query by dueDate
+7. getAssignmentsDue(by date, for classId) - query by date + classId
+8. observeAssignments(for classId) - listen
+9. observeAssignmentChanges(for classId) - changes
+10. stopObserving()
+
+FIRESTORE COLLECTION: assignments/{id}
+FIELDS:
+- id: string
+- classId: string (KEY)
+- name: string
+- dueDate: timestamp (KEY for date queries)
+- description: string (optional)
+- score: number (optional, updated when graded)
+- maxScore: number
+- weight: number (0-1, for GPA calculation)
+- type: string (Homework|Quiz|Exam|Project|Other)
+- createdAt: timestamp
+- updatedAt: timestamp
+
+SPECIAL CONSIDERATIONS:
+- This is CRITICAL for grade calculations
+- getUpcomingAssignments(daysAhead) needs:
+  ```swift
+  let todayStart = Calendar.current.startOfDay(for: Date())
+  let futureDate = Calendar.current.date(byAdding: .day, value: daysAhead, to: todayStart)!
+  query where dueDate >= today AND dueDate <= futureDate
+  ```
+- Grade tracking depends on accurate score/weight data
+- Update is called frequently (when grades entered)
+
+---
+
+### STEP 5: USERREPOSITORYIMPL
+File: Sources/Core/Data/FirestoreUserRepositoryImpl.swift
+Protocol: UserRepositoryProtocol
+Model: User
+
+METHODS TO IMPLEMENT:
+1. getUser(by id) - simple get
+2. getCurrentUser() - get auth'd user (need auth context)
+3. updateUser(_) - update
+4. deleteUser(id) - delete
+5. searchUsers(firstName, email, collegeId) - query
+6. searchUsersByEmail(email, collegeId) - query by email
+
+FIRESTORE COLLECTION: users/{id}
+FIELDS:
+- id: string
+- email: string
+- name: string
+- collegeId: string (optional)
+- createdAt: timestamp
+- updatedAt: timestamp
+
+SPECIAL CONSIDERATIONS:
+- getCurrentUser() needs access to current auth context
+  - May need to get current user ID from Firebase Auth
+  - Then call getUser(userId)
+- searchUsers requires querying by multiple fields
+  - email: exact match
+  - collegeId: exact match
+  - firstName: partial match (tricky - Firestore doesn't do LIKE)
+  - RECOMMEND: Filter client-side after querying collegeId
+- This might already be partially implemented - VERIFY FIRST
+
+---
+
+### STEP 6: GROUPSTUDYSESSIONREPOSITORYIMPL
+File: Sources/StudyGroups/Data/FirestoreGroupStudySessionRepositoryImpl.swift
+Protocol: GroupStudySessionRepositoryProtocol
+Model: GroupStudySession
+
+METHODS TO IMPLEMENT:
+1. getStudySessions(for groupId) - filter by groupId
+2. getUpcomingSessions(for userId) - filter by attendeeIds containing userId
+3. getStudySession(by id) - simple get
+4. createStudySession(_) - create
+5. updateStudySession(_) - update
+6. deleteStudySession(id) - delete
+7. addAttendee(sessionId, userId) - array union
+8. removeAttendee(sessionId, userId) - array remove
+9. observeStudySessions(for groupId) - listen
+10. observeStudySessionChanges(for sessionId) - changes
+11. stopObserving()
+
+FIRESTORE COLLECTION: groupSessions/{id}
+FIELDS:
+- id: string
+- groupId: string (KEY)
+- title: string
+- description: string
+- startTime: timestamp
+- endTime: timestamp
+- location: string
+- attendeeIds: array<string> (for addAttendee/removeAttendee)
+- createdBy: string
+- createdAt: timestamp
+- updatedAt: timestamp
+
+SPECIAL CONSIDERATIONS:
+- Similar to StudyGroup with member management
+- addAttendee/removeAttendee use FieldValue.arrayUnion/arrayRemove
+- getUpcomingSessions needs to:
+  1. Query sessions where attendeeIds contains userId
+  2. Filter startTime > now
+- Two different listener methods - manage carefully
+
+---
+
+### STEP 7: GROUPMESSAGEREPOSITORYIMPL
+File: Sources/StudyGroups/Data/FirestoreGroupMessageRepositoryImpl.swift
+Protocol: GroupMessageRepositoryProtocol
+Model: GroupMessage
+
+METHODS TO IMPLEMENT:
+1. getMessages(for groupId, limit) - query with limit
+2. getMessage(by id) - simple get
+3. sendMessage(_) - create (sendMessage = createMessage)
+4. updateMessage(_) - update
+5. deleteMessage(id) - delete
+6. observeMessages(for groupId, limit) - listen with limit
+7. observeNewMessages(for groupId) - only newly added messages (tricky!)
+8. stopObserving()
+
+FIRESTORE COLLECTION: groupMessages/{id}
+FIELDS:
+- id: string
+- groupId: string (KEY)
+- userId: string (sender)
+- content: string
+- createdAt: timestamp (for ordering)
+- updatedAt: timestamp
+
+SPECIAL CONSIDERATIONS:
+- Messages need pagination/limits for performance
+- observeMessages(limit) should:
+  ```swift
+  query.order(by: "createdAt", descending: true).limit(to: limit)
+  ```
+- observeNewMessages is tricky:
+  - Only listen to messages created after NOW
+  - Filter server-side in query:
+  ```swift
+  query.whereField("createdAt", isGreaterThan: Date())
+  ```
+- Remember to remove old listeners to prevent memory leaks
+
+---
+
+## Build Verification Strategy
+
+After each implementation:
+```bash
+cd /Users/benh/Documents/StudentStudyHaven
+swift build 2>&1 | grep -E "error:|Build complete|Build failed"
+```
+
+Expected: "Build complete! (X.XX sec)"
+
+---
+
+## Commit Strategy
+
+After each successful repository:
+```bash
+git add Sources/[Module]/Data/Firestore[Model]RepositoryImpl.swift
+git commit -m "Phase 3: Implement Firestore[Model]Repository
+
+- Full CRUD: create, read, update, delete
+- Query methods: [specific queries]
+- Real-time listeners: observe[Model]
+- Uses DatabaseService from FirebaseIntegration
+- Build verified ✅
+
+Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>"
+```
+
+---
+
+## Dependencies to Verify
+
+Each repository file needs:
+```swift
+import FirebaseIntegration
+import FirebaseFirestore
+import Combine
+import Core
+import Foundation
+```
+
+---
+
+## Ready to Begin?
+
+This plan keeps us organized and prevents mistakes. Starting with ClassRepositoryImpl.
