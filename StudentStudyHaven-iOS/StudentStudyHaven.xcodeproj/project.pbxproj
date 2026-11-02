@@ -17,7 +17,7 @@
 		3693E89C30993457009D1106 /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = 36AC9ED830986B1000B6E86E /* FirebaseCore */; };
 		3693E89D30993457009D1106 /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 36AC9ED930986B1000B6E86E /* FirebaseAuth */; };
 		3693E89E30993457009D1106 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 36AC9EDA30986B1000B6E86E /* FirebaseFirestore */; };
-		36AC9ED13097E77900B6E86E /* GoogleService-Info 2.plist in Resources */ = {isa = PBXBuildFile; fileRef = 36AC9ED03097E77900B6E86E /* GoogleService-Info 2.plist */; };
+		36AC9ED13097E77900B6E86E /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 36AC9ED03097E77900B6E86E /* GoogleService-Info.plist */; };
 		E1000000000000000000000000000001B /* iOSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1000000000000000000000000000001 /* iOSApp.swift */; };
 		E1000000000000000000000000000011B /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E1000000000000000000000000000011 /* LaunchScreen.storyboard */; };
 		E1000000000000000000000000000012B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E1000000000000000000000000000012 /* Assets.xcassets */; };
@@ -72,7 +72,7 @@
 		E1000000000000000000000000000010 = {
 			isa = PBXGroup;
 			children = (
-				36AC9ED03097E77900B6E86E /* GoogleService-Info 2.plist */,
+				36AC9ED03097E77900B6E86E /* GoogleService-Info.plist */,
 				E1000000000000000000000000000020 /* StudentStudyHaven */,
 				3660E77230574659006DEB60 /* Frameworks */,
 				3660E77030574475006DEB60 /* Products */,
@@ -158,7 +158,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				E1000000000000000000000000000011B /* LaunchScreen.storyboard in Resources */,
-				36AC9ED13097E77900B6E86E /* GoogleService-Info 2.plist in Resources */,
+				36AC9ED13097E77900B6E86E /* GoogleService-Info.plist in Resources */,
 				E1000000000000000000000000000012B /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -279,7 +279,7 @@
 			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 13.1.1;
+				minimumVersion = 12.0.0;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
