@@ -259,7 +259,7 @@
 /* Begin XCLocalSwiftPackageReference section */
 		3660E7713057454C006DEB60 /* XCLocalSwiftPackageReference "../../StudentStudyHaven" */ = {
 			isa = XCLocalSwiftPackageReference;
-			relativePath = ../../StudentStudyHaven;
+			relativePath = ../;
 		};
 /* End XCLocalSwiftPackageReference section */
 
