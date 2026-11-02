@@ -6,7 +6,7 @@ import iCloudIntegration
 
 /// CloudKit-backed implementation of AssignmentRepositoryProtocol
 /// Uses Apple's native CloudKit for grade tracking data persistence
-public actor CloudKitAssignmentRepositoryImpl: AssignmentRepositoryProtocol {
+public class CloudKitAssignmentRepositoryImpl: AssignmentRepositoryProtocol {
     private let cloudKitManager = CloudKitManager.shared
     private let recordType = CloudKitRecord.RecordType.assignment.rawValue
     
@@ -101,8 +101,8 @@ public actor CloudKitAssignmentRepositoryImpl: AssignmentRepositoryProtocol {
     
     /// Delete an assignment
     public func deleteAssignment(id: String) async throws {
-        guard let assignment = assignmentCache[id] else {
-            // Try to fetch first
+        if assignmentCache[id] == nil {
+            // Try to fetch first to ensure it exists
             _ = try await getAssignment(by: id)
         }
         
@@ -211,23 +211,29 @@ public actor CloudKitAssignmentRepositoryImpl: AssignmentRepositoryProtocol {
 extension Assignment {
     /// Convert Assignment to CloudKit record
     func toCKRecord() -> CKRecord {
-        let record = CKRecord(recordType: CloudKitRecord.RecordType.assignment.rawValue)
-        
-        record["id"] = id as CKRecordValue
-        record["classId"] = classId as CKRecordValue
-        record["name"] = name as CKRecordValue
-        record["dueDate"] = dueDate as CKRecordValue
-        record["description"] = description as CKRecordValue
-        record["score"] = score as CKRecordValue
-        record["maxScore"] = maxScore as CKRecordValue
-        record["weight"] = weight as CKRecordValue
-        record["type"] = type.rawValue as CKRecordValue
-        record["createdAt"] = createdAt as CKRecordValue
-        record["updatedAt"] = updatedAt as CKRecordValue
-        
-        // Use custom record ID based on assignment ID for easier lookup
         let recordID = CKRecord.ID(recordName: id)
-        return CKRecord(recordType: CloudKitRecord.RecordType.assignment.rawValue, recordID: recordID)
+        let record = CKRecord(recordType: CloudKitRecord.RecordType.assignment.rawValue, recordID: recordID)
+        
+        record["id"] = id
+        record["classId"] = classId
+        record["name"] = name
+        record["dueDate"] = dueDate
+        record["maxScore"] = NSNumber(value: maxScore)
+        record["weight"] = NSNumber(value: weight)
+        record["type"] = type.rawValue
+        record["createdAt"] = createdAt
+        record["updatedAt"] = updatedAt
+        
+        // Handle optional fields
+        if let description = description {
+            record["description"] = description
+        }
+        
+        if let score = score {
+            record["score"] = NSNumber(value: score)
+        }
+        
+        return record
     }
     
     /// Create Assignment from CloudKit record

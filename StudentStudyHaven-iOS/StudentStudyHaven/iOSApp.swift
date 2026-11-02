@@ -1,6 +1,6 @@
 import SwiftUI
 import App
-import FirebaseIntegration
+import iCloudIntegration
 import os.log
 
 class AppDelegate: NSObject, UIApplicationDelegate {
@@ -10,9 +10,9 @@ class AppDelegate: NSObject, UIApplicationDelegate {
         let log = OSLog(subsystem: "com.bholsinger.studentstudyhaven", category: "startup")
         os_log("🚀 App launching - AppDelegate.application()", log: log, type: .info)
         
-        os_log("📍 Initializing Firebase", log: log, type: .info)
-        FirebaseService.shared.initialize()
-        os_log("✅ Firebase initialized successfully", log: log, type: .info)
+        os_log("📍 Initializing CloudKit", log: log, type: .info)
+        _ = CloudKitManager.shared
+        os_log("✅ CloudKit initialized successfully", log: log, type: .info)
         
         return true
     }

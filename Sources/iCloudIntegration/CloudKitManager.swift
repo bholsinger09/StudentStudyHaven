@@ -8,11 +8,8 @@ public actor CloudKitManager {
 
     private let container: CKContainer
     private let privateDatabase: CKDatabase
-    private let publicDatabase: CKDatabase
-    private let sharedDatabase: CKDatabase
     
     public private(set) var isSignedIn = false
-    public private(set) var currentUser: CKUserIdentity?
     
     public enum CloudKitError: LocalizedError {
         case notSignedIn
@@ -40,17 +37,12 @@ public actor CloudKitManager {
     private init() {
         self.container = CKContainer.default()
         self.privateDatabase = container.privateCloudDatabase
-        self.publicDatabase = container.publicCloudDatabase
-        self.sharedDatabase = container.sharedCloudDatabase
     }
     
-    /// Initialize CloudKit - Check sign-in status and get user
+    /// Initialize CloudKit - Check sign-in status
     public func initialize() async throws {
         do {
             let recordID = try await container.userRecordID()
-            let record = try await privateDatabase.record(for: recordID)
-            
-            self.currentUser = record.creatorUserID
             self.isSignedIn = true
             
             print("✅ CloudKit initialized successfully")
@@ -59,11 +51,6 @@ public actor CloudKitManager {
             self.isSignedIn = false
             throw CloudKitError.notSignedIn
         }
-    }
-    
-    /// Request user permission for CloudKit access
-    public func requestPermission() async throws {
-        try await container.requestApplicationPermission([.userDisclosureData])
     }
     
     /// Fetch a record from private database
@@ -84,28 +71,6 @@ public actor CloudKitManager {
         }
     }
     
-    /// Save multiple records
-    public func save(records: [CKRecord]) async throws -> [CKRecord] {
-        do {
-            let operation = CKModifyRecordsOperation(recordsToSave: records)
-            var savedRecords: [CKRecord] = []
-            
-            return try await withCheckedThrowingContinuation { continuation in
-                operation.modifyRecordsResultBlock = { result in
-                    do {
-                        let (savedRecs, _) = try result.get()
-                        continuation.resume(returning: savedRecs ?? [])
-                    } catch {
-                        continuation.resume(throwing: CloudKitError.networkError(error))
-                    }
-                }
-                privateDatabase.add(operation)
-            }
-        } catch {
-            throw CloudKitError.networkError(error)
-        }
-    }
-    
     /// Delete a record from private database
     public func delete(recordID: CKRecord.ID) async throws {
         do {
@@ -115,23 +80,34 @@ public actor CloudKitManager {
         }
     }
     
-    /// Query records from private database
+    /// Query records from private database using CKQueryOperation
     public func query(recordType: String, predicate: NSPredicate = NSPredicate(value: true)) async throws -> [CKRecord] {
-        do {
+        return try await withCheckedThrowingContinuation { continuation in
             let query = CKQuery(recordType: recordType, predicate: predicate)
-            let records = try await privateDatabase.records(matching: query)
+            let operation = CKQueryOperation(query: query)
             
             var results: [CKRecord] = []
-            for batch in records {
-                results.append(batch.record)
+            
+            operation.recordMatchedBlock = { _, result in
+                if case .success(let record) = result {
+                    results.append(record)
+                }
             }
-            return results
-        } catch {
-            throw CloudKitError.networkError(error)
+            
+            operation.queryResultBlock = { result in
+                do {
+                    _ = try result.get()
+                    continuation.resume(returning: results)
+                } catch {
+                    continuation.resume(throwing: CloudKitError.networkError(error))
+                }
+            }
+            
+            privateDatabase.add(operation)
         }
     }
     
-    /// Create a subscription for real-time updates
+    /// Subscribe to record type changes
     public func subscribe(toRecordType recordType: String) async throws {
         let subscription = CKQuerySubscription(
             recordType: recordType,
@@ -145,10 +121,11 @@ public actor CloudKitManager {
         subscription.notificationInfo = notificationInfo
         
         do {
-            try await privateDatabase.save(subscription)
+            _ = try await privateDatabase.save(subscription)
             print("✅ Subscribed to \(recordType) updates")
         } catch {
-            throw CloudKitError.networkError(error)
+            // Subscriptions are optional, don't fail initialization
+            print("⚠️  Could not set up subscriptions: \(error)")
         }
     }
     
@@ -158,18 +135,6 @@ public actor CloudKitManager {
             return try await container.userRecordID()
         } catch {
             throw CloudKitError.notSignedIn
-        }
-    }
-    
-    /// Discover other users (for study groups, etc.)
-    public func discoverUser(byEmail email: String) async throws -> CKUserIdentity? {
-        do {
-            let userInfos = try await container.discoverUserInfo(
-                withEmailAddress: email
-            )
-            return userInfos
-        } catch {
-            return nil
         }
     }
 }

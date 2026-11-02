@@ -52,7 +52,7 @@ public struct CloudKitRecord {
                 record[key] = value
             } else if let value = value as? [String] {
                 record[key] = value as CKRecordValue
-            } else if let value = value as? CKReference {
+            } else if let value = value as? CKRecord.Reference {
                 record[key] = value
             }
         }

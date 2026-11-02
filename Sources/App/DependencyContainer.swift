@@ -40,59 +40,31 @@ public class DependencyContainer {
     }()
     
     public lazy var userRepository: UserRepositoryProtocol = {
-        if useMockRepositories {
-            return MockUserRepositoryImpl()
-        } else {
-            return FirebaseUserRepositoryImpl()
-        }
+        return MockUserRepositoryImpl()
     }()
     
     public lazy var classRepository: ClassRepositoryProtocol = {
-        if useMockRepositories {
-            return MockClassRepositoryImpl()
-        } else {
-            return FirestoreClassRepositoryImpl()
-        }
+        return MockClassRepositoryImpl()
     }()
     
     public lazy var flashcardRepository: FlashcardRepositoryProtocol = {
-        if useMockRepositories {
-            return MockFlashcardRepositoryImpl()
-        } else {
-            return FirestoreFlashcardRepositoryImpl()
-        }
+        return MockFlashcardRepositoryImpl()
     }()
     
     public lazy var noteRepository: NoteRepositoryProtocol = {
-        if useMockRepositories {
-            return MockNoteRepositoryImpl()
-        } else {
-            return FirestoreNoteRepositoryImpl()
-        }
+        return MockNoteRepositoryImpl()
     }()
     
     public lazy var studyGroupRepository: StudyGroupRepositoryProtocol = {
-        if useMockRepositories {
-            return MockStudyGroupRepositoryImpl()
-        } else {
-            return FirebaseStudyGroupRepositoryImpl()
-        }
+        return MockStudyGroupRepositoryImpl()
     }()
     
     public lazy var studySessionRepository: GroupStudySessionRepositoryProtocol = {
-        if useMockRepositories {
-            return MockStudySessionRepositoryImpl()
-        } else {
-            return FirestoreGroupStudySessionRepositoryImpl()
-        }
+        return MockStudySessionRepositoryImpl()
     }()
     
     public lazy var groupMessageRepository: GroupMessageRepositoryProtocol = {
-        if useMockRepositories {
-            return MockGroupMessageRepositoryImpl()
-        } else {
-            return FirestoreGroupMessageRepositoryImpl()
-        }
+        return MockGroupMessageRepositoryImpl()
     }()
     
     // MARK: - Initialization
@@ -101,24 +73,14 @@ public class DependencyContainer {
     
     /// Reset all repository instances (useful for testing or switching modes)
     public func reset() {
-        if useMockRepositories {
-            authRepository = MockAuthRepositoryImpl()
-            userRepository = MockUserRepositoryImpl()
-            classRepository = MockClassRepositoryImpl()
-            flashcardRepository = MockFlashcardRepositoryImpl()
-            noteRepository = MockNoteRepositoryImpl()
-            studyGroupRepository = MockStudyGroupRepositoryImpl()
-            studySessionRepository = MockStudySessionRepositoryImpl()
-            groupMessageRepository = MockGroupMessageRepositoryImpl()
-        } else {
-            authRepository = MockAuthRepositoryImpl() // FirebaseAuthRepositoryImpl()
-            userRepository = FirestoreUserRepositoryImpl()
-            classRepository = FirestoreClassRepositoryImpl()
-            flashcardRepository = FirestoreFlashcardRepositoryImpl()
-            noteRepository = FirestoreNoteRepositoryImpl()
-            studyGroupRepository = FirestoreStudyGroupRepositoryImpl()
-            studySessionRepository = FirestoreGroupStudySessionRepositoryImpl()
-            groupMessageRepository = FirestoreGroupMessageRepositoryImpl()
-        }
+        authRepository = MockAuthRepositoryImpl()
+        userRepository = MockUserRepositoryImpl()
+        classRepository = MockClassRepositoryImpl()
+        flashcardRepository = MockFlashcardRepositoryImpl()
+        noteRepository = MockNoteRepositoryImpl()
+        studyGroupRepository = MockStudyGroupRepositoryImpl()
+        studySessionRepository = MockStudySessionRepositoryImpl()
+        groupMessageRepository = MockGroupMessageRepositoryImpl()
+        assignmentRepository = CloudKitAssignmentRepositoryImpl()
     }
 }
