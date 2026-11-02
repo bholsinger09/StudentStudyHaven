@@ -17,8 +17,8 @@ let package = Package(
             name: "Core",
             targets: ["Core"]),
         .library(
-            name: "FirebaseIntegration",
-            targets: ["FirebaseIntegration"]),
+            name: "iCloudIntegration",
+            targets: ["iCloudIntegration"]),
         .library(
             name: "Authentication",
             targets: ["Authentication"]),
@@ -39,7 +39,7 @@ let package = Package(
             targets: ["GradeTracking"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/firebase/firebase-ios-sdk.git", "11.0.0"..<"12.0.0"),
+        // CloudKit is built-in to iOS - no external dependency needed!
     ],
     targets: [
         // MARK: - App Library Target
@@ -47,7 +47,7 @@ let package = Package(
             name: "App",
             dependencies: [
                 "Core",
-                "FirebaseIntegration",
+                "iCloudIntegration",
                 "Authentication",
                 "ClassManagement",
                 "Flashcards",
@@ -67,23 +67,20 @@ let package = Package(
             dependencies: ["Core"],
             path: "Tests/CoreTests"),
 
-        // MARK: - Firebase Integration Module
+        // MARK: - iCloud Integration Module (CloudKit)
         .target(
-            name: "FirebaseIntegration",
+            name: "iCloudIntegration",
             dependencies: [
                 "Core",
-                .product(name: "FirebaseCore", package: "firebase-ios-sdk"),
-                .product(name: "FirebaseAuth", package: "firebase-ios-sdk"),
-                .product(name: "FirebaseFirestore", package: "firebase-ios-sdk"),
             ],
-            path: "Sources/FirebaseIntegration"),
+            path: "Sources/iCloudIntegration"),
 
         // MARK: - Authentication Module
         .target(
             name: "Authentication",
             dependencies: [
                 "Core",
-                "FirebaseIntegration",
+                "iCloudIntegration",
             ],
             path: "Sources/Authentication",
             linkerSettings: [
@@ -100,7 +97,7 @@ let package = Package(
             dependencies: [
                 "Core",
                 "GradeTracking",
-                "FirebaseIntegration",
+                "iCloudIntegration",
             ],
             path: "Sources/ClassManagement"),
         .testTarget(
@@ -113,7 +110,7 @@ let package = Package(
             name: "Flashcards",
             dependencies: [
                 "Core",
-                "FirebaseIntegration",
+                "iCloudIntegration",
             ],
             path: "Sources/Flashcards"),
         .testTarget(
@@ -126,7 +123,7 @@ let package = Package(
             name: "Notes",
             dependencies: [
                 "Core",
-                "FirebaseIntegration",
+                "iCloudIntegration",
             ],
             path: "Sources/Notes"),
         .testTarget(
@@ -139,7 +136,7 @@ let package = Package(
             name: "StudyGroups",
             dependencies: [
                 "Core",
-                "FirebaseIntegration",
+                "iCloudIntegration",
             ],
             path: "Sources/StudyGroups"),
         .testTarget(
@@ -152,7 +149,7 @@ let package = Package(
             name: "GradeTracking",
             dependencies: [
                 "Core",
-                "FirebaseIntegration",
+                "iCloudIntegration",
             ],
             path: "Sources/GradeTracking"),
         .testTarget(
