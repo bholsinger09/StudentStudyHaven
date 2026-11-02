@@ -1,11 +1,12 @@
 import SwiftUI
 import App
-import FirebaseCore
+import FirebaseIntegration
 
 class AppDelegate: NSObject, UIApplicationDelegate {
     func application(_ application: UIApplication,
                      didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
-        FirebaseApp.configure()
+        // Initialize Firebase
+        FirebaseService.shared.initialize()
         return true
     }
 }
@@ -16,11 +17,6 @@ struct iOSApp: App {
     
     // Register app delegate for Firebase setup
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
-
-    init() {
-        // Enable Firebase repositories for real data persistence
-        DependencyContainer.shared.useMockRepositories = false
-    }
 
     var body: some Scene {
         WindowGroup {

@@ -180,6 +180,7 @@
 				DEVELOPMENT_TEAM = PL58734CZ4;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = StudentStudyHaven/Info.plist;
+				INFOPLIST_KEY_NSCameraUsageDescription = "We need camera access to scan QR codes and join study groups.";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UIRequiredDeviceCapabilities = armv7;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
@@ -206,6 +207,7 @@
 				DEVELOPMENT_TEAM = PL58734CZ4;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = StudentStudyHaven/Info.plist;
+				INFOPLIST_KEY_NSCameraUsageDescription = "We need camera access to scan QR codes and join study groups.";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UIRequiredDeviceCapabilities = armv7;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";

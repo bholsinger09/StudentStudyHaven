@@ -17,6 +17,9 @@ let package = Package(
             name: "Core",
             targets: ["Core"]),
         .library(
+            name: "FirebaseIntegration",
+            targets: ["FirebaseIntegration"]),
+        .library(
             name: "Authentication",
             targets: ["Authentication"]),
         .library(
@@ -36,7 +39,7 @@ let package = Package(
             targets: ["GradeTracking"]),
     ],
     dependencies: [
-        // No external dependencies - using Firebase REST API
+        .package(url: "https://github.com/firebase/firebase-ios-sdk.git", "11.0.0"..<"14.0.0"),
     ],
     targets: [
         // MARK: - App Library Target
@@ -44,6 +47,7 @@ let package = Package(
             name: "App",
             dependencies: [
                 "Core",
+                "FirebaseIntegration",
                 "Authentication",
                 "ClassManagement",
                 "Flashcards",
@@ -63,11 +67,23 @@ let package = Package(
             dependencies: ["Core"],
             path: "Tests/CoreTests"),
 
+        // MARK: - Firebase Integration Module
+        .target(
+            name: "FirebaseIntegration",
+            dependencies: [
+                "Core",
+                .product(name: "FirebaseCore", package: "firebase-ios-sdk"),
+                .product(name: "FirebaseAuth", package: "firebase-ios-sdk"),
+                .product(name: "FirebaseFirestore", package: "firebase-ios-sdk"),
+            ],
+            path: "Sources/FirebaseIntegration"),
+
         // MARK: - Authentication Module
         .target(
             name: "Authentication",
             dependencies: [
                 "Core",
+                "FirebaseIntegration",
             ],
             path: "Sources/Authentication",
             linkerSettings: [
@@ -84,6 +100,7 @@ let package = Package(
             dependencies: [
                 "Core",
                 "GradeTracking",
+                "FirebaseIntegration",
             ],
             path: "Sources/ClassManagement"),
         .testTarget(
@@ -96,6 +113,7 @@ let package = Package(
             name: "Flashcards",
             dependencies: [
                 "Core",
+                "FirebaseIntegration",
             ],
             path: "Sources/Flashcards"),
         .testTarget(
@@ -108,6 +126,7 @@ let package = Package(
             name: "Notes",
             dependencies: [
                 "Core",
+                "FirebaseIntegration",
             ],
             path: "Sources/Notes"),
         .testTarget(
@@ -120,6 +139,7 @@ let package = Package(
             name: "StudyGroups",
             dependencies: [
                 "Core",
+                "FirebaseIntegration",
             ],
             path: "Sources/StudyGroups"),
         .testTarget(
@@ -132,6 +152,7 @@ let package = Package(
             name: "GradeTracking",
             dependencies: [
                 "Core",
+                "FirebaseIntegration",
             ],
             path: "Sources/GradeTracking"),
         .testTarget(

@@ -91,3 +91,7 @@ iOSInjectionProject/
 
 ## macOS specific
 .DS_Store
+
+# Firebase configuration files (contain sensitive credentials)
+GoogleService-Info.plist
+**/GoogleService-Info.plist

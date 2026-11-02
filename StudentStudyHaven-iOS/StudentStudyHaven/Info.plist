@@ -9,7 +9,5 @@
 	</dict>
 	<key>UILaunchScreen</key>
 	<dict/>
-	<key>NSCameraUsageDescription</key>
-	<string>We need camera access to scan QR codes and join study groups.</string>
 </dict>
 </plist>

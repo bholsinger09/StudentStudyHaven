@@ -1,6 +1,6 @@
 import Foundation
 
-public struct CourseGradeInfo: Identifiable, Equatable {
+public struct CourseGradeInfo: Identifiable, Codable, Equatable {
     public let classId: String
     public let assignments: [Assignment]
     
