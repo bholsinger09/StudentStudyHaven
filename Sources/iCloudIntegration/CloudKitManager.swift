@@ -109,24 +109,10 @@ public actor CloudKitManager {
     
     /// Subscribe to record type changes
     public func subscribe(toRecordType recordType: String) async throws {
-        let subscription = CKQuerySubscription(
-            recordType: recordType,
-            predicate: NSPredicate(value: true),
-            subscriptionID: "subscribe-\(recordType)",
-            options: []
-        )
-        
-        let notificationInfo = CKSubscription.NotificationInfo()
-        notificationInfo.shouldSendContentAvailable = true
-        subscription.notificationInfo = notificationInfo
-        
-        do {
-            _ = try await privateDatabase.save(subscription)
-            print("✅ Subscribed to \(recordType) updates")
-        } catch {
-            // Subscriptions are optional, don't fail initialization
-            print("⚠️  Could not set up subscriptions: \(error)")
-        }
+        // Note: Subscriptions in CloudKit require push notifications to be set up
+        // For now, we skip subscriptions to avoid crashes during initialization
+        // Real-time updates can be implemented via manual polling if needed
+        print("ℹ️  Subscriptions disabled (requires push notification setup)")
     }
     
     /// Get current user's record ID
