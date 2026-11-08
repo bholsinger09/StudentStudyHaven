@@ -73,7 +73,10 @@ public struct StudyGroupDetailView: View {
                     currentUserId: currentUserId,
                     collegeId: collegeId,
                     searchUsersUseCase: searchUsersUseCase,
-                    inviteUserToGroupUseCase: inviteUserToGroupUseCase
+                    inviteUserToGroupUseCase: inviteUserToGroupUseCase,
+                    leaveStudyGroupUseCase: leaveStudyGroupUseCase,
+                    deleteStudyGroupUseCase: deleteStudyGroupUseCase,
+                    showLeaveConfirmation: $showLeaveConfirmation
                 )
                     .tag(2)
             }
@@ -254,16 +257,24 @@ struct GroupMembersView: View {
     let collegeId: String
     let searchUsersUseCase: SearchUsersUseCase?
     let inviteUserToGroupUseCase: InviteUserToGroupUseCase?
+    let leaveStudyGroupUseCase: LeaveStudyGroupUseCase?
+    let deleteStudyGroupUseCase: DeleteStudyGroupUseCase?
+    @Binding var showLeaveConfirmation: Bool
     
     @State private var showUserSearch = false
     
     init(group: StudyGroup, currentUserId: String, collegeId: String, 
-         searchUsersUseCase: SearchUsersUseCase?, inviteUserToGroupUseCase: InviteUserToGroupUseCase?) {
+         searchUsersUseCase: SearchUsersUseCase?, inviteUserToGroupUseCase: InviteUserToGroupUseCase?,
+         leaveStudyGroupUseCase: LeaveStudyGroupUseCase?, deleteStudyGroupUseCase: DeleteStudyGroupUseCase?,
+         showLeaveConfirmation: Binding<Bool>) {
         self.group = group
         self.currentUserId = currentUserId
         self.collegeId = collegeId
         self.searchUsersUseCase = searchUsersUseCase
         self.inviteUserToGroupUseCase = inviteUserToGroupUseCase
+        self.leaveStudyGroupUseCase = leaveStudyGroupUseCase
+        self.deleteStudyGroupUseCase = deleteStudyGroupUseCase
+        self._showLeaveConfirmation = showLeaveConfirmation
         
         print("👥 GroupMembersView INIT")
         print("   Group: \(group.name)")
@@ -359,7 +370,8 @@ struct GroupMembersView: View {
             
             Section {
                 Button("Leave Group", role: .destructive) {
-                    // Handle leave
+                    print("🚪 Leave Group button tapped from section")
+                    showLeaveConfirmation = true
                 }
             }
         }
