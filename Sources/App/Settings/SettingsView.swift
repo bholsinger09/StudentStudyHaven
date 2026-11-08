@@ -121,7 +121,7 @@ public struct SettingsView: View {
 
                                 SettingsInfoRow(
                                     title: "Version",
-                                    value: "1.0.0"
+                                    value: "3.0.0"
                                 )
                             }
                             .background(Color.white.opacity(0.05))
