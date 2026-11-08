@@ -27,12 +27,7 @@ public final class LeaveStudyGroupUseCase {
             throw AppError.invalidData("You are not a member of this study group")
         }
         
-        // Prevent creator from leaving (they must delete the group instead)
-        guard !studyGroup.isCreator(userId) else {
-            throw AppError.invalidData("Group creator cannot leave. Delete the group instead.")
-        }
-        
-        // Remove user from group
+        // Remove user from group (allows creator to leave without deleting the group)
         return try await studyGroupRepository.removeMember(groupId: groupId, userId: userId)
     }
 }
