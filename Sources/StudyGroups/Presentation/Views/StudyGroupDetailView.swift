@@ -111,54 +111,95 @@ public struct StudyGroupDetailView: View {
                 }
             }
         }
-        .alert(studyGroup.isCreator(currentUserId) ? "Delete Group" : "Leave Group", isPresented: $showLeaveConfirmation) {
+        .alert("Manage Group", isPresented: $showLeaveConfirmation) {
             let isCreator = studyGroup.isCreator(currentUserId)
             
             Button("Cancel", role: .cancel) {
-                print("🚪 User cancelled \(isCreator ? "delete" : "leave")")
+                print("🚪 User cancelled")
             }
-            Button(isCreator ? "Delete" : "Leave", role: .destructive) {
-                print("📊 Alert Action - isCreator check result: \(isCreator)")
-                print("   Current User: \(currentUserId)")
-                print("   Group Creator: \(studyGroup.createdBy)")
-                print("🚪 User tapped confirm for \(isCreator ? "delete" : "leave")")
-                print("   Delete Use Case: \(deleteStudyGroupUseCase != nil ? "✅ PRESENT" : "❌ NIL")")
-                print("   Leave Use Case: \(leaveStudyGroupUseCase != nil ? "✅ PRESENT" : "❌ NIL")")
+            
+            if isCreator {
+                Button("Leave Group", role: .destructive) {
+                    print("🚪 Creator tapped Leave (without deleting)")
+                    print("   Leave Use Case: \(leaveStudyGroupUseCase != nil ? "✅ PRESENT" : "❌ NIL")")
+                    
+                    Task {
+                        do {
+                            print("🚪 Attempting to leave group as creator...")
+                            guard let leaveUseCase = leaveStudyGroupUseCase else {
+                                leaveErrorMessage = "Leave use case not available"
+                                return
+                            }
+                            _ = try await leaveUseCase.execute(groupId: groupId, userId: currentUserId)
+                            print("✅ Creator left group successfully (others remain)")
+                            await MainActor.run {
+                                dismiss()
+                            }
+                        } catch let error as AppError {
+                            print("❌ Error leaving: \(error.localizedDescription)")
+                            leaveErrorMessage = error.localizedDescription
+                        } catch {
+                            print("❌ Error leaving: \(error)")
+                            leaveErrorMessage = "Failed to leave group"
+                        }
+                    }
+                }
                 
-                Task {
-                    do {
-                        if isCreator {
+                Button("Delete Group", role: .destructive) {
+                    print("🗑️ Creator tapped Delete")
+                    print("   Delete Use Case: \(deleteStudyGroupUseCase != nil ? "✅ PRESENT" : "❌ NIL")")
+                    
+                    Task {
+                        do {
                             print("🗑️ Attempting to delete group...")
                             guard let deleteUseCase = deleteStudyGroupUseCase else {
                                 leaveErrorMessage = "Delete use case not available"
                                 return
                             }
                             try await deleteUseCase.execute(groupId: groupId, userId: currentUserId)
-                            print("✅ Group deleted successfully")
-                        } else {
-                            print("🚪 Attempting to leave group...")
+                            print("✅ Group deleted successfully for everyone")
+                            await MainActor.run {
+                                dismiss()
+                            }
+                        } catch let error as AppError {
+                            print("❌ Error deleting: \(error.localizedDescription)")
+                            leaveErrorMessage = error.localizedDescription
+                        } catch {
+                            print("❌ Error deleting: \(error)")
+                            leaveErrorMessage = "Failed to delete group"
+                        }
+                    }
+                }
+            } else {
+                Button("Leave Group", role: .destructive) {
+                    print("🚪 Member tapped Leave")
+                    print("   Leave Use Case: \(leaveStudyGroupUseCase != nil ? "✅ PRESENT" : "❌ NIL")")
+                    
+                    Task {
+                        do {
+                            print("🚪 Attempting to leave group as member...")
                             guard let leaveUseCase = leaveStudyGroupUseCase else {
                                 leaveErrorMessage = "Leave use case not available"
                                 return
                             }
                             _ = try await leaveUseCase.execute(groupId: groupId, userId: currentUserId)
                             print("✅ Left group successfully")
+                            await MainActor.run {
+                                dismiss()
+                            }
+                        } catch let error as AppError {
+                            print("❌ Error: \(error.localizedDescription)")
+                            leaveErrorMessage = error.localizedDescription
+                        } catch {
+                            print("❌ Error: \(error)")
+                            leaveErrorMessage = "Failed to leave group"
                         }
-                        await MainActor.run {
-                            dismiss()
-                        }
-                    } catch let error as AppError {
-                        print("❌ Error: \(error.localizedDescription)")
-                        leaveErrorMessage = error.localizedDescription
-                    } catch {
-                        print("❌ Error: \(error)")
-                        leaveErrorMessage = studyGroup.isCreator(currentUserId) ? "Failed to delete group" : "Failed to leave group"
                     }
                 }
             }
         } message: {
             if studyGroup.isCreator(currentUserId) {
-                Text("Are you sure you want to delete this group? This cannot be undone.")
+                Text("You are the creator. You can leave this group (others continue) or delete it for everyone.")
             } else {
                 Text("Are you sure you want to leave this group?")
             }

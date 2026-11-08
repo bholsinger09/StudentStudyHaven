@@ -116,9 +116,18 @@ public struct StudyGroupsView: View {
             }
             .alert("Delete Group", isPresented: $showDeleteConfirmation) {
                 Button("Cancel", role: .cancel) {
-                    print("🗑️ User cancelled delete")
+                    print("🚪 User cancelled delete")
                 }
-                Button("Delete", role: .destructive) {
+                if let group = selectedGroupForAction, group.isCreator(userId) {
+                    // Creator has option to leave or delete
+                    Button("Leave Group", role: .destructive) {
+                        print("🚪 Creator chose to leave (not delete) for: \(group.name)")
+                        Task {
+                            await viewModel.leaveGroup(groupId: group.id)
+                        }
+                    }
+                }
+                Button(selectedGroupForAction?.isCreator(userId) == true ? "Delete Group" : "Delete", role: .destructive) {
                     print("🗑️ User confirmed delete for: \(selectedGroupForAction?.name ?? "unknown")")
                     if let group = selectedGroupForAction {
                         Task {
@@ -128,7 +137,11 @@ public struct StudyGroupsView: View {
                 }
             } message: {
                 if let group = selectedGroupForAction {
-                    Text("Are you sure you want to delete '\(group.name)'? This cannot be undone.")
+                    if group.isCreator(userId) {
+                        Text("You are the creator of '\(group.name)'. Choose to leave the group (others continue) or delete it for everyone.")
+                    } else {
+                        Text("Are you sure you want to delete '\(group.name)'? This cannot be undone.")
+                    }
                 }
             }
             .alert("Leave Group", isPresented: $showLeaveConfirmation) {
