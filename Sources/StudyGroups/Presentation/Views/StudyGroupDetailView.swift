@@ -112,17 +112,22 @@ public struct StudyGroupDetailView: View {
             }
         }
         .alert(studyGroup.isCreator(currentUserId) ? "Delete Group" : "Leave Group", isPresented: $showLeaveConfirmation) {
+            let isCreator = studyGroup.isCreator(currentUserId)
+            
             Button("Cancel", role: .cancel) {
-                print("🚪 User cancelled \(studyGroup.isCreator(currentUserId) ? "delete" : "leave")")
+                print("🚪 User cancelled \(isCreator ? "delete" : "leave")")
             }
-            Button(studyGroup.isCreator(currentUserId) ? "Delete" : "Leave", role: .destructive) {
-                print("🚪 User tapped confirm for \(studyGroup.isCreator(currentUserId) ? "delete" : "leave")")
+            Button(isCreator ? "Delete" : "Leave", role: .destructive) {
+                print("📊 Alert Action - isCreator check result: \(isCreator)")
+                print("   Current User: \(currentUserId)")
+                print("   Group Creator: \(studyGroup.createdBy)")
+                print("🚪 User tapped confirm for \(isCreator ? "delete" : "leave")")
                 print("   Delete Use Case: \(deleteStudyGroupUseCase != nil ? "✅ PRESENT" : "❌ NIL")")
                 print("   Leave Use Case: \(leaveStudyGroupUseCase != nil ? "✅ PRESENT" : "❌ NIL")")
                 
                 Task {
                     do {
-                        if studyGroup.isCreator(currentUserId) {
+                        if isCreator {
                             print("🗑️ Attempting to delete group...")
                             guard let deleteUseCase = deleteStudyGroupUseCase else {
                                 leaveErrorMessage = "Delete use case not available"
