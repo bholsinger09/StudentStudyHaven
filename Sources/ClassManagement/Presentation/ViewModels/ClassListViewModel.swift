@@ -36,6 +36,9 @@ public final class ClassListViewModel: ObservableObject {
         do {
             classes = try await getClassesUseCase.execute(userId: userId)
             
+            // Clear error on successful load (even if empty)
+            errorMessage = nil
+            
             // Load assignment stats and details for each class
             await loadAssignmentData()
         } catch let error as AppError {

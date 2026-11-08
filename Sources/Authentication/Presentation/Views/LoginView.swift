@@ -7,10 +7,16 @@ public struct LoginView: View {
     @State private var isPasswordVisible = false
     @Environment(\.horizontalSizeClass) var horizontalSizeClass
     var backAction: (() -> Void)?
+    var registerAction: (() -> Void)?
 
-    public init(viewModel: LoginViewModel, backAction: (() -> Void)? = nil) {
+    public init(
+        viewModel: LoginViewModel,
+        backAction: (() -> Void)? = nil,
+        registerAction: (() -> Void)? = nil
+    ) {
         _viewModel = StateObject(wrappedValue: viewModel)
         self.backAction = backAction
+        self.registerAction = registerAction
     }
 
     private var isCompact: Bool {
@@ -261,9 +267,8 @@ public struct LoginView: View {
 
                         // Register Button - PROMINENT
                         VStack(spacing: isCompact ? 12 : 16) {
-                            NavigationLink(destination: {
-                                // RegisterView will be injected here
-                                Text("Register View")
+                            Button(action: {
+                                registerAction?()
                             }) {
                                 HStack(spacing: 8) {
                                     Image(systemName: "person.badge.plus")
@@ -283,6 +288,7 @@ public struct LoginView: View {
                                 )
                                 .foregroundColor(Color(red: 0.73, green: 0.33, blue: 0.83))
                             }
+                            .buttonStyle(.plain)
 
                             HStack(spacing: 4) {
                                 Text("Already have an account?")

@@ -1,14 +1,8 @@
-//
-//  AppState.swift
-//  StudentStudyHaven
-//
-//  Created by Ben H on 11/24/25.
-//
-
 import Authentication
 import ClassManagement
 import Core
 import Flashcards
+import iCloudIntegration
 import Notes
 import StudyGroups
 import SwiftUI
@@ -44,6 +38,13 @@ public class AppState: ObservableObject {
         self.groupMessageRepository = container.groupMessageRepository
 
         Task {
+            // Initialize CloudKit for iCloud integration
+            do {
+                try await CloudKitManager.shared.initialize()
+            } catch {
+                print("⚠️  CloudKit initialization failed: \(error)")
+            }
+            
             await checkAuthStatus()
         }
     }

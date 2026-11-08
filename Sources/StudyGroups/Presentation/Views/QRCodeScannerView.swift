@@ -9,6 +9,7 @@ public class QRScannerCoordinator: NSObject, AVCaptureMetadataOutputObjectsDeleg
     @Binding var scannedCode: String?
     @Binding var errorMessage: String?
     var captureSession: AVCaptureSession?
+    private var lastScannedCode: String? = nil
     
     public init(scannedCode: Binding<String?>, errorMessage: Binding<String?>) {
         self._scannedCode = scannedCode
@@ -73,6 +74,7 @@ public class QRScannerCoordinator: NSObject, AVCaptureMetadataOutputObjectsDeleg
     public func startSession() {
         if let captureSession = captureSession, !captureSession.isRunning {
             print("🎥 QRScannerCoordinator: Starting capture session")
+            lastScannedCode = nil
             captureSession.startRunning()
             print("✅ QRScannerCoordinator: Capture session running = \(captureSession.isRunning)")
         } else if captureSession != nil {
@@ -93,10 +95,14 @@ public class QRScannerCoordinator: NSObject, AVCaptureMetadataOutputObjectsDeleg
         if let metadataObject = metadataObjects.first as? AVMetadataMachineReadableCodeObject,
            metadataObject.type == .qr,
            let stringValue = metadataObject.stringValue {
-            print("🎉 QRScannerCoordinator: QR code detected! Value: \(stringValue)")
-            DispatchQueue.main.async {
-                self.scannedCode = stringValue
-                self.stopSession()
+            // Only process if this is a different code than the last one
+            if stringValue != lastScannedCode {
+                print("🎉 QRScannerCoordinator: QR code detected! Value: \(stringValue)")
+                lastScannedCode = stringValue
+                DispatchQueue.main.async {
+                    self.scannedCode = stringValue
+                    self.stopSession()
+                }
             }
         }
     }
@@ -187,11 +193,14 @@ public struct QRScannerView: UIViewControllerRepresentable {
 public struct QRCodeScannerWrapper: View {
     @State private var scannedCode: String?
     @State private var errorMessage: String?
+    @State private var isProcessing = false
     let onScan: (String) -> Void
+    let onScanComplete: (() -> Void)?
     @Environment(\.dismiss) private var dismiss
     
-    public init(onScan: @escaping (String) -> Void) {
+    public init(onScan: @escaping (String) -> Void, onScanComplete: (() -> Void)? = nil) {
         self.onScan = onScan
+        self.onScanComplete = onScanComplete
     }
     
     public var body: some View {
@@ -212,24 +221,39 @@ public struct QRCodeScannerWrapper: View {
                 
                 Spacer()
                 
-                VStack(spacing: 12) {
-                    Image(systemName: "qrcode.viewfinder")
-                        .font(.system(size: 60))
-                        .foregroundColor(.white)
-                    
-                    Text("Point camera at QR code")
-                        .font(.headline)
-                        .foregroundColor(.white)
-                    
-                    Text("The QR code will be automatically scanned")
-                        .font(.caption)
-                        .foregroundColor(.white.opacity(0.7))
+                if isProcessing {
+                    VStack(spacing: 12) {
+                        ProgressView()
+                            .tint(.white)
+                        Text("Processing QR code...")
+                            .font(.headline)
+                            .foregroundColor(.white)
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding(30)
+                    .background(Color.black.opacity(0.6))
+                    .cornerRadius(12)
+                    .padding()
+                } else {
+                    VStack(spacing: 12) {
+                        Image(systemName: "qrcode.viewfinder")
+                            .font(.system(size: 60))
+                            .foregroundColor(.white)
+                        
+                        Text("Point camera at QR code")
+                            .font(.headline)
+                            .foregroundColor(.white)
+                        
+                        Text("The QR code will be automatically scanned")
+                            .font(.caption)
+                            .foregroundColor(.white.opacity(0.7))
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding(30)
+                    .background(Color.black.opacity(0.6))
+                    .cornerRadius(12)
+                    .padding()
                 }
-                .frame(maxWidth: .infinity)
-                .padding(30)
-                .background(Color.black.opacity(0.6))
-                .cornerRadius(12)
-                .padding()
                 
                 Spacer()
             }
@@ -237,8 +261,8 @@ public struct QRCodeScannerWrapper: View {
         }
         .onChange(of: scannedCode) { newCode in
             if let code = newCode {
+                isProcessing = true
                 onScan(code)
-                dismiss()
             }
         }
         .alert("Camera Error", isPresented: .constant(errorMessage != nil)) {
@@ -261,9 +285,11 @@ public struct QRScannerView: View {
 /// Stub for non-iOS platforms
 public struct QRCodeScannerWrapper: View {
     let onScan: (String) -> Void
+    let onScanComplete: (() -> Void)?
     
-    public init(onScan: @escaping (String) -> Void) {
+    public init(onScan: @escaping (String) -> Void, onScanComplete: (() -> Void)? = nil) {
         self.onScan = onScan
+        self.onScanComplete = onScanComplete
     }
     
     public var body: some View {

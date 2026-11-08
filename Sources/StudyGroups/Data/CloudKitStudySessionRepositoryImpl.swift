@@ -183,6 +183,8 @@ extension GroupStudySession {
         let recordID = CKRecord.ID(recordName: id)
         let record = CKRecord(recordType: CloudKitRecord.RecordType.studySession.rawValue, recordID: recordID)
         
+        let isoFormatter = ISO8601DateFormatter()
+        
         record["id"] = id
         record["studyGroupId"] = studyGroupId
         record["title"] = title
@@ -191,9 +193,9 @@ extension GroupStudySession {
             record["description"] = description
         }
         
-        record["scheduledAt"] = scheduledAt
-        record["createdAt"] = createdAt
-        record["updatedAt"] = updatedAt
+        record["scheduledAt"] = isoFormatter.string(from: scheduledAt)
+        record["createdAt"] = isoFormatter.string(from: createdAt)
+        record["updatedAt"] = isoFormatter.string(from: updatedAt)
         
         // Encode session details
         record["durationMinutes"] = NSNumber(value: durationMinutes)
@@ -223,16 +225,21 @@ extension GroupStudySession {
     /// Create GroupStudySession from CKRecord
     static func fromCKRecord(_ record: CKRecord) -> GroupStudySession? {
         let id = record.recordID.recordName
+        let isoFormatter = ISO8601DateFormatter()
+        
         guard let studyGroupId = record["studyGroupId"] as? String,
               let title = record["title"] as? String,
-              let scheduledAt = record["scheduledAt"] as? Date,
-              let createdAt = record["createdAt"] as? Date,
-              let updatedAt = record["updatedAt"] as? Date,
+              let scheduledAtStr = record["scheduledAt"] as? String,
+              let createdAtStr = record["createdAt"] as? String,
+              let updatedAtStr = record["updatedAt"] as? String,
               let durationMinutes = record["durationMinutes"] as? NSNumber,
               let isVirtual = record["isVirtual"] as? NSNumber,
               let createdBy = record["createdBy"] as? String,
               let statusString = record["status"] as? String,
-              let status = GroupStudySession.SessionStatus(rawValue: statusString) else {
+              let status = GroupStudySession.SessionStatus(rawValue: statusString),
+              let scheduledAt = isoFormatter.date(from: scheduledAtStr),
+              let createdAt = isoFormatter.date(from: createdAtStr),
+              let updatedAt = isoFormatter.date(from: updatedAtStr) else {
             return nil
         }
         

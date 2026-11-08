@@ -58,7 +58,7 @@ public struct ClassListView: View {
                     await viewModel.loadClasses()
                 }
             }
-            .alert("Error", isPresented: .constant(viewModel.errorMessage != nil)) {
+            .alert("Error", isPresented: .constant(viewModel.errorMessage != nil && !viewModel.classes.isEmpty)) {
                 Button("OK") {
                     viewModel.errorMessage = nil
                 }

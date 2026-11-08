@@ -9,13 +9,9 @@ public struct StudentStudyHavenApp: App {
     @StateObject private var appState = AppState()
 
     public init() {
-        // Configure Firebase on app launch
-        // Task { @MainActor in
-        //     FirebaseManager.shared.configure()
-        // }
-
-        // Use mock repositories for now
-        DependencyContainer.shared.useMockRepositories = true
+        // Use real CloudKit repositories for device testing
+        // Set to true only for testing without iCloud
+        DependencyContainer.shared.useMockRepositories = false
     }
 
     public var body: some Scene {

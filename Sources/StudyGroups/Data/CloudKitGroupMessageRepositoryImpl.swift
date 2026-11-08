@@ -151,6 +151,8 @@ extension GroupMessage {
         let recordID = CKRecord.ID(recordName: id)
         let record = CKRecord(recordType: CloudKitRecord.RecordType.groupMessage.rawValue, recordID: recordID)
         
+        let isoFormatter = ISO8601DateFormatter()
+        
         record["id"] = id
         record["studyGroupId"] = studyGroupId
         record["senderId"] = senderId
@@ -158,10 +160,10 @@ extension GroupMessage {
         record["content"] = content
         record["messageType"] = messageType.rawValue
         record["isEdited"] = NSNumber(value: isEdited)
-        record["timestamp"] = timestamp
+        record["timestamp"] = isoFormatter.string(from: timestamp)
         
         if let editedAt = editedAt {
-            record["editedAt"] = editedAt
+            record["editedAt"] = isoFormatter.string(from: editedAt)
         }
         
         return record
@@ -170,6 +172,8 @@ extension GroupMessage {
     /// Create GroupMessage from CKRecord
     static func fromCKRecord(_ record: CKRecord) -> GroupMessage? {
         let id = record.recordID.recordName
+        let isoFormatter = ISO8601DateFormatter()
+        
         guard let studyGroupId = record["studyGroupId"] as? String,
               let senderId = record["senderId"] as? String,
               let senderName = record["senderName"] as? String,
@@ -177,11 +181,15 @@ extension GroupMessage {
               let messageTypeString = record["messageType"] as? String,
               let messageType = GroupMessage.MessageType(rawValue: messageTypeString),
               let isEdited = record["isEdited"] as? NSNumber,
-              let timestamp = record["timestamp"] as? Date else {
+              let timestampStr = record["timestamp"] as? String,
+              let timestamp = isoFormatter.date(from: timestampStr) else {
             return nil
         }
         
-        let editedAt = record["editedAt"] as? Date
+        var editedAt: Date? = nil
+        if let editedAtStr = record["editedAt"] as? String {
+            editedAt = isoFormatter.date(from: editedAtStr)
+        }
         
         return GroupMessage(
             id: id,

@@ -63,8 +63,23 @@ public final class CreateStudyGroupViewModel: ObservableObject {
             errorMessage = error.localizedDescription
             isLoading = false
             return false
+        } catch let error as NSError {
+            // Provide specific error messages for CloudKit errors
+            if error.domain == "CKErrorDomain" {
+                if error.code == 1 { // CKError.notAuthenticated
+                    errorMessage = "Please sign in to iCloud in Settings"
+                } else if error.code == 25 { // CKError.requestRateLimited
+                    errorMessage = "Too many requests. Please try again later"
+                } else {
+                    errorMessage = "CloudKit error: \(error.localizedDescription)"
+                }
+            } else {
+                errorMessage = error.localizedDescription
+            }
+            isLoading = false
+            return false
         } catch {
-            errorMessage = "Failed to create study group"
+            errorMessage = "Failed to create study group: \(error)"
             isLoading = false
             return false
         }

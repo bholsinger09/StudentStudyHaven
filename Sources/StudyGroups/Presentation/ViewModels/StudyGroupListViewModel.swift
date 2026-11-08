@@ -13,17 +13,26 @@ public final class StudyGroupListViewModel: ObservableObject {
     
     private let getStudyGroupsUseCase: GetStudyGroupsUseCase
     private let joinStudyGroupUseCase: JoinStudyGroupUseCase
+    private let leaveStudyGroupUseCase: LeaveStudyGroupUseCase
+    private let deleteStudyGroupUseCase: DeleteStudyGroupUseCase
+    let studyGroupRepository: StudyGroupRepositoryProtocol
     private let userId: String
     private let collegeId: String
     
     public init(
         getStudyGroupsUseCase: GetStudyGroupsUseCase,
         joinStudyGroupUseCase: JoinStudyGroupUseCase,
+        leaveStudyGroupUseCase: LeaveStudyGroupUseCase,
+        deleteStudyGroupUseCase: DeleteStudyGroupUseCase,
+        studyGroupRepository: StudyGroupRepositoryProtocol,
         userId: String,
         collegeId: String
     ) {
         self.getStudyGroupsUseCase = getStudyGroupsUseCase
         self.joinStudyGroupUseCase = joinStudyGroupUseCase
+        self.leaveStudyGroupUseCase = leaveStudyGroupUseCase
+        self.deleteStudyGroupUseCase = deleteStudyGroupUseCase
+        self.studyGroupRepository = studyGroupRepository
         self.userId = userId
         self.collegeId = collegeId
     }
@@ -112,6 +121,39 @@ public final class StudyGroupListViewModel: ObservableObject {
         } catch {
             print("❌ StudyGroupListViewModel: Join failed with error: \(error)")
             errorMessage = "Failed to join group"
+        }
+    }
+    
+    public func leaveGroup(groupId: String) async {
+        print("🚪 StudyGroupListViewModel.leaveGroup() - Leaving group: \(groupId)")
+        do {
+            _ = try await leaveStudyGroupUseCase.execute(groupId: groupId, userId: userId)
+            myGroups.removeAll { $0.id == groupId }
+            errorMessage = nil
+            print("✅ StudyGroupListViewModel: Left group successfully")
+        } catch let error as AppError {
+            errorMessage = error.localizedDescription
+            print("❌ StudyGroupListViewModel: Leave failed - \(error.localizedDescription)")
+        } catch {
+            errorMessage = "Failed to leave group"
+            print("❌ StudyGroupListViewModel: Leave failed - \(error)")
+        }
+    }
+    
+    public func deleteGroup(groupId: String) async {
+        print("🗑️ StudyGroupListViewModel.deleteGroup() - Deleting group: \(groupId)")
+        do {
+            try await deleteStudyGroupUseCase.execute(groupId: groupId, userId: userId)
+            myGroups.removeAll { $0.id == groupId }
+            discoverGroups.removeAll { $0.id == groupId }
+            errorMessage = nil
+            print("✅ StudyGroupListViewModel: Deleted group successfully")
+        } catch let error as AppError {
+            errorMessage = error.localizedDescription
+            print("❌ StudyGroupListViewModel: Delete failed - \(error.localizedDescription)")
+        } catch {
+            errorMessage = "Failed to delete group"
+            print("❌ StudyGroupListViewModel: Delete failed - \(error)")
         }
     }
 }

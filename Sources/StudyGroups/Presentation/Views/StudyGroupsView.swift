@@ -9,10 +9,15 @@ public struct StudyGroupsView: View {
     @State private var showJoinSheet = false
     @State private var scannedGroupId: String? = nil
     @State private var joinError: String? = nil
+    @State private var showDeleteConfirmation = false
+    @State private var showLeaveConfirmation = false
+    @State private var selectedGroupForAction: StudyGroup? = nil
     
     private let createStudyGroupUseCase: CreateStudyGroupUseCase
     private let searchUsersUseCase: SearchUsersUseCase
     private let inviteUserToGroupUseCase: InviteUserToGroupUseCase
+    private let leaveStudyGroupUseCase: LeaveStudyGroupUseCase
+    private let deleteStudyGroupUseCase: DeleteStudyGroupUseCase
     private let userId: String
     private let collegeId: String
     
@@ -21,6 +26,8 @@ public struct StudyGroupsView: View {
         createStudyGroupUseCase: CreateStudyGroupUseCase,
         searchUsersUseCase: SearchUsersUseCase,
         inviteUserToGroupUseCase: InviteUserToGroupUseCase,
+        leaveStudyGroupUseCase: LeaveStudyGroupUseCase,
+        deleteStudyGroupUseCase: DeleteStudyGroupUseCase,
         userId: String,
         collegeId: String
     ) {
@@ -28,6 +35,8 @@ public struct StudyGroupsView: View {
         self.createStudyGroupUseCase = createStudyGroupUseCase
         self.searchUsersUseCase = searchUsersUseCase
         self.inviteUserToGroupUseCase = inviteUserToGroupUseCase
+        self.leaveStudyGroupUseCase = leaveStudyGroupUseCase
+        self.deleteStudyGroupUseCase = deleteStudyGroupUseCase
         self.userId = userId
         self.collegeId = collegeId
     }
@@ -105,6 +114,40 @@ public struct StudyGroupsView: View {
                     Text(error)
                 }
             }
+            .alert("Delete Group", isPresented: $showDeleteConfirmation) {
+                Button("Cancel", role: .cancel) {
+                    print("🗑️ User cancelled delete")
+                }
+                Button("Delete", role: .destructive) {
+                    print("🗑️ User confirmed delete for: \(selectedGroupForAction?.name ?? "unknown")")
+                    if let group = selectedGroupForAction {
+                        Task {
+                            await viewModel.deleteGroup(groupId: group.id)
+                        }
+                    }
+                }
+            } message: {
+                if let group = selectedGroupForAction {
+                    Text("Are you sure you want to delete '\(group.name)'? This cannot be undone.")
+                }
+            }
+            .alert("Leave Group", isPresented: $showLeaveConfirmation) {
+                Button("Cancel", role: .cancel) {
+                    print("🚪 User cancelled leave")
+                }
+                Button("Leave", role: .destructive) {
+                    print("🚪 User confirmed leave for: \(selectedGroupForAction?.name ?? "unknown")")
+                    if let group = selectedGroupForAction {
+                        Task {
+                            await viewModel.leaveGroup(groupId: group.id)
+                        }
+                    }
+                }
+            } message: {
+                if let group = selectedGroupForAction {
+                    Text("Are you sure you want to leave '\(group.name)'?")
+                }
+            }
         }
     }
     
@@ -128,7 +171,10 @@ public struct StudyGroupsView: View {
                     currentUserId: userId,
                     collegeId: collegeId,
                     searchUsersUseCase: searchUsersUseCase,
-                    inviteUserToGroupUseCase: inviteUserToGroupUseCase
+                    inviteUserToGroupUseCase: inviteUserToGroupUseCase,
+                    studyGroupRepository: viewModel.studyGroupRepository,
+                    leaveStudyGroupUseCase: leaveStudyGroupUseCase,
+                    deleteStudyGroupUseCase: deleteStudyGroupUseCase
                 )) {
                     StudyGroupRow(group: group)
                 }
@@ -136,6 +182,44 @@ public struct StudyGroupsView: View {
                     print("📱 NavigationLink for: \(group.name)")
                     print("   Search Use Case: ✅ PRESENT")
                     print("   Invite Use Case: ✅ PRESENT")
+                }
+                .contextMenu {
+                    if group.isCreator(userId) {
+                        Button(role: .destructive) {
+                            print("🗑️ Context menu: Delete tapped for \(group.name)")
+                            selectedGroupForAction = group
+                            showDeleteConfirmation = true
+                        } label: {
+                            Label("Delete", systemImage: "trash")
+                        }
+                    } else {
+                        Button(role: .destructive) {
+                            print("🚪 Context menu: Leave tapped for \(group.name)")
+                            selectedGroupForAction = group
+                            showLeaveConfirmation = true
+                        } label: {
+                            Label("Leave", systemImage: "xmark")
+                        }
+                    }
+                }
+                .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                    if group.isCreator(userId) {
+                        Button(role: .destructive) {
+                            print("🗑️ Swipe action: Delete tapped for \(group.name)")
+                            selectedGroupForAction = group
+                            showDeleteConfirmation = true
+                        } label: {
+                            Label("Delete", systemImage: "trash")
+                        }
+                    } else {
+                        Button(role: .destructive) {
+                            print("🚪 Swipe action: Leave tapped for \(group.name)")
+                            selectedGroupForAction = group
+                            showLeaveConfirmation = true
+                        } label: {
+                            Label("Leave", systemImage: "xmark")
+                        }
+                    }
                 }
             }
             .refreshable {
@@ -169,9 +253,14 @@ public struct StudyGroupsView: View {
     private var joinSheetContent: some View {
         NavigationStack {
             VStack {
-                QRCodeScannerWrapper(onScan: { scannedId in
-                    scannedGroupId = scannedId
-                })
+                QRCodeScannerWrapper(
+                    onScan: { scannedId in
+                        scannedGroupId = scannedId
+                    },
+                    onScanComplete: {
+                        showJoinSheet = false
+                    }
+                )
             }
             .navigationTitle("Join Group")
             #if !os(macOS)
@@ -211,11 +300,22 @@ public struct StudyGroupsView: View {
         Task {
             print("📱 StudyGroupsView.handleJoinGroup() - Inside task, calling viewModel.joinGroupByQRCode()")
             await viewModel.joinGroupByQRCode(groupId: extractedGroupId, userId: userId)
-            print("📱 StudyGroupsView.handleJoinGroup() - Back from joinGroupByQRCode(), reloading groups")
+            
+            // Check if join was successful
+            if let error = viewModel.errorMessage {
+                print("❌ StudyGroupsView.handleJoinGroup() - Join failed: \(error)")
+                joinError = error
+                scannedGroupId = nil
+                viewModel.errorMessage = nil
+                return
+            }
+            
+            print("📱 StudyGroupsView.handleJoinGroup() - Join successful!")
+            print("📱 StudyGroupsView.handleJoinGroup() - myGroups count after join: \(viewModel.myGroups.count)")
             scannedGroupId = nil
             showJoinSheet = false
-            await viewModel.loadMyGroups()
-            print("📱 StudyGroupsView.handleJoinGroup() - Complete! myGroups count: \(viewModel.myGroups.count)")
+            // Don't reload groups - the group was already added to myGroups during the join
+            // CloudKit propagation delays could cause a re-query to show 0 groups temporarily
         }
     }
 }

@@ -53,15 +53,11 @@ public class CloudKitStudyGroupRepositoryImpl: StudyGroupRepositoryProtocol {
             return cached
         }
         
-        // Try to fetch from CloudKit
-        let predicate = NSPredicate(format: "id == %@", id)
-        let records = try await cloudKitManager.query(
-            recordType: recordType,
-            predicate: predicate
-        )
+        // Try to fetch from CloudKit by record ID (the ID is used as the record name)
+        let recordID = CKRecord.ID(recordName: id)
+        let record = try await cloudKitManager.fetchRecord(withID: recordID)
         
-        guard let record = records.first,
-              let group = StudyGroup.fromCKRecord(record) else {
+        guard let group = StudyGroup.fromCKRecord(record) else {
             throw CloudKitManager.CloudKitError.recordNotFound
         }
         
@@ -107,9 +103,36 @@ public class CloudKitStudyGroupRepositoryImpl: StudyGroupRepositoryProtocol {
     
     /// Update an existing study group
     public func updateStudyGroup(_ studyGroup: StudyGroup) async throws -> StudyGroup {
-        let record = studyGroup.toCKRecord()
+        // Fetch the current record to preserve etag and change tag
+        let recordID = CKRecord.ID(recordName: studyGroup.id)
+        let currentRecord = try await cloudKitManager.fetchRecord(withID: recordID)
         
-        _ = try await cloudKitManager.save(record: record)
+        // Update fields in-place on the existing record
+        let isoFormatter = ISO8601DateFormatter()
+        
+        currentRecord["name"] = studyGroup.name
+        currentRecord["classId"] = studyGroup.classId
+        currentRecord["collegeId"] = studyGroup.collegeId
+        currentRecord["createdBy"] = studyGroup.createdBy
+        currentRecord["isPublic"] = NSNumber(value: studyGroup.isPublic)
+        currentRecord["memberIds"] = studyGroup.memberIds
+        currentRecord["createdAt"] = isoFormatter.string(from: studyGroup.createdAt)
+        currentRecord["updatedAt"] = isoFormatter.string(from: studyGroup.updatedAt)
+        
+        if let description = studyGroup.description {
+            currentRecord["description"] = description
+        } else {
+            currentRecord["description"] = nil
+        }
+        
+        if let maxMembers = studyGroup.maxMembers {
+            currentRecord["maxMembers"] = NSNumber(value: maxMembers)
+        } else {
+            currentRecord["maxMembers"] = nil
+        }
+        
+        // Save the updated record (preserves etag)
+        _ = try await cloudKitManager.save(record: currentRecord)
         groupCache[studyGroup.id] = studyGroup
         
         // Notify subscribers
@@ -138,14 +161,53 @@ public class CloudKitStudyGroupRepositoryImpl: StudyGroupRepositoryProtocol {
     
     /// Add a member to a study group
     public func addMember(groupId: String, userId: String) async throws -> StudyGroup {
-        var group = try await getStudyGroup(by: groupId)
+        var retryCount = 0
+        let maxRetries = 3
+        var backoffDelay: UInt64 = 100_000_000 // Start at 100ms
         
-        if !group.memberIds.contains(userId) {
-            group.memberIds.append(userId)
-            _ = try await updateStudyGroup(group)
+        while retryCount <= maxRetries {
+            do {
+                var group = try await getStudyGroup(by: groupId)
+                
+                if !group.memberIds.contains(userId) {
+                    group.memberIds.append(userId)
+                    let updated = try await updateStudyGroup(group)
+                    print("✅ CloudKitStudyGroupRepositoryImpl: Successfully added member after \(retryCount) retries")
+                    return updated
+                }
+                
+                return group
+            } catch let error as CloudKitManager.CloudKitError {
+                // Check for server record changed error
+                if case .networkError(let nsError) = error {
+                    let errorString = nsError.localizedDescription
+                    print("🔍 CloudKitStudyGroupRepositoryImpl: Error details: \(errorString)")
+                    
+                    if let ckError = nsError as? CKError {
+                        print("🔍 CloudKitStudyGroupRepositoryImpl: CKError code: \(ckError.code.rawValue)")
+                        
+                        if ckError.code == .serverRecordChanged {
+                            retryCount += 1
+                            if retryCount <= maxRetries {
+                                print("⚠️ CloudKitStudyGroupRepositoryImpl: Server record changed, retrying (attempt \(retryCount)/\(maxRetries))...")
+                                // Clear cache to force fresh fetch
+                                groupCache.removeValue(forKey: groupId)
+                                // Exponential backoff: 100ms, 200ms, 400ms
+                                try? await Task.sleep(nanoseconds: backoffDelay)
+                                backoffDelay *= 2
+                                continue
+                            } else {
+                                print("❌ CloudKitStudyGroupRepositoryImpl: Max retries (\(maxRetries)) exceeded for server record conflict")
+                                throw AppError.networkError("Unable to join group after multiple attempts. Please try again later.")
+                            }
+                        }
+                    }
+                }
+                throw error
+            }
         }
         
-        return group
+        throw AppError.networkError("Failed to add member after retries")
     }
     
     /// Remove a member from a study group
@@ -190,6 +252,8 @@ extension StudyGroup {
         let recordID = CKRecord.ID(recordName: id)
         let record = CKRecord(recordType: CloudKitRecord.RecordType.studyGroup.rawValue, recordID: recordID)
         
+        let isoFormatter = ISO8601DateFormatter()
+        
         record["id"] = id
         record["name"] = name
         record["classId"] = classId
@@ -197,8 +261,8 @@ extension StudyGroup {
         record["createdBy"] = createdBy
         record["isPublic"] = NSNumber(value: isPublic)
         record["memberIds"] = memberIds
-        record["createdAt"] = createdAt
-        record["updatedAt"] = updatedAt
+        record["createdAt"] = isoFormatter.string(from: createdAt)
+        record["updatedAt"] = isoFormatter.string(from: updatedAt)
         
         if let description = description {
             record["description"] = description
@@ -220,8 +284,15 @@ extension StudyGroup {
               let createdBy = record["createdBy"] as? String,
               let isPublic = record["isPublic"] as? NSNumber,
               let memberIds = record["memberIds"] as? [String],
-              let createdAt = record["createdAt"] as? Date,
-              let updatedAt = record["updatedAt"] as? Date else {
+              let createdAtStr = record["createdAt"] as? String,
+              let updatedAtStr = record["updatedAt"] as? String else {
+            return nil
+        }
+        
+        let isoFormatter = ISO8601DateFormatter()
+        
+        guard let createdAt = isoFormatter.date(from: createdAtStr),
+              let updatedAt = isoFormatter.date(from: updatedAtStr) else {
             return nil
         }
         

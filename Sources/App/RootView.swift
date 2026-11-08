@@ -53,7 +53,8 @@ struct AuthenticationCoordinator: View {
                                 authRepository: appState.authRepository
                             )
                         ),
-                        backAction: { authStep = .landing }
+                        backAction: { authStep = .landing },
+                        registerAction: { authStep = .register }
                     )
 
                 case .register:
@@ -73,7 +74,8 @@ struct AuthenticationCoordinator: View {
                                 authRepository: appState.authRepository
                             )
                         ),
-                        backAction: { authStep = .landing }
+                        backAction: { authStep = .landing },
+                        registerAction: { authStep = .register }
                     )
                 }
             }
@@ -483,6 +485,11 @@ struct StudyGroupsTab: View {
                             studyGroupRepository: appState.studyGroupRepository),
                         joinStudyGroupUseCase: JoinStudyGroupUseCase(
                             studyGroupRepository: appState.studyGroupRepository),
+                        leaveStudyGroupUseCase: LeaveStudyGroupUseCase(
+                            studyGroupRepository: appState.studyGroupRepository),
+                        deleteStudyGroupUseCase: DeleteStudyGroupUseCase(
+                            studyGroupRepository: appState.studyGroupRepository),
+                        studyGroupRepository: appState.studyGroupRepository,
                         userId: userId,
                         collegeId: collegeId
                     ),
@@ -493,6 +500,10 @@ struct StudyGroupsTab: View {
                     inviteUserToGroupUseCase: InviteUserToGroupUseCase(
                         studyGroupRepository: appState.studyGroupRepository,
                         userRepository: appState.userRepository),
+                    leaveStudyGroupUseCase: LeaveStudyGroupUseCase(
+                        studyGroupRepository: appState.studyGroupRepository),
+                    deleteStudyGroupUseCase: DeleteStudyGroupUseCase(
+                        studyGroupRepository: appState.studyGroupRepository),
                     userId: userId,
                     collegeId: collegeId
                 )

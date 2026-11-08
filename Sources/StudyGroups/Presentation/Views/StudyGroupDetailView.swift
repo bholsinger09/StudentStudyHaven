@@ -4,13 +4,18 @@ import SwiftUI
 /// Study Group Detail View
 public struct StudyGroupDetailView: View {
     let groupId: String
-    let studyGroup: StudyGroup
     let currentUserId: String
     let collegeId: String
     let searchUsersUseCase: SearchUsersUseCase?
     let inviteUserToGroupUseCase: InviteUserToGroupUseCase?
+    let studyGroupRepository: StudyGroupRepositoryProtocol?
+    let leaveStudyGroupUseCase: LeaveStudyGroupUseCase?
+    let deleteStudyGroupUseCase: DeleteStudyGroupUseCase?
     
+    @State private var studyGroup: StudyGroup
     @State private var selectedTab = 0
+    @State private var showLeaveConfirmation = false
+    @State private var leaveErrorMessage: String? = nil
     @Environment(\.dismiss) private var dismiss
     
     public init(
@@ -19,20 +24,29 @@ public struct StudyGroupDetailView: View {
         currentUserId: String,
         collegeId: String,
         searchUsersUseCase: SearchUsersUseCase? = nil,
-        inviteUserToGroupUseCase: InviteUserToGroupUseCase? = nil
+        inviteUserToGroupUseCase: InviteUserToGroupUseCase? = nil,
+        studyGroupRepository: StudyGroupRepositoryProtocol? = nil,
+        leaveStudyGroupUseCase: LeaveStudyGroupUseCase? = nil,
+        deleteStudyGroupUseCase: DeleteStudyGroupUseCase? = nil
     ) {
         self.groupId = groupId
-        self.studyGroup = studyGroup
+        _studyGroup = State(initialValue: studyGroup)
         self.currentUserId = currentUserId
         self.collegeId = collegeId
         self.searchUsersUseCase = searchUsersUseCase
         self.inviteUserToGroupUseCase = inviteUserToGroupUseCase
+        self.studyGroupRepository = studyGroupRepository
+        self.leaveStudyGroupUseCase = leaveStudyGroupUseCase
+        self.deleteStudyGroupUseCase = deleteStudyGroupUseCase
         
         print("🔍 StudyGroupDetailView INIT")
         print("   Group: \(studyGroup.name)")
         print("   Current User: \(currentUserId)")
         print("   Search Use Case: \(searchUsersUseCase != nil ? "✅ PRESENT" : "❌ NIL")")
         print("   Invite Use Case: \(inviteUserToGroupUseCase != nil ? "✅ PRESENT" : "❌ NIL")")
+        print("   Repository: \(studyGroupRepository != nil ? "✅ PRESENT" : "❌ NIL")")
+        print("   Leave Use Case: \(leaveStudyGroupUseCase != nil ? "✅ PRESENT" : "❌ NIL")")
+        print("   Delete Use Case: \(deleteStudyGroupUseCase != nil ? "✅ PRESENT" : "❌ NIL")")
     }
     
     public var body: some View {
@@ -71,6 +85,101 @@ public struct StudyGroupDetailView: View {
         #if os(iOS)
         .navigationBarTitleDisplayMode(.inline)
         #endif
+        .toolbar {
+            ToolbarItem(placement: .primaryAction) {
+                if studyGroup.isCreator(currentUserId) {
+                    Menu {
+                        Button(role: .destructive) {
+                            print("🗑️ Delete button tapped in toolbar")
+                            showLeaveConfirmation = true
+                        } label: {
+                            Label("Delete Group", systemImage: "trash")
+                        }
+                    } label: {
+                        Image(systemName: "ellipsis.circle")
+                    }
+                } else {
+                    Button {
+                        print("🚪 Leave button tapped in toolbar")
+                        showLeaveConfirmation = true
+                    } label: {
+                        Image(systemName: "xmark")
+                    }
+                }
+            }
+        }
+        .alert(studyGroup.isCreator(currentUserId) ? "Delete Group" : "Leave Group", isPresented: $showLeaveConfirmation) {
+            Button("Cancel", role: .cancel) {
+                print("🚪 User cancelled \(studyGroup.isCreator(currentUserId) ? "delete" : "leave")")
+            }
+            Button(studyGroup.isCreator(currentUserId) ? "Delete" : "Leave", role: .destructive) {
+                print("🚪 User tapped confirm for \(studyGroup.isCreator(currentUserId) ? "delete" : "leave")")
+                print("   Delete Use Case: \(deleteStudyGroupUseCase != nil ? "✅ PRESENT" : "❌ NIL")")
+                print("   Leave Use Case: \(leaveStudyGroupUseCase != nil ? "✅ PRESENT" : "❌ NIL")")
+                
+                Task {
+                    do {
+                        if studyGroup.isCreator(currentUserId) {
+                            print("🗑️ Attempting to delete group...")
+                            guard let deleteUseCase = deleteStudyGroupUseCase else {
+                                leaveErrorMessage = "Delete use case not available"
+                                return
+                            }
+                            try await deleteUseCase.execute(groupId: groupId, userId: currentUserId)
+                            print("✅ Group deleted successfully")
+                        } else {
+                            print("🚪 Attempting to leave group...")
+                            guard let leaveUseCase = leaveStudyGroupUseCase else {
+                                leaveErrorMessage = "Leave use case not available"
+                                return
+                            }
+                            _ = try await leaveUseCase.execute(groupId: groupId, userId: currentUserId)
+                            print("✅ Left group successfully")
+                        }
+                        await MainActor.run {
+                            dismiss()
+                        }
+                    } catch let error as AppError {
+                        print("❌ Error: \(error.localizedDescription)")
+                        leaveErrorMessage = error.localizedDescription
+                    } catch {
+                        print("❌ Error: \(error)")
+                        leaveErrorMessage = studyGroup.isCreator(currentUserId) ? "Failed to delete group" : "Failed to leave group"
+                    }
+                }
+            }
+        } message: {
+            if studyGroup.isCreator(currentUserId) {
+                Text("Are you sure you want to delete this group? This cannot be undone.")
+            } else {
+                Text("Are you sure you want to leave this group?")
+            }
+        }
+        .alert("Error", isPresented: .constant(leaveErrorMessage != nil)) {
+            Button("OK") {
+                leaveErrorMessage = nil
+            }
+        } message: {
+            if let error = leaveErrorMessage {
+                Text(error)
+            }
+        }
+        .task {
+            // Periodically refresh the group data to get updates from other devices
+            while true {
+                try? await Task.sleep(nanoseconds: 2_000_000_000) // 2 seconds
+                if let repository = studyGroupRepository {
+                    do {
+                        let updated = try await repository.getStudyGroup(by: groupId)
+                        await MainActor.run {
+                            studyGroup = updated
+                        }
+                    } catch {
+                        print("⚠️ StudyGroupDetailView: Failed to refresh group - \(error)")
+                    }
+                }
+            }
+        }
     }
 }
 
