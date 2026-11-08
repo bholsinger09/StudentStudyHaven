@@ -11,6 +11,7 @@ public struct StudyGroupsView: View {
     @State private var joinError: String? = nil
     @State private var showDeleteConfirmation = false
     @State private var showLeaveConfirmation = false
+    @State private var showEditSheet = false
     @State private var selectedGroupForAction: StudyGroup? = nil
     
     private let createStudyGroupUseCase: CreateStudyGroupUseCase
@@ -18,6 +19,7 @@ public struct StudyGroupsView: View {
     private let inviteUserToGroupUseCase: InviteUserToGroupUseCase
     private let leaveStudyGroupUseCase: LeaveStudyGroupUseCase
     private let deleteStudyGroupUseCase: DeleteStudyGroupUseCase
+    private let updateStudyGroupUseCase: UpdateStudyGroupUseCase
     private let userId: String
     private let collegeId: String
     
@@ -28,6 +30,7 @@ public struct StudyGroupsView: View {
         inviteUserToGroupUseCase: InviteUserToGroupUseCase,
         leaveStudyGroupUseCase: LeaveStudyGroupUseCase,
         deleteStudyGroupUseCase: DeleteStudyGroupUseCase,
+        updateStudyGroupUseCase: UpdateStudyGroupUseCase,
         userId: String,
         collegeId: String
     ) {
@@ -37,6 +40,7 @@ public struct StudyGroupsView: View {
         self.inviteUserToGroupUseCase = inviteUserToGroupUseCase
         self.leaveStudyGroupUseCase = leaveStudyGroupUseCase
         self.deleteStudyGroupUseCase = deleteStudyGroupUseCase
+        self.updateStudyGroupUseCase = updateStudyGroupUseCase
         self.userId = userId
         self.collegeId = collegeId
     }
@@ -161,6 +165,22 @@ public struct StudyGroupsView: View {
                     Text("Are you sure you want to leave '\(group.name)'?")
                 }
             }
+            .sheet(isPresented: $showEditSheet) {
+                if let group = selectedGroupForAction {
+                    EditStudyGroupView(
+                        groupId: group.id,
+                        currentUserId: userId,
+                        initialGroup: group,
+                        updateStudyGroupUseCase: updateStudyGroupUseCase,
+                        onSaveComplete: {
+                            print("🔄 Edit completed in list, refreshing groups...")
+                            Task {
+                                await viewModel.loadMyGroups()
+                            }
+                        }
+                    )
+                }
+            }
         }
     }
     
@@ -187,7 +207,8 @@ public struct StudyGroupsView: View {
                     inviteUserToGroupUseCase: inviteUserToGroupUseCase,
                     studyGroupRepository: viewModel.studyGroupRepository,
                     leaveStudyGroupUseCase: leaveStudyGroupUseCase,
-                    deleteStudyGroupUseCase: deleteStudyGroupUseCase
+                    deleteStudyGroupUseCase: deleteStudyGroupUseCase,
+                    updateStudyGroupUseCase: updateStudyGroupUseCase
                 )) {
                     StudyGroupRow(group: group)
                 }
@@ -198,6 +219,14 @@ public struct StudyGroupsView: View {
                 }
                 .contextMenu {
                     if group.isCreator(userId) {
+                        Button {
+                            print("✏️ Context menu: Edit tapped for \(group.name)")
+                            selectedGroupForAction = group
+                            showEditSheet = true
+                        } label: {
+                            Label("Edit", systemImage: "pencil")
+                        }
+                        
                         Button(role: .destructive) {
                             print("🗑️ Context menu: Delete tapped for \(group.name)")
                             selectedGroupForAction = group
@@ -224,6 +253,15 @@ public struct StudyGroupsView: View {
                         } label: {
                             Label("Delete", systemImage: "trash")
                         }
+                        
+                        Button {
+                            print("✏️ Swipe action: Edit tapped for \(group.name)")
+                            selectedGroupForAction = group
+                            showEditSheet = true
+                        } label: {
+                            Label("Edit", systemImage: "pencil")
+                        }
+                        .tint(.blue)
                     } else {
                         Button(role: .destructive) {
                             print("🚪 Swipe action: Leave tapped for \(group.name)")

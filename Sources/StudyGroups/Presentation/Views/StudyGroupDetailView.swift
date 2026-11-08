@@ -11,11 +11,13 @@ public struct StudyGroupDetailView: View {
     let studyGroupRepository: StudyGroupRepositoryProtocol?
     let leaveStudyGroupUseCase: LeaveStudyGroupUseCase?
     let deleteStudyGroupUseCase: DeleteStudyGroupUseCase?
+    let updateStudyGroupUseCase: UpdateStudyGroupUseCase?
     
     @State private var studyGroup: StudyGroup
     @State private var selectedTab = 0
     @State private var showLeaveConfirmation = false
     @State private var leaveErrorMessage: String? = nil
+    @State private var showEditView = false
     @Environment(\.dismiss) private var dismiss
     
     public init(
@@ -27,7 +29,8 @@ public struct StudyGroupDetailView: View {
         inviteUserToGroupUseCase: InviteUserToGroupUseCase? = nil,
         studyGroupRepository: StudyGroupRepositoryProtocol? = nil,
         leaveStudyGroupUseCase: LeaveStudyGroupUseCase? = nil,
-        deleteStudyGroupUseCase: DeleteStudyGroupUseCase? = nil
+        deleteStudyGroupUseCase: DeleteStudyGroupUseCase? = nil,
+        updateStudyGroupUseCase: UpdateStudyGroupUseCase? = nil
     ) {
         self.groupId = groupId
         _studyGroup = State(initialValue: studyGroup)
@@ -38,6 +41,7 @@ public struct StudyGroupDetailView: View {
         self.studyGroupRepository = studyGroupRepository
         self.leaveStudyGroupUseCase = leaveStudyGroupUseCase
         self.deleteStudyGroupUseCase = deleteStudyGroupUseCase
+        self.updateStudyGroupUseCase = updateStudyGroupUseCase
         
         print("🔍 StudyGroupDetailView INIT")
         print("   Group: \(studyGroup.name)")
@@ -47,6 +51,7 @@ public struct StudyGroupDetailView: View {
         print("   Repository: \(studyGroupRepository != nil ? "✅ PRESENT" : "❌ NIL")")
         print("   Leave Use Case: \(leaveStudyGroupUseCase != nil ? "✅ PRESENT" : "❌ NIL")")
         print("   Delete Use Case: \(deleteStudyGroupUseCase != nil ? "✅ PRESENT" : "❌ NIL")")
+        print("   Update Use Case: \(updateStudyGroupUseCase != nil ? "✅ PRESENT" : "❌ NIL")")
     }
     
     public var body: some View {
@@ -92,6 +97,13 @@ public struct StudyGroupDetailView: View {
             ToolbarItem(placement: .primaryAction) {
                 if studyGroup.isCreator(currentUserId) {
                     Menu {
+                        Button {
+                            print("✏️ Edit button tapped in toolbar")
+                            showEditView = true
+                        } label: {
+                            Label("Edit Group", systemImage: "pencil")
+                        }
+                        
                         Button(role: .destructive) {
                             print("🗑️ Delete button tapped in toolbar")
                             showLeaveConfirmation = true
@@ -211,6 +223,31 @@ public struct StudyGroupDetailView: View {
         } message: {
             if let error = leaveErrorMessage {
                 Text(error)
+            }
+        }
+        .sheet(isPresented: $showEditView) {
+            if let updateUseCase = updateStudyGroupUseCase {
+                EditStudyGroupView(
+                    groupId: groupId,
+                    currentUserId: currentUserId,
+                    initialGroup: studyGroup,
+                    updateStudyGroupUseCase: updateUseCase,
+                    onSaveComplete: {
+                        print("🔄 Edit completed, triggering refresh...")
+                        Task {
+                            if let repository = studyGroupRepository {
+                                do {
+                                    let updated = try await repository.getStudyGroup(by: groupId)
+                                    await MainActor.run {
+                                        studyGroup = updated
+                                    }
+                                } catch {
+                                    print("⚠️ Failed to refresh after edit - \(error)")
+                                }
+                            }
+                        }
+                    }
+                )
             }
         }
         .task {

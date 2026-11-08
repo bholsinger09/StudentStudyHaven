@@ -504,6 +504,8 @@ struct StudyGroupsTab: View {
                         studyGroupRepository: appState.studyGroupRepository),
                     deleteStudyGroupUseCase: DeleteStudyGroupUseCase(
                         studyGroupRepository: appState.studyGroupRepository),
+                    updateStudyGroupUseCase: UpdateStudyGroupUseCase(
+                        studyGroupRepository: appState.studyGroupRepository),
                     userId: userId,
                     collegeId: collegeId
                 )
